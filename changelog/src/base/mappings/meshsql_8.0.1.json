@@ -1,0 +1,15 @@
+{
+  "version": "8.0.1",
+  "componentVersion": "2.0.1",
+  "date": "13.07.2023",
+  "changeLogEntryFileNames": [
+    "7487.bugfix",
+    "7495.bugfix",
+    "7494.bugfix",
+    "7493.bugfix",
+    "7492.bugfix",
+    "7491.bugfix"
+  ],
+  "genericProperties": {
+  }
+}

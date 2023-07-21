@@ -1,0 +1,235 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.gentics.cmp</groupId>
+		<artifactId>cmp</artifactId>
+		<version>8.1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>cmp-changelog</artifactId>
+	<packaging>pom</packaging>
+	<description>Module for building the combined changelog.</description>
+
+    <dependencies>
+		<!-- Gentics CMS EE -->
+		<dependency>
+			<groupId>com.gentics.cms</groupId>
+			<artifactId>cms-changelog</artifactId>
+			<version>${cms.version}</version>
+			<type>zip</type>
+			<classifier>entries</classifier>
+		</dependency>
+
+		<!-- Gentics Aloha Editor -->
+		<dependency>
+			<groupId>org.alohaeditor</groupId>
+			<artifactId>alohaeditor</artifactId>
+			<version>${aloha.version}</version>
+			<type>zip</type>
+			<classifier>changelog-entries</classifier>
+		</dependency>
+
+		<!-- Gentics Mesh -->
+		<dependency>
+			<groupId>com.gentics.mesh</groupId>
+			<artifactId>mesh-changelog</artifactId>
+			<version>${mesh.version}</version>
+			<type>zip</type>
+			<classifier>entries</classifier>
+		</dependency>
+
+		<!-- Gentics Mesh SQL -->
+		<dependency>
+			<groupId>com.gentics.mesh.enterprise</groupId>
+			<artifactId>mesh-enterprise-changelog</artifactId>
+			<version>${meshsql.version}</version>
+			<type>zip</type>
+			<classifier>entries</classifier>
+		</dependency>
+
+		<!-- Gentics Portal | java -->
+		<dependency>
+			<groupId>com.gentics.mesh.portal</groupId>
+			<artifactId>mesh-portal-changelog</artifactId>
+			<version>${portal.java.version}</version>
+			<type>zip</type>
+			<classifier>entries</classifier>
+		</dependency>
+
+		<!-- Gentics Mesh Commercial Plugins -->
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-commercial-plugins-changelog</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>entries</classifier>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<!-- Gentics CMS EE -->
+								<artifactItem>
+									<groupId>com.gentics.cms</groupId>
+									<artifactId>cms-changelog</artifactId>
+									<type>zip</type>
+									<classifier>entries</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/cms/entries</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Aloha Editor -->
+								<artifactItem>
+									<groupId>org.alohaeditor</groupId>
+									<artifactId>alohaeditor</artifactId>
+									<type>zip</type>
+									<classifier>changelog-entries</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/aloha/entries</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Mesh -->
+								<artifactItem>
+									<groupId>com.gentics.mesh</groupId>
+									<artifactId>mesh-changelog</artifactId>
+									<type>zip</type>
+									<classifier>entries</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/mesh/entries</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Mesh SQL -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.enterprise</groupId>
+									<artifactId>mesh-enterprise-changelog</artifactId>
+									<type>zip</type>
+									<classifier>entries</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/meshsql/entries</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Portal | java -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.portal</groupId>
+									<artifactId>mesh-portal-changelog</artifactId>
+									<type>zip</type>
+									<classifier>entries</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/portaljava/entries</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Mesh Commercial Plugins -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-commercial-plugins-changelog</artifactId>
+									<type>zip</type>
+									<classifier>entries</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/meshplugins/entries</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+							<includes>**/*</includes>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+            <plugin>
+				<groupId>com.gentics</groupId>
+				<artifactId>changelog-manager-plugin</artifactId>
+				<version>${changelog.manager.plugin.version}</version>
+                <executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<baseDirectory>${basedir}/src/base</baseDirectory>
+					<outputDirectory>${basedir}/target/output</outputDirectory>
+					<changelogTitle>Gentics CMP</changelogTitle>
+					<changelogTypes>manualchange,feature,enhancement,bugfix</changelogTypes>
+					<changelogVersion>${changelog.version}</changelogVersion>
+					<strictRenderMode>false</strictRenderMode>
+					<allowEmptyChangelog>true</allowEmptyChangelog>
+					<includeProjectProperties>false</includeProjectProperties>
+					<overviewTemplateFileNames>index.vm</overviewTemplateFileNames>
+					<perMajorVersionTemplateFiles>majorversion/index.vm</perMajorVersionTemplateFiles>
+					<perMajorVersionChangelogFile>majorversion/changelog.vm</perMajorVersionChangelogFile>
+					<components>
+						<!-- Gentics CMS EE -->
+						<component>
+							<id>cms</id>
+							<name>Gentics CMS EE</name>
+							<shortName>CMS</shortName>
+							<version>${cms.changelog.version}</version>
+							<entriesDirectory>${project.build.directory}/cms/entries</entriesDirectory>
+						</component>
+
+						<!-- Gentics Aloha Editor -->
+						<component>
+							<id>aloha</id>
+							<name>Gentics Aloha Editor</name>
+							<shortName>Aloha Editor</shortName>
+							<version>${aloha.changelog.version}</version>
+							<entriesDirectory>${project.build.directory}/aloha/entries</entriesDirectory>
+						</component>
+
+						<!-- Gentics Mesh -->
+						<component>
+							<id>mesh</id>
+							<name>Gentics Mesh</name>
+							<shortName>Mesh</shortName>
+							<version>${mesh.changelog.version}</version>
+							<entriesDirectory>${project.build.directory}/mesh/entries</entriesDirectory>
+						</component>
+
+						<!-- Gentics Mesh SQL -->
+						<component>
+							<id>meshsql</id>
+							<name>Gentics Mesh SQL</name>
+							<shortName>Mesh SQL</shortName>
+							<version>${meshsql.changelog.version}</version>
+							<entriesDirectory>${project.build.directory}/meshsql/entries</entriesDirectory>
+						</component>
+
+						<!-- Gentics Portal | java -->
+						<component>
+							<id>portaljava</id>
+							<name>Gentics Portal | java</name>
+							<shortName>Portal | java</shortName>
+							<version>${portal.java.changelog.version}</version>
+							<entriesDirectory>${project.build.directory}/portaljava/entries</entriesDirectory>
+						</component>
+
+						<!-- Gentics Mesh Commercial Plugins -->
+						<component>
+							<id>meshplugins</id>
+							<name>Gentics Mesh Commercial Plugins</name>
+							<shortName>Plugins</shortName>
+							<version>${mesh.plugins.changelog.version}</version>
+							<entriesDirectory>${project.build.directory}/meshplugins/entries</entriesDirectory>
+						</component>
+					</components>
+				</configuration>
+			</plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.gentics.cmp</groupId>
+    <artifactId>cmp</artifactId>
+	<version>8.1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+    <modules>
+        <module>changelog</module>
+    </modules>
+
+    <properties>
+        <changelog.manager.plugin.version>3.0.0-SNAPSHOT</changelog.manager.plugin.version>
+        <changelog.version>${project.version}</changelog.version>
+
+        <!-- Gentics CMS EE -->
+        <cms.version>6.1.0-SNAPSHOT</cms.version>
+        <cms.changelog.version>${cms.version}</cms.changelog.version>
+
+        <!-- Gentics Aloha Editor -->
+        <aloha.version>1.5.1-SNAPSHOT</aloha.version>
+        <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
+
+        <!-- Gentics Mesh -->
+        <mesh.version>2.1.0-SNAPSHOT</mesh.version>
+        <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
+
+        <!-- Gentics Mesh SQL -->
+        <meshsql.version>2.1.0-SNAPSHOT</meshsql.version>
+        <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
+
+        <!-- Gentics Portal | java -->
+        <portal.java.version>3.1.0-SNAPSHOT</portal.java.version>
+        <portal.java.changelog.version>${portal.java.version}</portal.java.changelog.version>
+
+        <!-- Gentics Mesh Commercial Plugins -->
+        <mesh.plugins.version>2.1.0-SNAPSHOT</mesh.plugins.version>
+        <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
+    </properties>
+
+	<repositories>
+		<repository>
+			<id>maven.gentics.com</id>
+			<name>Gentics Maven Repository</name>
+			<url>https://maven.gentics.com/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>gtx-commercial</id>
+			<name>Gentics Commercial Maven Repository</name>
+			<url>https://maven.gentics.com/maven2-commercial/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>lan.releases</id>
+			<name>Gentics Releases Repository</name>
+			<url>https://repo.apa-it.at/artifactory/gtx-maven-releases-staging-mpf</url>
+		</repository>
+		<snapshotRepository>
+			<id>lan.snapshots</id>
+			<name>Gentics Snapshots Repository</name>
+			<url>https://repo.apa-it.at/artifactory/gtx-maven-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

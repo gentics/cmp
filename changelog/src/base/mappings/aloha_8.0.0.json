@@ -1,0 +1,10 @@
+{
+  "changeLogEntryFileNames": [
+    "12529.SUP-15210.bugfix",
+    "12530.GPU-883.enhancement"
+  ],
+  "componentVersion": "1.5.0",
+  "version": "8.0.0",
+  "date": "30.06.2023",
+  "genericProperties": {}
+}
