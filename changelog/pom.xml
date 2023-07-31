@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.gentics.cmp</groupId>
 		<artifactId>cmp</artifactId>
-		<version>8.1.0-SNAPSHOT</version>
+		<version>8.0.2</version>
 	</parent>
 
 	<artifactId>cmp-changelog</artifactId>
@@ -49,6 +49,15 @@
 			<classifier>entries</classifier>
 		</dependency>
 
+		<!-- Gentics Mesh Commercial Plugins -->
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-commercial-plugins-changelog</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>entries</classifier>
+		</dependency>
+
 		<!-- Gentics Portal | java -->
 		<dependency>
 			<groupId>com.gentics.mesh.portal</groupId>
@@ -58,11 +67,11 @@
 			<classifier>entries</classifier>
 		</dependency>
 
-		<!-- Gentics Mesh Commercial Plugins -->
+		<!-- Gentics Portal | php -->
 		<dependency>
-			<groupId>com.gentics.mesh.plugin.commercial</groupId>
-			<artifactId>mesh-commercial-plugins-changelog</artifactId>
-			<version>${mesh.plugins.version}</version>
+			<groupId>com.gentics.mesh.portal-php</groupId>
+			<artifactId>mesh-portal-php-changelog</artifactId>
+			<version>${portal.php.version}</version>
 			<type>zip</type>
 			<classifier>entries</classifier>
 		</dependency>
@@ -122,6 +131,16 @@
 									<outputDirectory>${project.build.directory}/meshsql/entries</outputDirectory>
 								</artifactItem>
 
+								<!-- Gentics Mesh Commercial Plugins -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-commercial-plugins-changelog</artifactId>
+									<type>zip</type>
+									<classifier>entries</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/meshplugins/entries</outputDirectory>
+								</artifactItem>
+
 								<!-- Gentics Portal | java -->
 								<artifactItem>
 									<groupId>com.gentics.mesh.portal</groupId>
@@ -132,14 +151,14 @@
 									<outputDirectory>${project.build.directory}/portaljava/entries</outputDirectory>
 								</artifactItem>
 
-								<!-- Gentics Mesh Commercial Plugins -->
+								<!-- Gentics Portal | php -->
 								<artifactItem>
-									<groupId>com.gentics.mesh.plugin.commercial</groupId>
-									<artifactId>mesh-commercial-plugins-changelog</artifactId>
+									<groupId>com.gentics.mesh.portal-php</groupId>
+									<artifactId>mesh-portal-php-changelog</artifactId>
 									<type>zip</type>
 									<classifier>entries</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/meshplugins/entries</outputDirectory>
+									<outputDirectory>${project.build.directory}/portalphp/entries</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 							<includes>**/*</includes>
@@ -170,9 +189,11 @@
 					<strictRenderMode>false</strictRenderMode>
 					<allowEmptyChangelog>true</allowEmptyChangelog>
 					<includeProjectProperties>false</includeProjectProperties>
-					<overviewTemplateFileNames>index.vm</overviewTemplateFileNames>
-					<perMajorVersionTemplateFiles>majorversion/index.vm</perMajorVersionTemplateFiles>
+					<overviewTemplateFiles>index.vm</overviewTemplateFiles>
+					<perMajorVersionTemplateFiles>majorversion/index.vm,majorversion/merged_changelog.vm</perMajorVersionTemplateFiles>
 					<perMajorVersionChangelogFile>majorversion/changelog.vm</perMajorVersionChangelogFile>
+					<skipMapping>${skip.mapping}</skipMapping>
+					<skipRender>${skip.render}</skipRender>
 					<components>
 						<!-- Gentics CMS EE -->
 						<component>
@@ -210,6 +231,15 @@
 							<entriesDirectory>${project.build.directory}/meshsql/entries</entriesDirectory>
 						</component>
 
+						<!-- Gentics Mesh Commercial Plugins -->
+						<component>
+							<id>meshplugins</id>
+							<name>Gentics Mesh Commercial Plugins</name>
+							<shortName>Plugins</shortName>
+							<version>${mesh.plugins.changelog.version}</version>
+							<entriesDirectory>${project.build.directory}/meshplugins/entries</entriesDirectory>
+						</component>
+
 						<!-- Gentics Portal | java -->
 						<component>
 							<id>portaljava</id>
@@ -219,13 +249,13 @@
 							<entriesDirectory>${project.build.directory}/portaljava/entries</entriesDirectory>
 						</component>
 
-						<!-- Gentics Mesh Commercial Plugins -->
+						<!-- Gentics Portal | php -->
 						<component>
-							<id>meshplugins</id>
-							<name>Gentics Mesh Commercial Plugins</name>
-							<shortName>Plugins</shortName>
-							<version>${mesh.plugins.changelog.version}</version>
-							<entriesDirectory>${project.build.directory}/meshplugins/entries</entriesDirectory>
+							<id>portalphp</id>
+							<name>Gentics Portal | php</name>
+							<shortName>Portal | php</shortName>
+							<version>${portal.php.changelog.version}</version>
+							<entriesDirectory>${project.build.directory}/portalphp/entries</entriesDirectory>
 						</component>
 					</components>
 				</configuration>

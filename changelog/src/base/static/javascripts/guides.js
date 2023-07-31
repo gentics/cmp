@@ -9,21 +9,42 @@ function guideMenu(){
 }
 
 function toggle(component) {
-  if (document.getElementById(component).style.display == "none") {
-    document.getElementById(component).style.display = "block";
+  if (sessionStorage.getItem(component) == "hidden") {
+    // show
+    const divs = document.getElementsByClassName("component_" + component);
+    for (let i = 0; i < divs.length; i++) {
+      divs[i].style.display = "block";
+    }
     document.getElementById(component + '_nav').classList.add("index");
     sessionStorage.removeItem(component);
   } else {
-    document.getElementById(component).style.display = "none";
+    // hide
+    const divs = document.getElementsByClassName("component_" + component);
+    for (let i = 0; i < divs.length; i++) {
+      divs[i].style.display = "none";
+    }
     document.getElementById(component + '_nav').classList.remove("index");
     sessionStorage.setItem(component, "hidden");
   }
+  // if (document.getElementById(component).style.display == "none") {
+  //   document.getElementById(component).style.display = "block";
+  //   document.getElementById(component + '_nav').classList.add("index");
+  //   sessionStorage.removeItem(component);
+  // } else {
+  //   document.getElementById(component).style.display = "none";
+  //   document.getElementById(component + '_nav').classList.remove("index");
+  //   sessionStorage.setItem(component, "hidden");
+  // }
 }
 
 function initToggles(...components) {
   components.forEach(component => {
     if (sessionStorage.getItem(component) == "hidden") {
-      document.getElementById(component).style.display = "none";
+      const divs = document.getElementsByClassName("component_" + component);
+      for (let i = 0; i < divs.length; i++) {
+        divs[i].style.display = "none";
+      }
+      // document.getElementById(component).style.display = "none";
       document.getElementById(component + '_nav').classList.remove("index");
     }
   });

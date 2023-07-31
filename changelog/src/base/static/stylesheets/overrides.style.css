@@ -52,13 +52,14 @@ a, #subCol .chapters a, #mainCol a, #subCol a, #feature a {
 	color: #77afd4;
 }
 
+#subCol ol { list-style-type: none; }
+
 /* START show anchor link hint on hover on changelog entry */
 #mainCol .entry-anchor-hint {
 	display: none;
 }
 
-#mainCol h4:hover .entry-anchor-hint,
-#mainCol div:hover .entry-anchor-hint {
+#mainCol h4:hover .entry-anchor-hint {
 	display: inline;
 }
 /* END show anchor link hint on hover on changelog entry */

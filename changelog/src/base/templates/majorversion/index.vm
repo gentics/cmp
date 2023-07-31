@@ -29,6 +29,8 @@
 				<div id="guides" class="clearfix" style="display: none;">
 					<hr />
 					<dl class="L">
+						<dt>Summary</dt>
+						<dd><a href="merged_changelog.html">$changelogTitle Changelog Summary</a></dd>
 						<dt>Versions</dt>
 						#foreach($changelog in $changelogsSubset)
 							<dd><a href="${changelog.version}.html">$changelogTitle $changelog.version</a></dd>
@@ -53,6 +55,11 @@
 	<div id="container">
 		<div class="wrapper">
 			<div id="mainCol">
+				<h3>Summary</h3>
+				<dl>
+					<dt><a href="merged_changelog.html">$changelogTitle Changelog Summary</a></dt>
+					<dd><p></p></dd>
+				</dl>
 				<h3>Versions</h3>
 				<dl>
 					#foreach($changelog in $changelogsSubset)##
