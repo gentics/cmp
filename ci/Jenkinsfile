@@ -92,9 +92,7 @@ spec:
                         mvnArguments = mvnArguments + ' -Dskip.mapping=true'
                     }
 
-                    withDockerRegistry([ credentialsId: "repo.gentics.com", url: "https://docker.apa-it.at/v2" ]) {
-                        sh "JAVA_HOME=\$" + javaEnvName + " mvn -U -B -fae " + mvnArguments + " clean " + mvnGoal
-                    }
+                    sh "JAVA_HOME=\$" + javaEnvName + " mvn -U -B -fae " + mvnArguments + " clean " + mvnGoal
                 }
             }
         }
