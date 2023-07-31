@@ -83,6 +83,8 @@ spec:
                             tagName = version
                             GitHelper.addCommit('.', gitCommitTag + ' ' + releaseMessage)
                             GitHelper.addTag(tagName, releaseMessage)
+
+                            currentBuild.description = currentBuild.description + "\nRelease " + version
                         }
 
                         echo "Deploying version: " + version
