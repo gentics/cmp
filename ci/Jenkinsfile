@@ -92,7 +92,7 @@ spec:
                         mvnArguments = mvnArguments + ' -Dskip.mapping=true'
                     }
 
-                    sh "mvn -U -B -fae " + mvnArguments + " clean " + mvnGoal
+                    sh "JAVA_HOME=\$JAVA_1_11_HOME mvn -U -B -fae " + mvnArguments + " clean " + mvnGoal
                 }
             }
         }
