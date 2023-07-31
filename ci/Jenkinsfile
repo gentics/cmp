@@ -1,0 +1,135 @@
+import com.gentics.*
+
+JobContext.set(this)
+
+final def gitCommitTag         = '[Jenkins | ' + env.JOB_BASE_NAME + ']';
+def tagName = null
+
+pipeline {
+    agent {
+        kubernetes {
+            label env.BUILD_TAG.take(63)
+            defaultContainer 'build'
+            yaml ocpWorker("""
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: build
+    image: gtx-docker-jenkinsbuilds.docker.apa-it.at/gentics/jenkinsbuilds/java-worker:10.0
+    resources:
+      limits:
+        cpu: 4
+        memory: 4Gi
+      requests:
+        cpu: 4
+        memory: 4Gi
+    env:
+      - name: HOME
+        value: /home/jenkins
+      - name: MAVEN_OPTS
+        value: "-Xmx1g -XX:MaxPermSize=128m"
+""")
+        }
+    }
+
+    parameters {
+        booleanParam(name: 'skipMapping',         defaultValue: false, description: "Skip (re-)generation of mapping files.")
+        booleanParam(name: 'runDeploy',           defaultValue: false, description: "Deploy the Maven artifacts.")
+        booleanParam(name: 'release',             defaultValue: false, description: "Run a release build (this requires 'runDeploy').")
+    }
+
+    options {
+        withCredentials([
+            usernamePassword(credentialsId: 'repo.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword'),
+            usernamePassword(credentialsId: 'gentics.gpg', usernameVariable: 'gpgKeyName', passwordVariable: 'gpgKeyPass')
+        ])
+        timestamps()
+        timeout(time: 1, unit: 'HOURS')
+        gitLabConnection('git.gentics.com')
+        gitlabBuilds(builds: ['Jenkins build'])
+        ansiColor('xterm')
+    }
+
+    environment {
+        GITLAB_WEBHOOK_SECRETTOKEN = credentials('gitlab-webhook-secrettoken')
+    }
+
+    stages {
+        stage("Build") {
+            steps {
+                script {
+                    currentBuild.description = env.GIT_COMMIT + "\n" + GitHelper.getLastCommitMessage().readLines()[0]
+                }
+
+                updateGitlabCommitStatus name: 'Jenkins build', state: "running"
+
+                script {
+                    def mvnGoal       = "install"
+                    def mvnArguments  = ""
+                    def version = MavenHelper.getVersion()
+
+                    if (params.runDeploy) {
+                        mvnGoal = "deploy"
+
+                        if (params.release) {
+                            echo "Updating version " + version + " for release."
+                            version = MavenHelper.transformSnapshotToReleaseVersion(version)
+
+                            MavenHelper.setVersion(version)
+
+                            def releaseMessage = 'Release of version ' + version
+
+                            tagName = version
+                            GitHelper.addCommit('.', gitCommitTag + ' ' + releaseMessage)
+                            GitHelper.addTag(tagName, releaseMessage)
+                        }
+
+                        echo "Deploying version: " + version
+                    }
+
+                    if (params.skipMapping) {
+                        mvnArguments = mvnArguments + ' -Dskip.mapping=true'
+                    }
+
+                    withDockerRegistry([ credentialsId: "repo.gentics.com", url: "https://docker.apa-it.at/v2" ]) {
+                        sh "JAVA_HOME=\$" + javaEnvName + " mvn -U -B -fae " + mvnArguments + " clean " + mvnGoal
+                    }
+                }
+            }
+        }
+
+        stage("Git push") {
+            when {
+                expression {
+                    return params.runDeploy && params.release
+                }
+            }
+
+            steps {
+                script {
+                    def version = MavenHelper.getNextSnapShotVersion()
+                    MavenHelper.setVersion(version)
+
+                    GitHelper.addCommit('.', gitCommitTag + ' Prepare for the next development iteration (' + version + ')' + '\n\n[ci-skip]')
+
+                    sshagent(["git"]) {
+                        def branchName = GitHelper.fetchCurrentBranchName()
+                        GitHelper.pushBranch(branchName)
+
+                        if (tagName != null) {
+                            GitHelper.pushTag(tagName)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            updateGitlabCommitCurrentBuildStatus name: 'Jenkins build'
+            notifyMattermostUsers()
+        }
+    }
+}
