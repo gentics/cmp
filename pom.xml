@@ -11,7 +11,7 @@
     </modules>
 
     <properties>
-        <changelog.manager.plugin.version>3.0.0-SNAPSHOT</changelog.manager.plugin.version>
+        <changelog.manager.plugin.version>3.0.0</changelog.manager.plugin.version>
         <changelog.version>${project.version}</changelog.version>
 
         <!-- Gentics CMS EE -->
