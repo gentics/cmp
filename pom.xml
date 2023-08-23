@@ -13,11 +13,11 @@
     <properties>
         <changelog.manager.plugin.version>3.0.1</changelog.manager.plugin.version>
         <changelog.version>${project.version}</changelog.version>
-		<skip.mapping>false</skip.mapping>
-		<skip.render>false</skip.render>
+	<skip.mapping>false</skip.mapping>
+	<skip.render>false</skip.render>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.0.3</cms.version>
+        <cms.version>6.0.4</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
@@ -29,7 +29,7 @@
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Mesh SQL -->
-        <meshsql.version>2.0.3</meshsql.version>
+        <meshsql.version>2.0.4</meshsql.version>
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
