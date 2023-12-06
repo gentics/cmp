@@ -17,7 +17,7 @@
 	<skip.render>false</skip.render>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.0.11</cms.version>
+        <cms.version>6.0.12</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
