@@ -25,15 +25,15 @@
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>2.0.9</mesh.version>
+        <mesh.version>2.0.10</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Mesh SQL -->
-        <meshsql.version>2.0.10</meshsql.version>
+        <meshsql.version>2.0.11</meshsql.version>
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
-        <mesh.plugins.version>2.0.3</mesh.plugins.version>
+        <mesh.plugins.version>2.0.4</mesh.plugins.version>
         <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
 
         <!-- Gentics Portal | java -->
