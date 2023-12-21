@@ -17,7 +17,7 @@
 	<skip.render>false</skip.render>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.0.12</cms.version>
+        <cms.version>6.0.13</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
@@ -25,11 +25,11 @@
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>2.0.10</mesh.version>
+        <mesh.version>2.0.11</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Mesh SQL -->
-        <meshsql.version>2.0.11</meshsql.version>
+        <meshsql.version>2.0.12</meshsql.version>
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
@@ -37,7 +37,7 @@
         <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
 
         <!-- Gentics Portal | java -->
-        <portal.java.version>3.0.2</portal.java.version>
+        <portal.java.version>3.0.3</portal.java.version>
         <portal.java.changelog.version>${portal.java.version}</portal.java.changelog.version>
 
         <!-- Gentics Portal | php -->
