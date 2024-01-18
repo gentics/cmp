@@ -1,0 +1,12 @@
+#foreach($component in $report.components)
+    Component "$component.name"
+    #foreach($module in $component.modules)
+        Module "$module.name"
+        #foreach($dependency in $module.dependencies)
+            Name: $dependency.name
+            Current: $dependency.current
+            Latest: $dependency.latest
+            ---
+        #end
+    #end
+#end

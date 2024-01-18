@@ -8,6 +8,7 @@
 
     <modules>
         <module>changelog</module>
+		<module>dependency-report</module>
     </modules>
 
     <properties>
@@ -15,6 +16,8 @@
         <changelog.version>${project.version}</changelog.version>
 	<skip.mapping>false</skip.mapping>
 	<skip.render>false</skip.render>
+        <!-- Gentics CMS OSS -->
+        <cms-oss.version>6.1.0-SNAPSHOT</cms-oss.version>
 
         <!-- Gentics CMS EE -->
         <cms.version>6.1.0-SNAPSHOT</cms.version>
