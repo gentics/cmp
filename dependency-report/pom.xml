@@ -44,7 +44,13 @@
 		</dependency>
 
 		<!-- Gentics CMS EE -->
-		<!-- TODO -->
+		<dependency>
+			<groupId>com.gentics.cms</groupId>
+			<artifactId>cms-server</artifactId>
+			<version>${cms.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 
 		<!-- Gentics Aloha Editor -->
 		<!-- TODO -->
@@ -114,7 +120,14 @@
 								</artifactItem>
 
 								<!-- Gentics CMS EE -->
-								<!-- TODO -->
+								<artifactItem>
+									<groupId>com.gentics.cms</groupId>
+									<artifactId>cms-server</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/cms-server/</outputDirectory>
+								</artifactItem>
 
 								<!-- Gentics Aloha Editor -->
 								<!-- TODO -->
