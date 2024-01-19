@@ -6,6 +6,9 @@
             Name: $dependency.name
             Current: $dependency.current
             Latest: $dependency.latest
+            Incremental: $!{dependency.incremental}
+            Minor: $!{dependency.minor}
+            Major: $!{dependency.major}
             ---
         #end
     #end
