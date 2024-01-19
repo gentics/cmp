@@ -56,7 +56,13 @@
 		<!-- TODO -->
 
 		<!-- Gentics Mesh -->
-		<!-- TODO -->
+		<dependency>
+			<groupId>com.gentics.mesh</groupId>
+			<artifactId>mesh-server</artifactId>
+			<version>${mesh.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 
 		<!-- Gentics Mesh SQL -->
 		<!-- TODO -->
@@ -133,7 +139,14 @@
 								<!-- TODO -->
 
 								<!-- Gentics Mesh -->
-								<!-- TODO -->
+								<artifactItem>
+									<groupId>com.gentics.mesh</groupId>
+									<artifactId>mesh-server</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-server/</outputDirectory>
+								</artifactItem>
 
 								<!-- Gentics Mesh SQL -->
 								<!-- TODO -->
