@@ -74,7 +74,69 @@
 		</dependency>
 
 		<!-- Gentics Mesh Commercial Plugins -->
-		<!-- TODO -->
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-comment-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-export-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-favorite-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-forms-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-gcms-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-keycloak-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-like-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-mustread-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-search-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 
 		<!-- Gentics Portal | java -->
 		<!-- TODO -->
@@ -165,7 +227,78 @@
 								</artifactItem>
 
 								<!-- Gentics Mesh Commercial Plugins -->
-								<!-- TODO -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-comment-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-comment-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-export-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-export-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-favorite-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-favorite-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-forms-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-forms-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-gcms-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-gcms-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-keycloak-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-keycloak-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-like-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-like-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-mustread-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-mustread-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-search-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-search-plugin/</outputDirectory>
+								</artifactItem>
 
 								<!-- Gentics Portal | java -->
 								<!-- TODO -->
