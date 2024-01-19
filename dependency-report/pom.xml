@@ -65,7 +65,13 @@
 		</dependency>
 
 		<!-- Gentics Mesh SQL -->
-		<!-- TODO -->
+		<dependency>
+			<groupId>com.gentics.mesh.enterprise</groupId>
+			<artifactId>mesh-enterprise-server</artifactId>
+			<version>${meshsql.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 
 		<!-- Gentics Mesh Commercial Plugins -->
 		<!-- TODO -->
@@ -149,7 +155,14 @@
 								</artifactItem>
 
 								<!-- Gentics Mesh SQL -->
-								<!-- TODO -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.enterprise</groupId>
+									<artifactId>mesh-enterprise-server</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-enterprise-server/</outputDirectory>
+								</artifactItem>
 
 								<!-- Gentics Mesh Commercial Plugins -->
 								<!-- TODO -->
