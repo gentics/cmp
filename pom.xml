@@ -40,7 +40,7 @@
         <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
 
         <!-- Gentics Portal | java -->
-        <portal.java.version>3.0.3</portal.java.version>
+        <portal.java.version>3.1.0-SNAPSHOT</portal.java.version>
         <portal.java.changelog.version>${portal.java.version}</portal.java.changelog.version>
 
         <!-- Gentics Portal | php -->
