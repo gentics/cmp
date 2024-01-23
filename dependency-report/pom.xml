@@ -148,7 +148,13 @@
 		</dependency>
 
 		<!-- Gentics Portal | php -->
-		<!-- TODO -->
+		<dependency>
+			<groupId>com.gentics.mesh.portal-php</groupId>
+			<artifactId>mesh-portal-php-dependencies</artifactId>
+			<version>${portal.php.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -316,10 +322,15 @@
 									<outputDirectory>${project.build.directory}/reports/portal-java/</outputDirectory>
 								</artifactItem>
 
-								<!-- TODO -->
-
 								<!-- Gentics Portal | php -->
-								<!-- TODO -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.portal-php</groupId>
+									<artifactId>mesh-portal-php-dependencies</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/portal-php/</outputDirectory>
+								</artifactItem>
 							</artifactItems>
 							<includes>**/*</includes>
 							<overWriteReleases>false</overWriteReleases>
