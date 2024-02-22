@@ -1,15 +1,135 @@
-#foreach($component in $report.components)
-    Component "$component.name"
-    #foreach($module in $component.modules)
-        Module "$module.name"
-        #foreach($dependency in $module.dependencies)
-            Name: $dependency.name
-            Current: $dependency.current
-            Latest: $dependency.latest
-            Incremental: $!{dependency.incremental}
-            Minor: $!{dependency.minor}
-            Major: $!{dependency.major}
-            ---
-        #end
-    #end
-#end
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0">
+	<title>Dependency Report</title>
+
+	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/style.css" />
+	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/print.css" media="print" />
+	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/overrides.style.css" />
+	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/overrides.print.css" media="print" />
+	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/syntaxhighlighter/shCore.css" />
+	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/syntaxhighlighter/shThemeRailsGuides.css" />
+</head>
+
+<body class="guide" onload="initToggles(#foreach($component in $components)'$component.id',#end)">
+	<div id="topNav">
+		<div class="wrapper"></div>
+	</div>
+
+	<div id="header">
+		<div class="wrapper clearfix">
+			<h1><a href="index.html" title="Return to home page">Dependency Report</a></h1>
+			<p class="hide"><a href="#mainCol">Skip navigation</a>.</p>
+			<ul class="subnav">
+				#foreach($component in $report.components)
+					<li class="index" id="${component.id}_nav"><a href="index.html" onclick="toggle('$component.id'); return false;">$component.name</a></li>
+				#end
+			</ul>
+		</div>
+	</div>
+
+	<hr class="hide" />
+
+	<div id="feature">
+		<div class="wrapper">
+			<h2>Dependency Report</h2>
+			<div id="subCol">
+				<h3 class="chapter">Components</h3>
+				<ol class="chapters">
+				#foreach($component in $report.components)
+					<li class="component_${component.id}"><a href="#${component.id}"><p>$component.name</p></a>
+                        <ol class="chapters">
+                        #foreach($module in $component.modules)
+                            <li class="module_${component.id}_${module.id}"><a href="#${component.id}_${module.id}"><p>$module.Name</p></a></li>
+                        #end
+                        </ol>
+                    </li>
+				#end
+				</ol>
+			</div>
+		</div>
+	</div>
+
+	<div id="container">
+		<div class="wrapper">
+			<div id="mainCol">
+				<hr />
+                #foreach($component in $report.components)
+                    <div id="$component.id" class="component_${component.id}" style="width: 100%">
+                        <h3>$component.name</h3>
+                        #foreach($module in $component.modules)
+                            <div id="${component.id}_${module.id}">
+                                <h4>$module.name</h4>
+                                <table style="width:100%">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Current</th>
+                                        <th>Latest</th>
+                                    </tr>
+                                    #foreach($dependency in $module.dependencies)
+                                    #set($next = $dependency.latest)
+                                    #if($dependency.major)
+                                        #set($next = $dependency.major)
+                                    #end
+                                    #if($dependency.minor)
+                                        #set($next = $dependency.minor)
+                                    #end
+                                    #if($dependency.incremental)
+                                        #set($next = $dependency.incremental)
+                                    #end
+                                    <tr>
+                                        <td>$dependency.name</td>
+                                        <td>$dependency.current</td>
+                                        <td>#if($dependency.current != $next)<b>#end$next#if($dependency.current != $next)</b>#end</td>
+                                        <!--td>$!{dependency.incremental}</td>
+                                        <td>$!{dependency.minor}</td>
+                                        <td>$!{dependency.major}</td -->
+                                    </tr>
+                                    #end
+                                </table>
+                            </div>
+                        #end
+                    </div>
+                #end
+            </div>
+        </div>
+    </div>
+
+	<hr class="hide" />
+	<div id="footer">
+		<div class="wrapper"><p></p></div>
+	</div>
+	
+	<script type="text/javascript" src="${baseUrl}/static/javascripts/guides.js"></script>
+	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shCore.js"></script>
+	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushRuby.js"></script>
+	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushJScript.js"></script>
+	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushCss.js"></script>
+	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushXml.js"></script>
+	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushSql.js"></script>
+	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushPlain.js"></script>
+	<script type="text/javascript">
+		SyntaxHighlighter.all()
+	</script>
+</body>
+</html>
+<!--
+                    #foreach($component in $report.components)
+                        Component "$component.name"
+                        #foreach($module in $component.modules)
+                            Module "$module.name"
+                            #foreach($dependency in $module.dependencies)
+                                Name: $dependency.name
+                                Current: $dependency.current
+                                Latest: $dependency.latest
+                                Incremental: $!{dependency.incremental}
+                                Minor: $!{dependency.minor}
+                                Major: $!{dependency.major}
+                                ---
+                            #end
+                        #end
+                    #end
+-->

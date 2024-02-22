@@ -352,6 +352,9 @@
 						<configuration>
 							<inputDirectory>${project.build.directory}/reports/</inputDirectory>
 							<templateFile>${project.basedir}/report.vm</templateFile>
+							<properties>
+								<baseUrl>https://www.gentics.com/cmp/changelog</baseUrl>
+							</properties>
 						</configuration>
 					</execution>
 				</executions>
