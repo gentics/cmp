@@ -24,6 +24,7 @@
 		<p class="hide"><a href="#mainCol">Skip navigation</a>.</p>
 			<ul class="nav">
 				<li><a href="index.html">Home</a></li>
+				<li><a href="dependency-report.html">Dependency Report</a></li>
 			</ul>
 		</div>
 	</div>

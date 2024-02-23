@@ -6,15 +6,15 @@
 	<meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0">
 	<title>Dependency Report</title>
 
-	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/style.css" />
-	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/overrides.style.css" />
-	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/overrides.print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/syntaxhighlighter/shCore.css" />
-	<link rel="stylesheet" type="text/css" href="${baseUrl}/static/stylesheets/syntaxhighlighter/shThemeRailsGuides.css" />
+	<link rel="stylesheet" type="text/css" href="static/stylesheets/style.css" />
+	<link rel="stylesheet" type="text/css" href="static/stylesheets/print.css" media="print" />
+	<link rel="stylesheet" type="text/css" href="static/stylesheets/overrides.style.css" />
+	<link rel="stylesheet" type="text/css" href="static/stylesheets/overrides.print.css" media="print" />
+	<link rel="stylesheet" type="text/css" href="static/stylesheets/syntaxhighlighter/shCore.css" />
+	<link rel="stylesheet" type="text/css" href="static/stylesheets/syntaxhighlighter/shThemeRailsGuides.css" />
 </head>
 
-<body class="guide" onload="initToggles(#foreach($component in $components)'$component.id',#end)">
+<body class="guide" onload="initToggles(#foreach($component in $report.components)'$component.id',#end)">
 	<div id="topNav">
 		<div class="wrapper"></div>
 	</div>
@@ -23,6 +23,10 @@
 		<div class="wrapper clearfix">
 			<h1><a href="index.html" title="Return to home page">Dependency Report</a></h1>
 			<p class="hide"><a href="#mainCol">Skip navigation</a>.</p>
+            <ul class="nav">
+				<li><a href="index.html">Home</a></li>
+				<li><a href="dependency-report.html">Dependency Report</a></li>
+			</ul>
 			<ul class="subnav">
 				#foreach($component in $report.components)
 					<li class="index" id="${component.id}_nav"><a href="index.html" onclick="toggle('$component.id'); return false;">$component.name</a></li>
@@ -36,6 +40,7 @@
 	<div id="feature">
 		<div class="wrapper">
 			<h2>Dependency Report</h2>
+            <p>Date: $reportTimestamp</p>
 			<div id="subCol">
 				<h3 class="chapter">Components</h3>
 				<ol class="chapters">
@@ -103,14 +108,14 @@
 		<div class="wrapper"><p></p></div>
 	</div>
 	
-	<script type="text/javascript" src="${baseUrl}/static/javascripts/guides.js"></script>
-	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shCore.js"></script>
-	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushRuby.js"></script>
-	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushJScript.js"></script>
-	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushCss.js"></script>
-	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushXml.js"></script>
-	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushSql.js"></script>
-	<script type="text/javascript" src="${baseUrl}/static/javascripts/syntaxhighlighter/shBrushPlain.js"></script>
+	<script type="text/javascript" src="static/javascripts/guides.js"></script>
+	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shCore.js"></script>
+	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushRuby.js"></script>
+	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushJScript.js"></script>
+	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushCss.js"></script>
+	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushXml.js"></script>
+	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushSql.js"></script>
+	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushPlain.js"></script>
 	<script type="text/javascript">
 		SyntaxHighlighter.all()
 	</script>

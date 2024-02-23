@@ -8,14 +8,15 @@
 
     <modules>
         <module>changelog</module>
-		<module>dependency-report</module>
     </modules>
 
     <properties>
         <changelog.manager.plugin.version>3.0.1</changelog.manager.plugin.version>
         <changelog.version>${project.version}</changelog.version>
-	<skip.mapping>false</skip.mapping>
-	<skip.render>false</skip.render>
+		<dependency.reporting.plugin.version>1.0.0-SNAPSHOT</dependency.reporting.plugin.version>
+		<maven.build.timestamp.format>dd.MM.yyyy</maven.build.timestamp.format>
+		<skip.mapping>false</skip.mapping>
+		<skip.render>false</skip.render>
         <!-- Gentics CMS OSS -->
         <cms-oss.version>6.1.0-SNAPSHOT</cms-oss.version>
 

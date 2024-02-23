@@ -10,9 +10,39 @@
 
 	<artifactId>cmp-changelog</artifactId>
 	<packaging>pom</packaging>
-	<description>Module for building the combined changelog.</description>
+	<description>Module for building the combined changelog including the dependecy report.</description>
 
     <dependencies>
+		<!-- Gentics CMS OSS -->
+		<dependency>
+			<groupId>com.gentics.cms-oss</groupId>
+			<artifactId>cms-oss-server</artifactId>
+			<version>${cms-oss.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.cms-oss</groupId>
+			<artifactId>cms-aloha-plugins</artifactId>
+			<version>${cms-oss.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.cms-oss</groupId>
+			<artifactId>cms-js-lib</artifactId>
+			<version>${cms-oss.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.cms-oss</groupId>
+			<artifactId>cms-ui</artifactId>
+			<version>${cms-oss.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+
 		<!-- Gentics CMS EE -->
 		<dependency>
 			<groupId>com.gentics.cms</groupId>
@@ -20,6 +50,13 @@
 			<version>${cms.version}</version>
 			<type>zip</type>
 			<classifier>entries</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.cms</groupId>
+			<artifactId>cms-server</artifactId>
+			<version>${cms.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
 		</dependency>
 
 		<!-- Gentics Aloha Editor -->
@@ -39,6 +76,13 @@
 			<type>zip</type>
 			<classifier>entries</classifier>
 		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh</groupId>
+			<artifactId>mesh-server</artifactId>
+			<version>${mesh.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 
 		<!-- Gentics Mesh SQL -->
 		<dependency>
@@ -47,6 +91,13 @@
 			<version>${meshsql.version}</version>
 			<type>zip</type>
 			<classifier>entries</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.enterprise</groupId>
+			<artifactId>mesh-enterprise-server</artifactId>
+			<version>${meshsql.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
 		</dependency>
 
 		<!-- Gentics Mesh Commercial Plugins -->
@@ -57,6 +108,69 @@
 			<type>zip</type>
 			<classifier>entries</classifier>
 		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-comment-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-export-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-favorite-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-forms-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-gcms-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-keycloak-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-like-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-mustread-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-search-plugin</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 
 		<!-- Gentics Portal | java -->
 		<dependency>
@@ -65,6 +179,13 @@
 			<version>${portal.java.version}</version>
 			<type>zip</type>
 			<classifier>entries</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.portal</groupId>
+			<artifactId>mesh-portal-server</artifactId>
+			<version>${portal.java.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
 		</dependency>
 
 		<!-- Gentics Portal | php -->
@@ -75,6 +196,13 @@
 			<type>zip</type>
 			<classifier>entries</classifier>
 		</dependency>
+		<dependency>
+			<groupId>com.gentics.mesh.portal-php</groupId>
+			<artifactId>mesh-portal-php-dependencies</artifactId>
+			<version>${portal.php.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -84,7 +212,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>unpack</id>
+						<id>unpack-changelogs</id>
 						<phase>process-resources</phase>
 						<goals>
 							<goal>unpack</goal>
@@ -98,7 +226,7 @@
 									<type>zip</type>
 									<classifier>entries</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/cms/entries</outputDirectory>
+									<outputDirectory>${project.build.directory}/changelogs/cms/entries</outputDirectory>
 								</artifactItem>
 
 								<!-- Gentics Aloha Editor -->
@@ -108,7 +236,7 @@
 									<type>zip</type>
 									<classifier>changelog-entries</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/aloha/entries</outputDirectory>
+									<outputDirectory>${project.build.directory}/changelogs/aloha/entries</outputDirectory>
 								</artifactItem>
 
 								<!-- Gentics Mesh -->
@@ -118,7 +246,7 @@
 									<type>zip</type>
 									<classifier>entries</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/mesh/entries</outputDirectory>
+									<outputDirectory>${project.build.directory}/changelogs/mesh/entries</outputDirectory>
 								</artifactItem>
 
 								<!-- Gentics Mesh SQL -->
@@ -128,7 +256,7 @@
 									<type>zip</type>
 									<classifier>entries</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/meshsql/entries</outputDirectory>
+									<outputDirectory>${project.build.directory}/changelogs/meshsql/entries</outputDirectory>
 								</artifactItem>
 
 								<!-- Gentics Mesh Commercial Plugins -->
@@ -138,7 +266,7 @@
 									<type>zip</type>
 									<classifier>entries</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/meshplugins/entries</outputDirectory>
+									<outputDirectory>${project.build.directory}/changelogs/meshplugins/entries</outputDirectory>
 								</artifactItem>
 
 								<!-- Gentics Portal | java -->
@@ -148,7 +276,7 @@
 									<type>zip</type>
 									<classifier>entries</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/portaljava/entries</outputDirectory>
+									<outputDirectory>${project.build.directory}/changelogs/portaljava/entries</outputDirectory>
 								</artifactItem>
 
 								<!-- Gentics Portal | php -->
@@ -158,7 +286,181 @@
 									<type>zip</type>
 									<classifier>entries</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/portalphp/entries</outputDirectory>
+									<outputDirectory>${project.build.directory}/changelogs/portalphp/entries</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+							<includes>**/*</includes>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+					<execution>
+						<id>unpack-dependency-reports</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<!-- Gentics CMS OSS -->
+								<artifactItem>
+									<groupId>com.gentics.cms-oss</groupId>
+									<artifactId>cms-oss-server</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/cms-oss-server/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.cms-oss</groupId>
+									<artifactId>cms-aloha-plugins</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/cms-aloha-plugins/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.cms-oss</groupId>
+									<artifactId>cms-js-lib</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/cms-js-lib/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.cms-oss</groupId>
+									<artifactId>cms-ui</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/cms-ui/</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics CMS EE -->
+								<artifactItem>
+									<groupId>com.gentics.cms</groupId>
+									<artifactId>cms-server</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/cms-server/</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Aloha Editor -->
+								<!-- TODO -->
+
+								<!-- Gentics Mesh -->
+								<artifactItem>
+									<groupId>com.gentics.mesh</groupId>
+									<artifactId>mesh-server</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-server/</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Mesh SQL -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.enterprise</groupId>
+									<artifactId>mesh-enterprise-server</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-enterprise-server/</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Mesh Commercial Plugins -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-comment-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-comment-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-export-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-export-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-favorite-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-favorite-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-forms-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-forms-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-gcms-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-gcms-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-keycloak-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-keycloak-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-like-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-like-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-mustread-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-mustread-plugin/</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-search-plugin</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/mesh-search-plugin/</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Portal | java -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.portal</groupId>
+									<artifactId>mesh-portal-server</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/portal-java/</outputDirectory>
+								</artifactItem>
+
+								<!-- Gentics Portal | php -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.portal-php</groupId>
+									<artifactId>mesh-portal-php-dependencies</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/portal-php/</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 							<includes>**/*</includes>
@@ -201,7 +503,7 @@
 							<name>Gentics CMS EE</name>
 							<shortName>CMS</shortName>
 							<version>${cms.changelog.version}</version>
-							<entriesDirectory>${project.build.directory}/cms/entries</entriesDirectory>
+							<entriesDirectory>${project.build.directory}/changelogs/cms/entries</entriesDirectory>
 						</component>
 
 						<!-- Gentics Aloha Editor -->
@@ -210,7 +512,7 @@
 							<name>Gentics Aloha Editor</name>
 							<shortName>Aloha Editor</shortName>
 							<version>${aloha.changelog.version}</version>
-							<entriesDirectory>${project.build.directory}/aloha/entries</entriesDirectory>
+							<entriesDirectory>${project.build.directory}/changelogs/aloha/entries</entriesDirectory>
 						</component>
 
 						<!-- Gentics Mesh -->
@@ -219,7 +521,7 @@
 							<name>Gentics Mesh</name>
 							<shortName>Mesh</shortName>
 							<version>${mesh.changelog.version}</version>
-							<entriesDirectory>${project.build.directory}/mesh/entries</entriesDirectory>
+							<entriesDirectory>${project.build.directory}/changelogs/mesh/entries</entriesDirectory>
 						</component>
 
 						<!-- Gentics Mesh SQL -->
@@ -228,7 +530,7 @@
 							<name>Gentics Mesh SQL</name>
 							<shortName>Mesh SQL</shortName>
 							<version>${meshsql.changelog.version}</version>
-							<entriesDirectory>${project.build.directory}/meshsql/entries</entriesDirectory>
+							<entriesDirectory>${project.build.directory}/changelogs/meshsql/entries</entriesDirectory>
 						</component>
 
 						<!-- Gentics Mesh Commercial Plugins -->
@@ -237,7 +539,7 @@
 							<name>Gentics Mesh Commercial Plugins</name>
 							<shortName>Plugins</shortName>
 							<version>${mesh.plugins.changelog.version}</version>
-							<entriesDirectory>${project.build.directory}/meshplugins/entries</entriesDirectory>
+							<entriesDirectory>${project.build.directory}/changelogs/meshplugins/entries</entriesDirectory>
 						</component>
 
 						<!-- Gentics Portal | java -->
@@ -246,7 +548,7 @@
 							<name>Gentics Portal | java</name>
 							<shortName>Portal | java</shortName>
 							<version>${portal.java.changelog.version}</version>
-							<entriesDirectory>${project.build.directory}/portaljava/entries</entriesDirectory>
+							<entriesDirectory>${project.build.directory}/changelogs/portaljava/entries</entriesDirectory>
 						</component>
 
 						<!-- Gentics Portal | php -->
@@ -255,10 +557,32 @@
 							<name>Gentics Portal | php</name>
 							<shortName>Portal | php</shortName>
 							<version>${portal.php.changelog.version}</version>
-							<entriesDirectory>${project.build.directory}/portalphp/entries</entriesDirectory>
+							<entriesDirectory>${project.build.directory}/changelogs/portalphp/entries</entriesDirectory>
 						</component>
 					</components>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.gentics</groupId>
+				<artifactId>dependency-reporting-plugin</artifactId>
+				<version>${dependency.reporting.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>render</id>
+						<goals>
+							<goal>render</goal>
+						</goals>
+						<configuration>
+							<inputDirectory>${project.build.directory}/reports/</inputDirectory>
+							<outputDirectory>${project.build.directory}/output</outputDirectory>
+							<outputName>dependency-report.html</outputName>
+							<templateFile>${project.basedir}/src/base/templates/dependency-report.vm</templateFile>
+							<properties>
+								<reportTimestamp>${maven.build.timestamp}</reportTimestamp>
+							</properties>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
