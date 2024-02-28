@@ -10,7 +10,7 @@
 
 	<artifactId>cmp-changelog</artifactId>
 	<packaging>pom</packaging>
-	<description>Module for building the combined changelog including the dependecy report.</description>
+	<description>Module for building the combined changelog including the dependency report.</description>
 
     <dependencies>
 		<!-- Gentics CMS OSS -->

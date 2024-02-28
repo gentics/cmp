@@ -85,9 +85,14 @@
                                     #if($dependency.incremental)
                                         #set($next = $dependency.incremental)
                                     #end
+                                    #if($dependency.description)
+                                        #set($current = "<span title='$dependency.description'>$dependency.current<sup>*</sup></span>")
+                                    #else
+                                        #set($current = $dependency.current)
+                                    #end
                                     <tr>
                                         <td>$dependency.name</td>
-                                        <td>$dependency.current</td>
+                                        <td>$current</td>
                                         <td>#if($dependency.current != $next)<b>#end$next#if($dependency.current != $next)</b>#end</td>
                                         <!--td>$!{dependency.incremental}</td>
                                         <td>$!{dependency.minor}</td>
