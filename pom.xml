@@ -13,7 +13,7 @@
     <properties>
         <changelog.manager.plugin.version>3.0.1</changelog.manager.plugin.version>
         <changelog.version>${project.version}</changelog.version>
-		<dependency.reporting.plugin.version>1.0.0-SNAPSHOT</dependency.reporting.plugin.version>
+		<dependency.reporting.plugin.version>1.0.0</dependency.reporting.plugin.version>
 		<maven.build.timestamp.format>dd.MM.yyyy</maven.build.timestamp.format>
 		<skip.mapping>false</skip.mapping>
 		<skip.render>false</skip.render>
