@@ -25,7 +25,7 @@
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
-        <aloha.version>1.5.0</aloha.version>
+        <aloha.version>1.5.1-SNAPSHOT</aloha.version>
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->

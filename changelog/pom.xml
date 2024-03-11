@@ -67,6 +67,13 @@
 			<type>zip</type>
 			<classifier>changelog-entries</classifier>
 		</dependency>
+		<dependency>
+			<groupId>org.alohaeditor</groupId>
+			<artifactId>alohaeditor</artifactId>
+			<version>${aloha.version}</version>
+			<type>zip</type>
+			<classifier>dependency-report</classifier>
+		</dependency>
 
 		<!-- Gentics Mesh -->
 		<dependency>
@@ -347,7 +354,14 @@
 								</artifactItem>
 
 								<!-- Gentics Aloha Editor -->
-								<!-- TODO -->
+								<artifactItem>
+									<groupId>org.alohaeditor</groupId>
+									<artifactId>alohaeditor</artifactId>
+									<type>zip</type>
+									<classifier>dependency-report</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/reports/aloha/</outputDirectory>
+								</artifactItem>
 
 								<!-- Gentics Mesh -->
 								<artifactItem>
