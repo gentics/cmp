@@ -25,7 +25,7 @@
 			<p class="hide"><a href="#mainCol">Skip navigation</a>.</p>
 			<ul class="nav">
 				<li><a href="index.html">Home</a></li>
-				<li><a href="dependency-report.html">Dependency Report</a></li>
+				<li><a href="../dependency-report.html">Dependency Report</a></li>
 				<li class="index"><a href="index.html" onclick="guideMenu(); return false;" id="guidesMenu">Changelog Index <span id="guidesArrow">&#9656;</span></a>
 					<div id="guides" class="clearfix" style="display: none;">
 						<hr />
