@@ -21,7 +21,7 @@
         <cms-oss.version>6.1.0</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.1.0</cms.version>
+        <cms.version>6.1.1</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
