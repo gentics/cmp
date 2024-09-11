@@ -16,7 +16,7 @@ kind: Pod
 spec:
   containers:
   - name: build
-    image: gtx-docker-jenkinsbuilds.docker.apa-it.at/gentics/jenkinsbuilds/java-worker:10.0
+    image: docker.gentics.com/jenkinsbuilds/java-worker:10.0
     resources:
       limits:
         cpu: 4
@@ -41,7 +41,7 @@ spec:
 
     options {
         withCredentials([
-            usernamePassword(credentialsId: 'repo.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword'),
+            usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword'),
             usernamePassword(credentialsId: 'gentics.gpg', usernameVariable: 'gpgKeyName', passwordVariable: 'gpgKeyPass')
         ])
         timestamps()
