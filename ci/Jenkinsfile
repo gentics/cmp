@@ -16,7 +16,7 @@ kind: Pod
 spec:
   containers:
   - name: build
-    image: docker.gentics.com/jenkinsbuilds/java-worker:10.0
+    image: docker.gentics.com/jenkinsbuilds/java-worker:17.2
     resources:
       limits:
         cpu: 4
