@@ -28,7 +28,7 @@ spec:
       - name: HOME
         value: /home/jenkins
       - name: MAVEN_OPTS
-        value: "-Xmx1g -XX:MaxPermSize=128m"
+        value: "-Xmx1g"
 """)
         }
     }
