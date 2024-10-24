@@ -29,11 +29,11 @@
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>2.1.8</mesh.version>
+        <mesh.version>2.1.9</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Mesh SQL -->
-        <meshsql.version>2.1.9</meshsql.version>
+        <meshsql.version>2.1.10</meshsql.version>
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
