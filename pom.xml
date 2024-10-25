@@ -13,19 +13,20 @@
     <properties>
         <changelog.manager.plugin.version>3.0.1</changelog.manager.plugin.version>
         <changelog.version>${project.version}</changelog.version>
-		<dependency.reporting.plugin.version>1.0.0</dependency.reporting.plugin.version>
-		<maven.build.timestamp.format>dd.MM.yyyy</maven.build.timestamp.format>
-		<skip.mapping>false</skip.mapping>
-		<skip.render>false</skip.render>
+	<dependency.reporting.plugin.version>1.0.0</dependency.reporting.plugin.version>
+	<maven.build.timestamp.format>dd.MM.yyyy</maven.build.timestamp.format>
+	<skip.mapping>false</skip.mapping>
+	<skip.render>false</skip.render>
+
         <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.1.14</cms-oss.version>
+        <cms-oss.version>6.1.15</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.1.14</cms.version>
+        <cms.version>6.1.15</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
-        <aloha.version>2.0.4</aloha.version>
+        <aloha.version>2.0.5</aloha.version>
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
