@@ -1,6 +1,9 @@
 {
-  "changeLogEntryFileNames": [],
-  "componentVersion": "2.1.10",
+  "changeLogEntryFileNames": [
+    "7757.GPU-1413.enhancement",
+    "7758.GPU-1413.enhancement"
+  ],
+  "componentVersion": "2.1.11",
   "version": "8.1.17",
   "date": "13.11.2024",
   "genericProperties": {}
