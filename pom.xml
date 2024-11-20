@@ -19,10 +19,10 @@
 	<skip.render>false</skip.render>
 
         <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.1.17</cms-oss.version>
+        <cms-oss.version>6.1.18</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.1.17</cms.version>
+        <cms.version>6.1.18</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
