@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.gentics.cmp</groupId>
 		<artifactId>cmp</artifactId>
-		<version>8.1.22-SNAPSHOT</version>
+		<version>8.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>cmp-changelog</artifactId>
@@ -541,8 +541,8 @@
 						<!-- Gentics Mesh SQL -->
 						<component>
 							<id>meshsql</id>
-							<name>Gentics Mesh SQL</name>
-							<shortName>Mesh SQL</shortName>
+							<name>Gentics Mesh EE</name>
+							<shortName>Mesh EE</shortName>
 							<version>${meshsql.changelog.version}</version>
 							<entriesDirectory>${project.build.directory}/changelogs/meshsql/entries</entriesDirectory>
 						</component>
