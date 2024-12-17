@@ -1,0 +1,11 @@
+{
+  "changeLogEntryFileNames": [
+    "7896.GPU-1581.enhancement",
+    "7932.SUP-1562.enhancement",
+    "7898.GPU-1615.enhancement"
+  ],
+  "componentVersion": "3.0.0",
+  "version": "8.2.0",
+  "date": "17.12.2024",
+  "genericProperties": {}
+}

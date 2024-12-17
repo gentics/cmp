@@ -1,0 +1,20 @@
+{
+  "changeLogEntryFileNames": [
+    "7886.GPU-1604.enhancement",
+    "8065.GPU-1712.enhancement",
+    "8067.GPU-1561.enhancement",
+    "8001.GPU-1805.enhancement",
+    "7934.GPU-1707.enhancement",
+    "8056.GPU-1851.enhancement",
+    "8066.GPU-1606.enhancement",
+    "7919.GPU-1708.enhancement",
+    "7948.GPU-1711.enhancement",
+    "7909.GPU-1712.enhancement",
+    "8064.GPU-1603.manualchange",
+    "7899.GPU-1608.enhancement"
+  ],
+  "componentVersion": "6.2.0",
+  "version": "8.2.0",
+  "date": "17.12.2024",
+  "genericProperties": {}
+}

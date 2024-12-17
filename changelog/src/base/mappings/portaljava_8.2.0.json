@@ -1,0 +1,10 @@
+{
+  "changeLogEntryFileNames": [
+    "7876.GPU-1602.enhancement",
+    "8050.GPU-1603.feature"
+  ],
+  "componentVersion": "3.2.0",
+  "version": "8.2.0",
+  "date": "17.12.2024",
+  "genericProperties": {}
+}
