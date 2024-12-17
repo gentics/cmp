@@ -1,0 +1,12 @@
+{
+  "changeLogEntryFileNames": [
+    "8088.SUP-17904.bugfix",
+    "8084.SUP-17885.bugfix",
+    "8089.SUP-17877.bugfix",
+    "8086.SUP-17891.bugfix"
+  ],
+  "componentVersion": "6.2.1",
+  "version": "8.2.1",
+  "date": "17.12.2024",
+  "genericProperties": {}
+}
