@@ -19,14 +19,14 @@
 	<skip.render>false</skip.render>
 
         <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.2.1</cms-oss.version>
+        <cms-oss.version>6.2.2</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.2.1</cms.version>
+        <cms.version>6.2.2</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
-        <aloha.version>2.1.1</aloha.version>
+        <aloha.version>2.1.2</aloha.version>
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
