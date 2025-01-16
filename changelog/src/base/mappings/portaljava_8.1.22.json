@@ -1,6 +1,8 @@
 {
-  "changeLogEntryFileNames": [],
-  "componentVersion": "3.1.6",
+  "changeLogEntryFileNames": [
+    "8092.SUP-17278.bugfix"
+  ],
+  "componentVersion": "3.1.7",
   "version": "8.1.22",
   "date": "16.01.2025",
   "genericProperties": {}
