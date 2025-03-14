@@ -1,0 +1,12 @@
+{
+  "changeLogEntryFileNames": [
+    "8183.SUP-18177.enhancement",
+    "8198.SUP-18208.bugfix",
+    "8182.SUP-18177.enhancement",
+    "8196.SUP-18220.bugfix"
+  ],
+  "componentVersion": "3.0.5",
+  "version": "8.2.7",
+  "date": "14.03.2025",
+  "genericProperties": {}
+}
