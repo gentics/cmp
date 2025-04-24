@@ -5,7 +5,8 @@
     "8005.SUP-17559.bugfix",
     "8038.SUP-17502.bugfix",
     "8027.SUP-17208.bugfix",
-    "8046.SUP-17688.bugfix"
+    "8046.SUP-17688.bugfix",
+    "8039.SUP-17287.documentation"
   ],
   "componentVersion": "6.1.17",
   "version": "8.1.17",

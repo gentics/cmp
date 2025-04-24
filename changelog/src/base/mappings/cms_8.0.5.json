@@ -1,7 +1,8 @@
 {
   "changeLogEntryFileNames": [
     "7543.SUP-15578.bugfix",
-    "7548.SUP-15622.bugfix"
+    "7548.SUP-15622.bugfix",
+    "7539.SUP-15658.documentation"
   ],
   "componentVersion": "6.0.5",
   "version": "8.0.5",

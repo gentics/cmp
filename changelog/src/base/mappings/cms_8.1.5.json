@@ -8,7 +8,8 @@
     "7844.SUP-15392.bugfix",
     "7835.SUP-16559.bugfix",
     "7825.SUP-16087.bugfix",
-    "7842.SUP-16865.bugfix"
+    "7842.SUP-16865.bugfix",
+    "7839.SUP-16705.documentation"
   ],
   "componentVersion": "6.1.5",
   "version": "8.1.5",

@@ -21,7 +21,13 @@
     "7771.SUP-16646.bugfix",
     "7514.GPU-1159.enhancement",
     "7784.GPU-942.enhancement",
-    "7731.GPU-1465.manualchange"
+    "7731.GPU-1465.manualchange",
+    "7709.SUP-12845.documentation",
+    "7782.GPU-1252.documentation",
+    "7767.GPU-943.optional-manualchange",
+    "7730.GPU-1465.optional-manualchange",
+    "7628.SUP-15790.documentation",
+    "7726.SUP-16530.documentation"
   ],
   "componentVersion": "6.1.0",
   "version": "8.1.0",

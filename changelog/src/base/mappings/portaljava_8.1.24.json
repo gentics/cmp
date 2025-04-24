@@ -1,5 +1,9 @@
 {
-  "changeLogEntryFileNames": [],
+  "changeLogEntryFileNames": [
+    "8125.SUP-17193.documentation",
+    "8127.SUP-16160.documentation",
+    "8126.SUP-17086.documentation"
+  ],
   "componentVersion": "3.1.8",
   "version": "8.1.24",
   "date": "12.02.2025",

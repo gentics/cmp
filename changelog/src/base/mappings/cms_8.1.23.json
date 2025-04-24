@@ -4,7 +4,8 @@
     "8111.SUP-17183.bugfix",
     "8090.SUP-17899.bugfix",
     "8112.SUP-17964.bugfix",
-    "8114.SUP-17941.bugfix"
+    "8114.SUP-17941.bugfix",
+    "8109.SUP-17980.optional-manualchange"
   ],
   "componentVersion": "6.1.23",
   "version": "8.1.23",

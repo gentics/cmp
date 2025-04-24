@@ -1,5 +1,7 @@
 {
-  "changeLogEntryFileNames": [],
+  "changeLogEntryFileNames": [
+    "7851.SUP-15779.documentation"
+  ],
   "componentVersion": "3.1.2",
   "version": "8.1.5",
   "date": "12.06.2024",
