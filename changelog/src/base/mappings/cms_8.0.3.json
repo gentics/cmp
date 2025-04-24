@@ -5,7 +5,8 @@
     "7479.SUP-15450.bugfix",
     "7519.SUP-15559.bugfix",
     "7510.SUP-15541.bugfix",
-    "7509.SUP-15541.bugfix"
+    "7509.SUP-15541.bugfix",
+    "7501.SUP-15498.documentation"
   ],
   "componentVersion": "6.0.3",
   "version": "8.0.3",

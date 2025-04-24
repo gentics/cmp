@@ -6,7 +6,8 @@
     "7708.SUP-16408.bugfix",
     "7712.SUP-14954.bugfix",
     "7705.SUP-16395.bugfix",
-    "7706.SUP-16395.bugfix"
+    "7706.SUP-16395.bugfix",
+    "7714.SUP-15045.documentation"
   ],
   "componentVersion": "6.0.19",
   "version": "8.0.18",

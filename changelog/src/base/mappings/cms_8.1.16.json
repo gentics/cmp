@@ -11,7 +11,8 @@
     "8023.SUP-17586.bugfix",
     "8021.SUP-17472.bugfix",
     "8024.SUP-17615.bugfix",
-    "8014.SUP-16786.bugfix"
+    "8014.SUP-16786.bugfix",
+    "8013.SUP-16786.optional-manualchange"
   ],
   "componentVersion": "6.1.15",
   "version": "8.1.16",

@@ -8,7 +8,8 @@
     "8177.SUP-17776.enhancement",
     "8185.SUP-18194.bugfix",
     "8194.SUP-18213.bugfix",
-    "8193.SUP-18222.bugfix"
+    "8193.SUP-18222.bugfix",
+    "8179.SUP-18180.documentation"
   ],
   "componentVersion": "6.1.26",
   "version": "8.1.26",
