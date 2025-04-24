@@ -11,7 +11,8 @@
     "7948.GPU-1711.enhancement",
     "7909.GPU-1712.enhancement",
     "8064.GPU-1603.manualchange",
-    "7899.GPU-1608.enhancement"
+    "7899.GPU-1608.enhancement",
+    "8055.GPU-1851.optional-manualchange"
   ],
   "componentVersion": "6.2.0",
   "version": "8.2.0",

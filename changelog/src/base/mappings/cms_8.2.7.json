@@ -10,7 +10,8 @@
     "8178.SUP-18179.bugfix",
     "8185.SUP-18194.bugfix",
     "8194.SUP-18213.bugfix",
-    "8193.SUP-18222.bugfix"
+    "8193.SUP-18222.bugfix",
+    "8179.SUP-18180.documentation"
   ],
   "componentVersion": "6.2.7",
   "version": "8.2.7",
