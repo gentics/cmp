@@ -1,0 +1,20 @@
+{
+  "changeLogEntryFileNames": [
+    "8228.SUP-18376.bugfix",
+    "8240.SUP-18320.bugfix",
+    "8238.SUP-18389.bugfix",
+    "8244.SUP-18399.bugfix",
+    "8246.SUP-18442.enhancement",
+    "8249.SUP-18470.bugfix",
+    "8253.SUP-18457.bugfix",
+    "8247.SUP-18395.bugfix",
+    "8234.SUP-18266.documentation",
+    "8252.SUP-18457.bugfix",
+    "8248.SUP-18440.bugfix",
+    "8241.SUP-18415.bugfix"
+  ],
+  "componentVersion": "6.2.11",
+  "version": "8.2.11",
+  "date": "09.05.2025",
+  "genericProperties": {}
+}
