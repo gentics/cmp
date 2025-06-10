@@ -1,0 +1,18 @@
+{
+  "changeLogEntryFileNames": [
+    "8296.GPU-1915.enhancement",
+    "8214.GPU-1908.enhancement",
+    "8195.GPU-1984.enhancement",
+    "8181.GPU-1898.enhancement",
+    "8289.bugfix",
+    "8188.GPU-434.enhancement",
+    "8219.GPU-1877.enhancement",
+    "8294.GPU-1861.enhancement",
+    "8156.GPU-1898.manualchange",
+    "8231.GPU-1914.enhancement"
+  ],
+  "componentVersion": "6.3.0",
+  "version": "8.3.0",
+  "date": "10.06.2025",
+  "genericProperties": {}
+}

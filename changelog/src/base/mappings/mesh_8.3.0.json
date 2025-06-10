@@ -1,0 +1,10 @@
+{
+  "changeLogEntryFileNames": [
+    "8286.bugfix",
+    "8215.GPU-1982.enhancement"
+  ],
+  "componentVersion": "3.1.0",
+  "version": "8.3.0",
+  "date": "10.06.2025",
+  "genericProperties": {}
+}
