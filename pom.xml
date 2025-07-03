@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gentics.cmp</groupId>
 	<artifactId>cmp</artifactId>
-	<version>8.1.35-SNAPSHOT</version>
+	<version>8.1.34-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
     <modules>
@@ -26,7 +26,7 @@
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
-        <aloha.version>2.0.12</aloha.version>
+        <aloha.version>2.0.13</aloha.version>
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
