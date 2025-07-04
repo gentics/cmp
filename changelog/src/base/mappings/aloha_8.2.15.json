@@ -1,9 +1,6 @@
 {
   "changeLogEntryFileNames": [
-    "12563.SUP-18660.enhancement",
-    "12560.SUP-18644.bugfix",
-    "12562.SUP-18659.bugfix",
-    "12561.SUP-18663.bugfix"
+    "12564.SUP-18736.bugfix"
   ],
   "componentVersion": "2.1.9",
   "version": "8.2.15",
