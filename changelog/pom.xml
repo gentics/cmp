@@ -500,7 +500,7 @@
 					<baseDirectory>${basedir}/src/base</baseDirectory>
 					<outputDirectory>${basedir}/target/output</outputDirectory>
 					<changelogTitle>Gentics CMP</changelogTitle>
-					<changelogTypes>manualchange,feature,enhancement,bugfix,documentation,optional-manualchange</changelogTypes>
+					<changelogTypes>manualchange,feature,enhancement,bugfix,documentation,optional-manualchange,security</changelogTypes>
 					<changelogVersion>${changelog.version}</changelogVersion>
 					<strictRenderMode>false</strictRenderMode>
 					<allowEmptyChangelog>true</allowEmptyChangelog>
