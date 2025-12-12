@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gentics.cmp</groupId>
 	<artifactId>cmp</artifactId>
-	<version>8.3.9-SNAPSHOT</version>
+	<version>8.4.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
     <modules>
@@ -13,16 +13,16 @@
     <properties>
         <changelog.manager.plugin.version>3.0.2</changelog.manager.plugin.version>
         <changelog.version>${project.version}</changelog.version>
-	<dependency.reporting.plugin.version>1.0.0</dependency.reporting.plugin.version>
-	<maven.build.timestamp.format>dd.MM.yyyy</maven.build.timestamp.format>
-	<skip.mapping>false</skip.mapping>
-	<skip.render>false</skip.render>
+		<dependency.reporting.plugin.version>1.0.0</dependency.reporting.plugin.version>
+		<maven.build.timestamp.format>dd.MM.yyyy</maven.build.timestamp.format>
+		<skip.mapping>false</skip.mapping>
+		<skip.render>false</skip.render>
 
         <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.3.8</cms-oss.version>
+        <cms-oss.version>6.4.0</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.3.8</cms.version>
+        <cms.version>6.4.0</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
@@ -30,19 +30,19 @@
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>3.1.6</mesh.version>
+        <mesh.version>3.2.0</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Mesh SQL -->
-        <meshsql.version>3.1.6</meshsql.version>
+        <meshsql.version>3.2.0</meshsql.version>
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
-        <mesh.plugins.version>3.1.7</mesh.plugins.version>
+        <mesh.plugins.version>3.2.0</mesh.plugins.version>
         <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
 
         <!-- Gentics Portal | java -->
-        <portal.java.version>3.3.5</portal.java.version>
+        <portal.java.version>3.4.0</portal.java.version>
         <portal.java.changelog.version>${portal.java.version}</portal.java.changelog.version>
 
         <!-- Gentics Portal | php -->
