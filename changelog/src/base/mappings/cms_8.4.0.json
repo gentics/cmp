@@ -1,0 +1,14 @@
+{
+  "changeLogEntryFileNames": [
+    "8592.GPU-2116.enhancement",
+    "8581.GPU-2112.enhancement",
+    "8589.GPU-2037.enhancement",
+    "8591.enhancement",
+    "8593.GPU-2113.enhancement",
+    "8594.SUP-19405.documentation"
+  ],
+  "componentVersion": "6.4.0",
+  "version": "8.4.0",
+  "date": "16.12.2025",
+  "genericProperties": {}
+}
