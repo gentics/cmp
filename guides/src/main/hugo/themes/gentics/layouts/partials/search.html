@@ -1,0 +1,35 @@
+
+
+<div class="search-overlay" id="search-overlay" data-searchurl="{{ "index.json" | absURL  }}">
+    <div class="search-overlay-backdrop"></div>
+    <div class="search-container">
+        <div class="search-header">
+            <input
+                type="search"
+                class="search-input"
+                placeholder="Search documentation..."
+                aria-label="Search"
+                autocomplete="off"
+            >
+            <button class="search-close" aria-label="Close search">×</button>
+        </div>
+
+        <!--
+        <div class="search-categories">
+            <button class="category-filter active" data-category="all">All</button>
+            <button class="category-filter" data-category="configuration">Configuration</button>
+            <button class="category-filter" data-category="customization">Customization</button>
+            <button class="category-filter" data-category="integration">Integration</button>
+            <button class="category-filter" data-category="api">API</button>
+            <button class="category-filter" data-category="guides">Guides</button>
+        </div>
+        -->
+
+        <div class="search-results">
+            <div class="search-empty">
+                <div class="search-empty-icon">🔍</div>
+                <p class="search-empty-text">Search our documentation</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+{{ define "content" }}
+
+    <div class="main-content">
+        {{ partial "breadcrumb.html" . }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="doc">
+            {{ .Content }}
+            {{ partial "subsection-list.html" . }}
+        </main>
+    </div>
+{{end}}
+
+
+
