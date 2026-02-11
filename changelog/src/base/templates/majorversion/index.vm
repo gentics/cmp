@@ -1,102 +1,136 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+#set($changelog = $changelogsSubset.get(0))
+#set($latestchangelog = $changelogsSubset.get(0))
+#set($version = "$changelog.getVersion()")
+#set($shortVersion = $version.substring(0, $version.lastIndexOf(".")))
+#set($pageTitle = "$changelogTitle $shortVersion Changelog")
+<!doctype html>
+<html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0">
-	<title>$changelogTitle Changelog</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Gentics ActaNovaDialogPortal Changelog. Overview of all Releases for Version $shortVersion" />
+  <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0">
+  <title>$pageTitle</title>
 
-	<link rel="stylesheet" type="text/css" href="../static/stylesheets/style.css" />
-	<link rel="stylesheet" type="text/css" href="../static/stylesheets/print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="../static/stylesheets/overrides.style.css" />
-	<link rel="stylesheet" type="text/css" href="../static/stylesheets/overrides.print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="../static/stylesheets/syntaxhighlighter/shCore.css" />
-	<link rel="stylesheet" type="text/css" href="../static/stylesheets/syntaxhighlighter/shThemeRailsGuides.css" />
+  <!-- Common Styles: Colors, Fonts, Header, Footer -->
+  <link rel="stylesheet" href="https://www.gentics.com/static/css/common.css" />
+
+
+  <!-- Changelog Specific Styles -->
+  <link rel="stylesheet" href="../static/css/changelog.css" />
 </head>
 
-<body class="guide">
-	<div id="topNav">
-		<div class="wrapper"></div>
-	</div>
+<body>
+  #parse("partials/header.vm")
 
-	<div id="header">
-		<div class="wrapper clearfix">
-			<h1><a href="index.html" title="Return to home page">$changelogTitle</a></h1>
-			<p class="hide"><a href="#mainCol">Skip navigation</a>.</p>
-			<ul class="nav">
-				<li><a href="../index.html">Home</a></li>
-				<li><a href="../dependency-report.html">Dependency Report</a></li>
-				<li class="index"><a href="index.html" onclick="guideMenu(); return false;" id="guidesMenu">Changelog Index <span id="guidesArrow">&#9656;</span></a>
-				<div id="guides" class="clearfix" style="display: none;">
-					<hr />
-					<dl class="L">
-						<dt>Summary</dt>
-						<dd><a href="merged_changelog.html">$changelogTitle Changelog Summary</a></dd>
-						<dt>Versions</dt>
-						#foreach($changelog in $changelogsSubset)
-							<dd><a href="${changelog.version}.html">$changelogTitle $changelog.version</a></dd>
-						#end
-					</dl>
-					<dl class="R"></dl>
-					</div>
-				</li>
-			</ul>
-		</div>
-	</div>
+  <section class="hero-small">
+    <div class="container">
+      <h1>$pageTitle</h1>
+    </div>
+  </section>
 
-	<hr class="hide" />
+  #parse("partials/mainnav.vm")
+
+  #set($version = "$changelog.getVersion()")
+  #set($shortVersion = $version.substring(0, $version.lastIndexOf(".")))
+  <div id="nav-currentversion-submenu" data-majorversion="${shortVersion}" data-markactive="true">
+    <ul class="nav-submenu"> 
+       #foreach($subversion in $changelogsSubset)
+          <li class="nav-item">
+            <a href="./${subversion.version}.html" class="nav-link">
+                $changelogTitle $subversion.version
+            </a>
+          </li>
+        #end
+    </ul>
+  </div>
+
 	
-	<div id="feature">
-		<div class="wrapper">
-			<h2>$changelogTitle</h2>
-			<p>Version $minorversion</p>
-		</div>
-	</div>
-	
-	<div id="container">
-		<div class="wrapper">
-			<div id="mainCol">
-				<h3>Summary</h3>
-				<dl>
-					<dt><a href="merged_changelog.html">$changelogTitle Changelog Summary</a></dt>
-					<dd><p></p></dd>
-				</dl>
-				<h3>Versions</h3>
-				<dl>
-					#foreach($changelog in $changelogsSubset)##
-						#set($unreleased = false)
-						#set($unreleased = $changelog.getGenericProperties().get("unreleased"))##
-						#if($unreleased)##
-							#set($info = "(Unreleased)")##
-						#else
-							#set($info = "")##
-						#end
-						<dt><a href="${changelog.version}.html">$changelogTitle $changelog.version $info</a></dt>
-						<dd>
-							<p>Release Date: $changelog.date</p>
-							<p></p>
-						</dd>
-					#end
-				</dl>
-			</div>
-		</div>
-	</div>
-	
-	<hr class="hide" />
-	<div id="footer">
-		<div class="wrapper"><p></p></div>
-	</div>
-	
-	<script type="text/javascript" src="../static/javascripts/guides.js"></script>
-	<script type="text/javascript" src="../static/javascripts/syntaxhighlighter/shCore.js"></script>
-	<script type="text/javascript" src="../static/javascripts/syntaxhighlighter/shBrushRuby.js"></script>
-	<script type="text/javascript" src="../static/javascripts/syntaxhighlighter/shBrushJScript.js"></script>
-	<script type="text/javascript" src="../static/javascripts/syntaxhighlighter/shBrushCss.js"></script>
-	<script type="text/javascript" src="../static/javascripts/syntaxhighlighter/shBrushXml.js"></script>
-	<script type="text/javascript" src="../static/javascripts/syntaxhighlighter/shBrushSql.js"></script>
-	<script type="text/javascript" src="../static/javascripts/syntaxhighlighter/shBrushPlain.js"></script>
-	<script type="text/javascript">
-		SyntaxHighlighter.all()
-	</script>
+<!-- Main Layout Wrapper -->
+  <div class="layout-wrapper">
+    <!-- Hero Section -->
+    <div class="main-content">
+      <!-- Breadcrumb Navigation -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item">
+            <a href="/infoportal" class="breadcrumb-link">
+              Infoportal
+            </a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="/cmp/changelog" class="breadcrumb-link">CMP Changelogs</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            <a href="../${shortVersion}.0" class="breadcrumb-link">$changelogTitle $shortVersion</a>
+          </li>
+        </ol>
+      </nav>	
+
+      <!-- Main Content -->
+      <main id="main-content">
+        <div id="changelog" class="changelog-hub">
+          <div class="title-wrapper">
+            <div class="hub-header">
+            <h2>$pageTitle</h2>
+            <p>Stay updated with the latest improvements and fixes.</p>
+            </div>
+            <a class="btn-view-summary" href="merged_changelog.html">
+            View Full Summary
+            </a>
+          </div>
+
+          <section class="latest-release-wrapper">
+            <a href="${latestchangelog.version}.html" class="version-card latest">
+            <div class="card-content">
+              <span class="badge-latest">Latest Release</span>
+              <span class="version-number">$changelogTitle $latestchangelog.version</span>
+              <span class="version-date">$latestchangelog.date</span>
+            </div>
+            <div class="version-arrow">→</div>
+            </a>
+          </section>
+
+          <h4 class="previous-versions-title">Previous Versions</h4>
+
+          
+          #if($changelogsSubset.size() > 1)
+            <section class="versions-list">
+              #set($skipFirst=true)
+              #foreach($changelog in $changelogsSubset)##
+                #if($skipFirst == true)
+                  #set($skipFirst=false)
+                #else##
+                  #set($unreleased = false)
+                  #set($unreleased = $changelog.getGenericProperties().get("unreleased"))##
+                  #if($unreleased)##
+                    #set($info = "(Unreleased)")##
+                  #else
+                    #set($info = "")##
+                  #end
+                  <a href="${changelog.version}.html" class="version-list-item">
+                  <span class="version-number">$changelogTitle $changelog.version $info</span>
+                  <span class="version-date">$changelog.date</span>
+                  <span class="version-arrow">→</span>
+                #end##
+              #end##
+              </a>
+            </section>
+          #end##
+        </div>
+      </main>
+    </div>
+
+
+	  <aside class="right-panel" id="right-panel">
+    </aside>
+  </div>
+  <!-- /.layout-wrapper -->
+  #parse("partials/footer.vm")
+  <!-- Changelog Functionality -->
+  <script src="../static/js/changelog.js"></script>
 </body>
+
 </html>
