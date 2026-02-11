@@ -4,7 +4,7 @@
   <nav class="side-nav-content" aria-label="Hauptnavigation">
     <ul class="nav-list">
       <li class="nav-item">
-        <a href="cmp/changelog/dependency-report.html" class="nav-link ">
+        <a href="/cmp/changelog/dependency-report.html" class="nav-link ">
             Dependency Report
         </a>
       </li>
