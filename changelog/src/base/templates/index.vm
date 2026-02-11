@@ -1,69 +1,99 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+#set($pageTitle = "$changelogTitle Changelog")
+<!doctype html>
+<html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0">
-	<title>$changelogTitle Changelog</title>
-	
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/style.css" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/overrides.style.css" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/overrides.print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/syntaxhighlighter/shCore.css" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/syntaxhighlighter/shThemeRailsGuides.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Gentics CMP Changelog. View all changes and bugfixes in a specific CMP Version" />
+  <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0">
+  <title>$pageTitle</title>
+
+  <!-- Common Styles: Colors, Fonts, Header, Footer -->
+  <link rel="stylesheet" href="https://www.gentics.com/static/css/common.css" />
+
+
+  <!-- Changelog Specific Styles -->
+  <link rel="stylesheet" href="./static/css/changelog.css" />
 </head>
 
-<body class="guide">
-	<div id="topNav">
-		<div class="wrapper"></div>
-	</div>
-	<div id="header">
-		<div class="wrapper clearfix">
-		<h1><a href="index.html" title="Return to home page">$changelogTitle Changelog</a></h1>
-		<p class="hide"><a href="#mainCol">Skip navigation</a>.</p>
-			<ul class="nav">
-				<li><a href="index.html">Home</a></li>
-				<li><a href="dependency-report.html">Dependency Report</a></li>
-			</ul>
-		</div>
-	</div>
-	<hr class="hide" />
+<body>
+  #parse("partials/header.vm")
+
+  <section class="hero-small">
+    <div class="container">
+      <h1>$pageTitle</h1>
+    </div>
+  </section>
+
+  #parse("partials/mainnav.vm")
+
+
+
 	
-	<div id="feature">
-		<div class="wrapper">
-			<h2>$changelogTitle Changelog</h2>
-		</div>
-	</div>
-	
-	<div id="container">
-		<div class="wrapper">
-			<div id="mainCol">
-			<h3>Feature Releases</h3>
-			<dl>
-			#foreach($entry in $minorVersions.keySet())
-				<dt><a href="${entry}/index.html">$changelogTitle $entry</a></dt>
-			#end
-			</dl>
-	</div>
-</div>
-		</div>
-		<hr class="hide" />
-		<div id="footer">
-			<div class="wrapper"><p></p>
-		</div>
-	</div>
-	
-	<script type="text/javascript" src="static/javascripts/guides.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shCore.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushRuby.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushJScript.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushCss.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushXml.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushSql.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushPlain.js"></script>
-	<script type="text/javascript">
-		SyntaxHighlighter.all()
-	</script>
+<!-- Main Layout Wrapper -->
+  <div class="layout-wrapper">
+    <!-- Hero Section -->
+    <div class="main-content">
+      <!-- Breadcrumb Navigation -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item">
+            <a href="/infoportal" class="breadcrumb-link">
+              Infoportal
+            </a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            <a href="/cmp/changelog" class="breadcrumb-link">CMP Changelogs</a>
+          </li>
+        </ol>
+      </nav>	
+
+      <!-- Main Content -->
+      <main id="main-content">
+        <div id="changelog" class="changelog-hub">
+          <div class="title-wrapper">
+            <div class="hub-header">
+              <h2>$changelogTitle Feature Releases</h2>
+              <p>Explore the evolution of our platform through major releases and milestones.</p>
+            </div>
+          </div>
+
+          <div class="timeline-container">
+
+            #foreach($entry in $minorVersions.keySet())
+              <div class="timeline-entry">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">Date/div>
+                  <div class="timeline-card">
+                    <div class="timeline-image-placeholder gradient-variant-1">
+                        <span>$changelogTitle $entry</span>
+                    </div>
+                    <div class="timeline-body">
+                        <h3>$changelogTitle $entry</h3>
+                        <p></p>
+                        <a href="${entry}/" class="btn-read-more">View 8.4.x Changelogs →</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            #end
+          </div>
+        </div>
+      </main>
+    </div>
+
+
+	  <aside class="right-panel" id="right-panel">
+    </aside>
+  </div>
+  <!-- /.layout-wrapper -->
+  #parse("partials/footer.vm")
+
+  <!-- Changelog Functionality -->
+  <script src="./static/js/changelog.js"></script>
 </body>
+
 </html>
