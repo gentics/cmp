@@ -1,0 +1,16 @@
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <address class="footer-note">
+        <a href="https://www.gentics.com">www.gentics.com</a> - 
+        <a href="mailto:office@gentics.com">office@gentics.com</a>
+      </address>
+      <p class="footer-date">Werdertorgasse 14, 1010 Wien</p>
+    </div>
+  </footer>
+
+
+  <script src="https://www.gentics.com/static/js/common.js"></script>
+
+
