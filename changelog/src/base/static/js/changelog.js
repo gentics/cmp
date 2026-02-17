@@ -176,17 +176,19 @@ function addMainNavigation(){
       const navList = document.querySelector('#main-nav .nav-list');
       const currentVersionSubmenu = document.querySelector('#nav-currentversion-submenu');
       const currentMajorVersion = currentVersionSubmenu?.dataset?.majorversion || 0;
-      data.majorversions.forEach(version => {
+      const addVersionsTextElements = document.querySelectorAll('.addDynamicLatestVersion');
+
+      data.majorversions.forEach(versionObj => {
         const li = document.createElement('li');
-        li.id = "nav-" + version;
+        li.id = "nav-" + versionObj.version;
         const a = document.createElement('a');
-        a.href = changelogBasePath + version +".0";
+        a.href = changelogBasePath + versionObj.version +".0";
         a.className = 'nav-link';
-        a.textContent = mainNav?.dataset?.changelogtitle + " " + version;
+        a.textContent = mainNav?.dataset?.changelogtitle + " " + versionObj.version;
         li.appendChild(a);
 
         let className = "nav-item";
-        if(currentMajorVersion == version){
+        if(currentMajorVersion == versionObj.version){
           className = "nav-item expandable is-expanded";
           if(currentVersionSubmenu?.dataset?.markactive == "true"){
             className = className + " active";
@@ -198,8 +200,55 @@ function addMainNavigation(){
 
         navList.appendChild(li);
       });
+
+      //add latest major version number to spans
+      addVersionsTextElements.forEach(textElem => {
+        textElem.textContent = data.majorversions[0]?.version || "";
+      });
     })
     .catch(error => console.error('Failed to major version list:', error));
+}
+
+function createChangelogOverview(){
+  const timelineContainer = document.querySelector('.timeline-container');
+  if (!timelineContainer) {
+    return;
+  }
+
+  const mainNav = document.querySelector('#main-nav');
+  const changelogBasePath = mainNav?.dataset?.changelogbasepath || './';
+  changelogBasePath = "https://www.gentics.com/cmp/changelog/majorversions.json"
+
+  fetch(changelogBasePath + '/majorversions.json')
+    .then(response => response.json())
+    .then(data => {
+      timelineContainer.innerHTML = '';
+
+      data.majorversions.forEach((versionObj, index) => {
+
+        const entry = document.createElement('div');
+        entry.className = 'timeline-entry';
+        entry.innerHTML = `
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">${versionObj.date}</div>
+            <div class="timeline-card">
+              <div class="timeline-image-placeholder gradient-variant-1">
+                <span>${mainNav?.dataset?.changelogtitle} ${versionObj.version}</span>
+              </div>
+              <div class="timeline-body">
+                <h3>${mainNav?.dataset?.changelogtitle} ${versionObj.version}</h3>
+                <p>${versionObj.description}</p>
+                <a href="${versionObj.version}.0/" class="btn-read-more">View ${versionObj.version}.x Changelogs →</a>
+              </div>
+            </div>
+          </div>
+        `;
+
+        timelineContainer.appendChild(entry);
+      });
+    })
+    .catch(error => console.error('Failed to load major version list:', error));
 }
 
 
@@ -438,6 +487,36 @@ window.addEventListener('load', handleHashNavigation);
 window.addEventListener('hashchange', handleHashNavigation);
 
 window.addEventListener('load', addMainNavigation);
+window.addEventListener('load', createChangelogOverview);
 window.addEventListener('load', createRightPanelNav);
+window.addEventListener('load', formatDate);
 
+function formatDate() {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
+  // Sucht alle Elemente mit der Klasse .release-date
+  const dateElements = document.querySelectorAll('.release-date');
+
+  dateElements.forEach(el => {
+    const dateString = el.textContent.trim();
+    if (!dateString) return;
+
+    const parts = dateString.split('.');
+    if (parts.length !== 3) return;
+
+    const day = parts[0];
+    const monthIndex = parseInt(parts[1], 10) - 1;
+    const year = parts[2];
+
+    // Nur formatieren, wenn der Monat gültig ist
+    if (monthIndex >= 0 && monthIndex <= 11) {
+      el.textContent = `${day}. ${monthNames[monthIndex]} ${year}`;
+    }
+  });
+}
+
+// Aufruf beim Laden der Seite
+window.addEventListener("load", formatDate);

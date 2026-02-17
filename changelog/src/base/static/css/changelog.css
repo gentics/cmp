@@ -44,8 +44,7 @@
   /* gap: 24px; */
 }
 
-#changelog .release-date, 
-#dependency-report .release-date {
+#changelog .release-date {
   font-size: 12px;
   color: var(--text-muted);
   text-decoration: underline;
@@ -483,7 +482,7 @@ h5 {
   display: inline-block;
   width: 20px;
   height: 20px;
-  background-color: var(--text-muted);
+  background-color: grey;
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3Cpath d='M431.2 476.5L163.5 208.8C141.1 240.2 128 278.6 128 320C128 426 214 512 320 512C361.5 512 399.9 498.9 431.2 476.5zM476.5 431.2C498.9 399.8 512 361.4 512 320C512 214 426 128 320 128C278.5 128 240.1 141.1 208.8 163.5L476.5 431.2zM64 320C64 178.6 178.6 64 320 64C461.4 64 576 178.6 576 320C576 461.4 461.4 576 320 576C178.6 576 64 461.4 64 320z'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3Cpath d='M431.2 476.5L163.5 208.8C141.1 240.2 128 278.6 128 320C128 426 214 512 320 512C361.5 512 399.9 498.9 431.2 476.5zM476.5 431.2C498.9 399.8 512 361.4 512 320C512 214 426 128 320 128C278.5 128 240.1 141.1 208.8 163.5L476.5 431.2zM64 320C64 178.6 178.6 64 320 64C461.4 64 576 178.6 576 320C576 461.4 461.4 576 320 576C178.6 576 64 461.4 64 320z'/%3E%3C/svg%3E");
   -webkit-mask-size: contain;
@@ -1163,11 +1162,20 @@ section,
   border-bottom: 1px solid var(--border);
 }
 
-#dependency-report .release-date {
-  margin-bottom: 0;
-  text-decoration: none;
-  font-size: 14px;
-  line-height: 1;
+#dependency-report .release-date-badge .release-date {
+  white-space: nowrap;
+}
+
+#dependency-report .release-date-badge {
+  text-align: end;
+  font-size: 12px;
+  color: var(--text-muted);
+  align-self: end;
+  width: min-content;
+  border-radius: 8px;
+  padding: 6px 10px;
+  border: none;
+  background: #eff2f2;
 }
 
 .report-legend {
@@ -1246,51 +1254,4 @@ section,
   color: var(--text-muted);
   margin-bottom: 12px;
   font-weight: 500;
-}
-
-/* Mismatch Highlight (Version Diff) */
-#dependency-report td b,
-#dependency-report .report-legend b {
-  /* Default / Unknown: Blue Marker */
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 8px;
-}
-
-/* Patch: Green Marker */
-#dependency-report td b.update-patch,
-#dependency-report .report-legend b.update-patch {
-  color: var(--success); /* green-800 */
-  background-color: var(--success-lighter); /* green-100 */
-  border: 1px solid var(--success-light);
-}
-
-/* Minor: Yellow Marker */
-#dependency-report td b.update-minor,
-#dependency-report .report-legend b.update-minor {
-  color: var(--warning); /* yellow-800 */
-  background-color: var(--yellow-lighter); /* yellow-100 */
-  border: 1px solid var(--yellow-light);
-}
-
-/* Major: Orange/Amber Marker */
-#dependency-report td b.update-major,
-#dependency-report .report-legend b.update-major {
-  color: var(--orange-primary); /* orange-900 */
-  background-color: var(--orange-light); /* orange-100 */
-  border: 1px solid rgba(196, 63, 19, 0.25);
-}
-
-#dependency-report td b::after {
-  content: "↑";
-  display: inline-block;
-  margin-left: 4px;
-  font-weight: 700;
-  font-size: 12px;
-  vertical-align: 0px;
-  opacity: 0.7;
-}
-
-#dependency-report td b.update-major::after {
-  content: "↑"; 
 }
