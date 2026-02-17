@@ -1,145 +1,164 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0">
-	<title>Dependency Report</title>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html charset=utf-8" />
+    <meta
+      http-equiv="cache-control"
+      content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
+    />
+    <title>Dependency Report</title>
 
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/style.css" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/overrides.style.css" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/overrides.print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/syntaxhighlighter/shCore.css" />
-	<link rel="stylesheet" type="text/css" href="static/stylesheets/syntaxhighlighter/shThemeRailsGuides.css" />
-</head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://www.gentics.com/static/css/common.css"
+    />
+    <!-- Changelog Specific Styles -->
+    <link rel="stylesheet" type="text/css" href="https://www.gentics.com/cmp/changelog/static/css/changelog.css" />
+  </head>
 
-<body class="guide" onload="initToggles(#foreach($component in $report.components)'$component.id',#end)">
-	<div id="topNav">
-		<div class="wrapper"></div>
-	</div>
+  <body>
+    <header>
+      <div class="container">
+        <div class="header-content">
+          <!-- Brand -->
+          <div class="brand">
+            <a href="https://www.gentics.com/infoportal"
+              ><img
+                src="https://www.gentics.com/static/logos/gentics-logo-primaryblue.jpg"
+                alt="Gentics Logo"
+                class="brand-logo"
+            /></a>
+            <span class="brand-headline">Dependency Report</span>
+          </div>
 
-	<div id="header">
-		<div class="wrapper clearfix">
-			<h1><a href="index.html" title="Return to home page">Dependency Report</a></h1>
-			<p class="hide"><a href="#mainCol">Skip navigation</a>.</p>
-            <ul class="nav">
-				<li><a href="index.html">Home</a></li>
-				<li><a href="dependency-report.html">Dependency Report</a></li>
-			</ul>
-			<ul class="subnav">
-				#foreach($component in $report.components)
-					<li class="index" id="${component.id}_nav"><a href="index.html" onclick="toggle('$component.id'); return false;">$component.name</a></li>
-				#end
-			</ul>
-		</div>
-	</div>
-
-	<hr class="hide" />
-
-	<div id="feature">
-		<div class="wrapper">
-			<h2>Dependency Report</h2>
-            <p>Date: $reportTimestamp</p>
-			<div id="subCol">
-				<h3 class="chapter">Components</h3>
-				<ol class="chapters">
-				#foreach($component in $report.components)
-					<li class="component_${component.id}"><a href="#${component.id}"><p>$component.name</p></a>
-                        <ol class="chapters">
-                        #foreach($module in $component.modules)
-                            <li class="module_${component.id}_${module.id}"><a href="#${component.id}_${module.id}"><p>$module.Name</p></a></li>
-                        #end
-                        </ol>
-                    </li>
-				#end
-				</ol>
-			</div>
-		</div>
-	</div>
-
-	<div id="container">
-		<div class="wrapper">
-			<div id="mainCol">
-				<hr />
-                #foreach($component in $report.components)
-                    <div id="$component.id" class="component_${component.id}" style="width: 100%">
-                        <h3>$component.name</h3>
-                        #foreach($module in $component.modules)
-                            <div id="${component.id}_${module.id}">
-                                <h4>$module.name</h4>
-                                <table style="width:100%">
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Current</th>
-                                        <th>Latest</th>
-                                    </tr>
-                                    #foreach($dependency in $module.dependencies)
-                                    #set($next = $dependency.latest)
-                                    #if($dependency.major)
-                                        #set($next = $dependency.major)
-                                    #end
-                                    #if($dependency.minor)
-                                        #set($next = $dependency.minor)
-                                    #end
-                                    #if($dependency.incremental)
-                                        #set($next = $dependency.incremental)
-                                    #end
-                                    #if($dependency.description)
-                                        #set($current = "<span title='$dependency.description'>$dependency.current<sup>*</sup></span>")
-                                    #else
-                                        #set($current = $dependency.current)
-                                    #end
-                                    <tr>
-                                        <td>$dependency.name</td>
-                                        <td>$current</td>
-                                        <td>#if($dependency.current != $next)<b>#end$next#if($dependency.current != $next)</b>#end</td>
-                                        <!--td>$!{dependency.incremental}</td>
-                                        <td>$!{dependency.minor}</td>
-                                        <td>$!{dependency.major}</td -->
-                                    </tr>
-                                    #end
-                                </table>
-                            </div>
-                        #end
-                    </div>
-                #end
-            </div>
+          <div class="header-actions">
+            <!-- Mobile Menu Toggle -->
+            <button
+              class="mobile-menu-toggle"
+              aria-label="Open navigation"
+              aria-expanded="false"
+              aria-controls="main-nav"
+            >
+              <span class="hamburger-icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
+          </div>
         </div>
+      </div>
+    </header>
+
+    <section class="hero-small">
+      <div class="container">
+        <h1 class="addDynamicVersion">CMP Dependency Report <span class="addDynamicLatestVersion"></span></h1>
+      </div>
+    </section>
+
+    <!-- Side Navigation -->
+    <aside class="side-nav" id="main-nav" data-changelogtitle="Gentics CMP" data-changelogbasepath="/cmp/changelog/">
+      <div class="side-nav-overlay"></div>
+      <nav class="side-nav-content" aria-label="Hauptnavigation">
+        <ul class="nav-list"></ul>
+      </nav>
+    </aside>
+
+    <div class="layout-wrapper">
+    <!-- Hero Section -->
+    <div class="main-content">
+      <!-- Breadcrumb Navigation -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item">
+            <a href="/infoportal" class="breadcrumb-link">
+              <span>Infoportal</span>
+            </a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="/cmp/changelog/dependency-report.html" class="breadcrumb-link">CMP Dependency Report</a>
+          </li>
+        </ol>
+      </nav>	
+
+      <!-- Main Content -->
+      <main id="main-content">
+        <ul class="toggle-filters">
+            #foreach($component in $report.components)
+                <li class="index" id="${component.id}_nav">
+                    <button onclick="toggle('${component.name}')">${component.name}</button>
+                </li>
+            #end 
+        </ul>
+        <div id="dependency-report">
+          <div class="release-date-badge">
+            <b>Created on</b>
+            <span class="release-date">$reportTimestamp</span>
+          </div>
+
+          #foreach($component in $report.components)
+            <section id="${component.id}" class="component">
+                <h4>${component.name}</h4>
+                #foreach($module in $component.modules)
+                  <article class="sub-component" id="${module.id}">
+                    <h5>${module.name}</h5>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th>Name</th>
+                                <th>Current</th>
+                                <th>Latest</th>
+                            </tr>
+                            #foreach($dependency in $module.dependencies)
+                            #set($next = $dependency.latest)
+                            #if($dependency.major)
+                                #set($next = $dependency.major)
+                            #end
+                            #if($dependency.minor)
+                                #set($next = $dependency.minor)
+                            #end
+                            #if($dependency.incremental)
+                                #set($next = $dependency.incremental)
+                            #end
+                            #if($dependency.description)
+                                #set($current = "<span title='$dependency.description'>$dependency.current<sup>*</sup></span>")
+                            #else
+                                #set($current = $dependency.current)
+                            #end
+                            <tr>
+                                <td>$dependency.name</td>
+                                <td>$current</td>
+                                <td>#if($dependency.current != $next)<b>#end$next#if($dependency.current != $next)</b>#end</td>
+                            </tr>
+                            #end
+                        </tbody>
+                    </table>
+                  </article>
+                #end
+            </section>
+          #end
+        </div>
+      </main>
     </div>
 
-	<hr class="hide" />
-	<div id="footer">
-		<div class="wrapper"><p></p></div>
-	</div>
-	
-	<script type="text/javascript" src="static/javascripts/guides.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shCore.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushRuby.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushJScript.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushCss.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushXml.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushSql.js"></script>
-	<script type="text/javascript" src="static/javascripts/syntaxhighlighter/shBrushPlain.js"></script>
-	<script type="text/javascript">
-		SyntaxHighlighter.all()
-	</script>
-</body>
+
+	  <aside class="right-panel" id="right-panel">
+    </aside>
+  </div>
+
+
+    <footer>
+      <div class="container">
+        <address class="footer-note">
+          <a href="https://www.gentics.com">www.gentics.com</a> –
+          <a href="mailto:office@gentics.com">office@gentics.com</a>
+        </address>
+        <p class="footer-date">Werdertorgasse 14, 1010 Wien</p>
+      </div>
+    </footer>
+   
+  <script type="text/javascript" src="https://www.gentics.com/cmp/changelog/static/js/changelog.js"></script>
+  </body>
 </html>
-<!--
-                    #foreach($component in $report.components)
-                        Component "$component.name"
-                        #foreach($module in $component.modules)
-                            Module "$module.name"
-                            #foreach($dependency in $module.dependencies)
-                                Name: $dependency.name
-                                Current: $dependency.current
-                                Latest: $dependency.latest
-                                Incremental: $!{dependency.incremental}
-                                Minor: $!{dependency.minor}
-                                Major: $!{dependency.major}
-                                ---
-                            #end
-                        #end
-                    #end
--->
