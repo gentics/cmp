@@ -1,5 +1,5 @@
 <!-- Side Navigation -->
-<aside class="side-nav" id="main-nav" data-changelogtitle="$changelogTitle" data-changelogbasepath="/cmp/changelog/">
+<aside class="side-nav" id="main-nav" data-changelogtitle="$changelogTitle" data-changelogbasepath="/cmp/changelog/static/">
   <div class="side-nav-overlay"></div>
   <nav class="side-nav-content" aria-label="Hauptnavigation">
     <ul class="nav-list">

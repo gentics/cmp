@@ -61,25 +61,7 @@
           </div>
 
           <div class="timeline-container">
-
-            #foreach($entry in $minorVersions.keySet())
-              <div class="timeline-entry">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content">
-                  <div class="timeline-date">Date</div>
-                  <div class="timeline-card">
-                    <div class="timeline-image-placeholder gradient-variant-1">
-                        <span>$changelogTitle $entry</span>
-                    </div>
-                    <div class="timeline-body">
-                        <h3>$changelogTitle $entry</h3>
-                        <p></p>
-                        <a href="${entry}/" class="btn-read-more">View 8.4.x Changelogs →</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            #end
+			<!-- entries will be generated dynamically in JS -->
           </div>
         </div>
       </main>
