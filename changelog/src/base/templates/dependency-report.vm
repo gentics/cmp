@@ -64,7 +64,7 @@
       <nav class="side-nav-content" aria-label="Hauptnavigation">
         <ul class="nav-list">
             <li  class="nav-item active">
-                <a href="/cmp/changelog/depency-report.html" class="nav-link">CMP Dependency Report</a>
+                <a href="/cmp/changelog/dependency-report.html" class="nav-link">CMP Dependency Report</a>
             </li>
             <li  class="nav-item">
                 <a href="/cmp/changelog/index.html" class="nav-link">CMP Changelogs</a>
@@ -95,7 +95,7 @@
         <ul class="toggle-filters">
             #foreach($component in $report.components)
                 <li class="index" id="${component.id}_nav">
-                    <button onclick="toggle('${component.name}')">${component.name}</button>
+                    <button onclick="toggle('${component.id}')">${component.name}</button>
                 </li>
             #end 
         </ul>
@@ -106,10 +106,10 @@
           </div>
 
           #foreach($component in $report.components)
-            <section id="${component.id}" class="component">
+            <section id="${component.id}" class="component component_${component.id}">
                 <h4>${component.name}</h4>
                 #foreach($module in $component.modules)
-                  <article class="sub-component" id="${module.id}">
+                  <article class="sub-component" id="${module.id}" data-parentcomponent="${component.id}">
                     <h5>${module.name}</h5>
                     <table>
                         <tbody>

@@ -25,7 +25,7 @@ window.toggle = function(component) {
 
 function applyFilters() {
   //sections + rightNavComponents
-  const combined = document.querySelectorAll('#changelog section, #right-panel li.right-nav-component');
+  const combined = document.querySelectorAll('#changelog section, #dependency-report section, #right-panel li.right-nav-component');
   const isAnyFilterActive = activeFilters.size > 0;
 
 
@@ -179,7 +179,7 @@ function addMainNavigation(){
       const addVersionsTextElements = document.querySelectorAll('.addDynamicLatestVersion');
 
       //dependency report does not have major versions in navigation
-      if(mainNav?.dataset?.dependencyreport !== true){
+      if(mainNav?.dataset?.dependencyreport !== 'true'){
         data.majorversions.forEach(versionObj => {
           const li = document.createElement('li');
           li.id = "nav-" + versionObj.version;
@@ -220,7 +220,6 @@ function createChangelogOverview(){
 
   const mainNav = document.querySelector('#main-nav');
   const changelogBasePath = mainNav?.dataset?.changelogbasepath || './';
-  changelogBasePath = "https://www.gentics.com/cmp/changelog/majorversions.json"
 
   fetch(changelogBasePath + '/majorversions.json')
     .then(response => response.json())
@@ -357,6 +356,7 @@ function createRightPanelNav() {
             element: sub, // anchor to the sub-component itself
             text: h5.textContent,
             id: sub.id,
+            parentComponent: sub.dataset?.parentcomponent || null,
             isIndent: true
           });
         }
@@ -402,6 +402,9 @@ function createRightPanelNav() {
     if(item.versionElement !== true){
       li.classList.add("right-nav-component");
       li.classList.add("component_" + item.id);
+      if(item.parentComponent != null){
+        li.classList.add("component_" + item.parentComponent);
+      }
     }
 
     a.addEventListener('click', (e) => {
