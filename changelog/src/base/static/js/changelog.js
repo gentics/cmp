@@ -178,28 +178,31 @@ function addMainNavigation(){
       const currentMajorVersion = currentVersionSubmenu?.dataset?.majorversion || 0;
       const addVersionsTextElements = document.querySelectorAll('.addDynamicLatestVersion');
 
-      data.majorversions.forEach(versionObj => {
-        const li = document.createElement('li');
-        li.id = "nav-" + versionObj.version;
-        const a = document.createElement('a');
-        a.href = changelogBasePath + versionObj.version +".0";
-        a.className = 'nav-link';
-        a.textContent = mainNav?.dataset?.changelogtitle + " " + versionObj.version;
-        li.appendChild(a);
+      //dependency report does not have major versions in navigation
+      if(mainNav?.dataset?.dependencyreport !== true){
+        data.majorversions.forEach(versionObj => {
+          const li = document.createElement('li');
+          li.id = "nav-" + versionObj.version;
+          const a = document.createElement('a');
+          a.href = changelogBasePath + versionObj.version +".0";
+          a.className = 'nav-link';
+          a.textContent = mainNav?.dataset?.changelogtitle + " " + versionObj.version;
+          li.appendChild(a);
 
-        let className = "nav-item";
-        if(currentMajorVersion == versionObj.version){
-          className = "nav-item expandable is-expanded";
-          if(currentVersionSubmenu?.dataset?.markactive == "true"){
-            className = className + " active";
+          let className = "nav-item";
+          if(currentMajorVersion == versionObj.version){
+            className = "nav-item expandable is-expanded";
+            if(currentVersionSubmenu?.dataset?.markactive == "true"){
+              className = className + " active";
+            }
+            li.appendChild(currentVersionSubmenu.children[0]);
           }
-          li.appendChild(currentVersionSubmenu.children[0]);
-        }
-        li.className = className;
+          li.className = className;
 
 
-        navList.appendChild(li);
-      });
+          navList.appendChild(li);
+        });
+      }
 
       //add latest major version number to spans
       addVersionsTextElements.forEach(textElem => {

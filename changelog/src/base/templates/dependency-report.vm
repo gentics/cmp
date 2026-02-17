@@ -59,10 +59,17 @@
     </section>
 
     <!-- Side Navigation -->
-    <aside class="side-nav" id="main-nav" data-changelogtitle="Gentics CMP" data-changelogbasepath="/cmp/changelog/">
+    <aside class="side-nav" id="main-nav" data-changelogtitle="Gentics CMP" data-changelogbasepath="/cmp/changelog/" data-dependencyreport="true">
       <div class="side-nav-overlay"></div>
       <nav class="side-nav-content" aria-label="Hauptnavigation">
-        <ul class="nav-list"></ul>
+        <ul class="nav-list">
+            <li  class="nav-item active">
+                <a href="/cmp/changelog/depency-report.html" class="nav-link">CMP Dependency Report</a>
+            </li>
+            <li  class="nav-item">
+                <a href="/cmp/changelog/index.html" class="nav-link">CMP Changelogs</a>
+            </li>
+        </ul>
       </nav>
     </aside>
 
