@@ -169,8 +169,9 @@ function handleHashNavigation() {
 
 function addMainNavigation(){
    const mainNav = document.querySelector('#main-nav');
-   const changelogBasePath = mainNav?.dataset?.changelogbasepath || "./" ;
-   fetch(changelogBasePath + '/majorversions.json')
+   const changelogBasePath = (mainNav?.dataset?.changelogbasepath || "./").replace(/static\/$/, "") ;
+   
+   fetch(changelogBasePath + '/static/majorversions.json')
     .then(response => response.json())
     .then(data => {
       const navList = document.querySelector('#main-nav .nav-list');
@@ -221,7 +222,7 @@ function createChangelogOverview(){
   const mainNav = document.querySelector('#main-nav');
   const changelogBasePath = mainNav?.dataset?.changelogbasepath || './';
 
-  fetch(changelogBasePath + '/majorversions.json')
+  fetch(changelogBasePath + '/static/majorversions.json')
     .then(response => response.json())
     .then(data => {
       timelineContainer.innerHTML = '';
