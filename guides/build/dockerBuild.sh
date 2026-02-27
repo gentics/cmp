@@ -15,5 +15,4 @@ mkdir -p $HTMLROOT
 cp -Rf $SRCCONTENTROOT/* $CONTENTROOT
 
 
-MSYS_NO_PATHCONV=1 docker run -v $CONTENTROOT:/site -v $HTMLROOT:/html/ --user 1000:1000 --rm gentics/hugo-asciidoctor /site/scripts/build.sh
-#MSYS_NO_PATHCONV=1 docker run -v $CONTENTROOT:/site --user 1000:1000 --rm gentics/hugo-asciidoctor /site/scripts/build.sh
+MSYS_NO_PATHCONV=1 docker run -v $CONTENTROOT:/site -v $HTMLROOT:/html/ --user 1000:1000 --rm gentics/hugo-asciidoctor:0.154.5 /site/scripts/build.sh
