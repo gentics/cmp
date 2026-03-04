@@ -1,0 +1,15 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Site.Title }} - {{ .Title }}</title>
+    
+    <!-- Common Styles: Colors, Fonts, Header, Footer -->
+    <link href="https://www.gentics.com/static/css/common.css" media="screen" rel="stylesheet">
+
+    <!-- Docs/Guides Specific styles -->
+    <link href="/styles/{{if .Params.stylesheet }}{{ .Params.stylesheet }}{{else}}docs.css{{end}}" media="screen" rel="stylesheet">
+
+    <script>
+        window.major_version = "{{ .Site.Params.cmpversion }}";
+    </script>
+</head>

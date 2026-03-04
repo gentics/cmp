@@ -1,0 +1,29 @@
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol class="breadcrumb-list">
+    <li class="breadcrumb-item">
+        <a href="https://www.gentics.com/infoportal" class="breadcrumb-link">Infoportal</a>
+    </li>
+    {{ template "breadcrumbnav" (dict "p1" . "p2" .) }}
+  </ol>
+</nav>
+
+{{ define "breadcrumbnav" }}
+  {{ if .p1.Parent }}
+    {{ template "breadcrumbnav" (dict "p1" .p1.Parent "p2" .p2 ) }}
+  {{ else if not .p1.IsHome }}
+    {{ template "breadcrumbnav" (dict "p1" .p1.Site.Home "p2" .p2 ) }}
+  {{ end }}
+  {{ if ne .p1 .p2 }}
+    {{ if .p1.Title }}
+      <li class="breadcrumb-item">
+          <a href="{{ .p1.RelPermalink }}" class="breadcrumb-link">{{ .p1.Title }}</a>
+      </li>
+    {{ end }}
+  {{ else }}
+    {{ if .p1.Title }}
+      <li class="breadcrumb-item active" aria-current="page">
+          <span class="breadcrumb-current">{{ .p1.Title }}</span>
+      </li>
+    {{ end }}
+  {{ end }}
+{{ end }}

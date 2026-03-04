@@ -1,0 +1,52 @@
+<div class="side-nav-overlay"></div>
+<nav class="side-nav-content" aria-label="Hauptnavigation">
+    <ul class="nav-list">
+        {{ $currentPage := . }}
+        {{ $currentSection := .CurrentSection }}
+        {{ range .Site.Home.Sections }}
+            {{ range .Sections }}
+                {{ $isInPath := or (eq . $currentPage) (.IsAncestor $currentPage) }}
+                <li class="nav-item  {{ if $isInPath }}is-expanded{{ end }}">
+                    <a href="{{ .RelPermalink }}" class="nav-link {{ if eq . $currentPage }}active{{ end }}">
+                        {{ .Title | default .File.BaseFileName }}
+                    </a>
+                    {{ if or .Sections .Pages }}
+                        {{ template "nav-recursive" (dict "page" . "current" $currentPage "currentSection" $currentSection) }}
+                    {{ end }}
+                </li>
+            {{ end }}
+            {{ range .RegularPages }}
+                <li class="nav-item {{ if eq . $currentPage }}active{{ end }}">
+                    <a href="{{ .RelPermalink }}" class="nav-link">
+                        {{ .Title }}
+                    </a>
+                </li>
+            {{ end }}    
+        {{ end }}         
+    </ul>
+</nav>
+
+
+{{ define "nav-recursive" }}
+    {{ $current := .current }}
+    <ul class="nav-submenu">
+    {{ range .page.Sections }}
+        {{ $isInPath := or (eq . $current) (.IsAncestor $current) }}
+        <li class="nav-item {{ if eq . $.current }}active{{ end }} {{ if $isInPath }}is-expanded{{ end }}">
+            <a href="{{ .RelPermalink }}" class="nav-link">
+                {{ .Title | default .File.BaseFileName }}
+            </a>
+            {{ if or .Sections .Pages }}
+                {{ template "nav-recursive" (dict "page" . "current" $.current "currentSection" $.currentSection) }}
+            {{ end }}
+        </li>
+    {{ end }}
+    {{ range .page.RegularPages }}
+        <li class="nav-item {{ if eq . $.current }}active{{ end }}">
+            <a href="{{ .RelPermalink }}" class="nav-link">
+                {{ .Title }}
+            </a>
+        </li>
+    {{ end }}
+    </ul>
+{{ end }}
