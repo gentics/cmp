@@ -1,0 +1,25 @@
+<div class="subsection-list">
+     
+
+    {{ range .Sections }}
+        <a href="{{ .RelPermalink }}">
+            <div class="subsection-item page">
+                <h3>{{ .Title }}</h3>
+                {{ with .Description }}
+                <p>{{ . }}</p>
+                {{ end }}
+            </div>
+        </a>
+    {{ end }}
+    {{ range .Pages }}
+        <a href="{{ .RelPermalink }}">
+            <div class="subsection-item page">
+                <h3>{{ .Title }}</h3>
+                {{ with .Description }}
+                <p>{{ . }}</p>
+                {{ end }}
+            </div>
+        </a>
+    {{ end }}
+
+</div>

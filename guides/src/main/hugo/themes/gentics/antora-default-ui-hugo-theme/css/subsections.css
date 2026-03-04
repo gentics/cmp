@@ -1,0 +1,114 @@
+/* ============================================
+   SUBSECTION.CSS - Subsection List Styles
+   ============================================
+   Styles for subsection overview pages
+   ============================================ */
+
+/* ============================================
+   SUBSECTION LIST
+   ============================================ */
+
+.subsection-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 32px 20px;
+    max-width: 1200px;
+}
+
+/* ============================================
+   SUBSECTION ITEM CARDS
+   ============================================ */
+
+.subsection-item {
+    background: var(--bg-white);
+    border-radius: 12px;
+    padding: 32px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 500px;
+}
+
+.subsection-item:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   SUBSECTION TITLE
+   ============================================ */
+
+.subsection-item h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0;
+    line-height: 1.3;
+}
+
+.subsection-item h3 a {
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.subsection-item h3 a:hover {
+    color: var(--primary);
+}
+
+/* ============================================
+   SUBSECTION DESCRIPTION
+   ============================================ */
+
+.subsection-item p {
+    color: var(--text-medium);
+    line-height: 1.7;
+    font-size: 15px;
+    margin-bottom: 0;
+}
+
+/* Optional: Add icon support */
+.subsection-item.with-icon {
+    padding-left: 28px;
+    position: relative;
+}
+
+.subsection-item.with-icon::before {
+    content: '→';
+    position: absolute;
+    left: 32px;
+    top: 32px;
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ============================================
+   RESPONSIVE - SUBSECTION
+   ============================================ */
+
+@media (max-width: 768px) {
+    .subsection-list {
+        grid-template-columns: 1fr;
+        padding: 24px 16px;
+        gap: 20px;
+    }
+
+    .subsection-item {
+        padding: 24px;
+    }
+
+    .subsection-item h3 {
+        font-size: 20px;
+    }
+
+    .subsection-item p {
+        font-size: 14px;
+    }
+}

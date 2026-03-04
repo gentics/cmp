@@ -8,6 +8,7 @@
 
     <modules>
         <module>changelog</module>
+        <module>guides</module>
     </modules>
 
     <properties>
@@ -48,6 +49,9 @@
         <!-- Gentics Portal | php -->
         <portal.php.version>3.3.4</portal.php.version>
         <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
+
+        <!-- ANDP -->
+        <andp.version>8.3.13-SNAPSHOT</andp.version>
     </properties>
 
 	<pluginRepositories>

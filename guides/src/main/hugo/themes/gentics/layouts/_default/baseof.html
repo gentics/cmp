@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    {{ partial "head.html" . }}
+    <body>
+
+        {{ partial "header.html" . }}
+
+
+        <section class="hero-small">
+            <div class="container">
+                <h1>{{ .Title }}</h1>
+            </div>
+        </section>
+
+        <!-- Side Navigation -->
+        <aside class="side-nav" id="main-nav">
+            {{ partial "nav.html" . }}
+        </aside>    
+ 
+        {{ partial "search.html" . }}
+
+        <!-- Main Layout Wrapper -->
+        <div class="layout-wrapper">
+            {{ block "content" . }}{{end}}
+        </div>
+
+        
+        {{ partial "footer.html" . }}
+
+        {{ partial "scripts.html" . }}
+        
+    </body>
+</html>
+
+

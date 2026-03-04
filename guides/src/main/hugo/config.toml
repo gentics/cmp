@@ -1,0 +1,27 @@
+languageCode = "en-us"
+title = "Gentics CMP - Guides"
+baseURL = "https://www.gentics.com/guides/"
+theme = "gentics"
+
+DefaultContentLanguage = "en-us"
+
+relativeURLs = true
+canonifyurls = true
+enableRobotsTXT = true
+publishDir = "output" # if you use GitHub to deploy
+disableKinds = ["RSS"]
+
+pluralizeListTitles = false
+
+[security]
+  [security.exec]
+    allow = ["asciidoctor"]
+
+
+[markup]
+  [markup.asciidocExt]
+    workingFolderCurrent = true
+
+[outputs]
+  home = ["HTML", "JSON"]
+
