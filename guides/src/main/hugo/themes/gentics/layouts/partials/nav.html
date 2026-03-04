@@ -15,7 +15,7 @@
                     {{ end }}
                 </li>
             {{ end }}
-            {{ range .Pages }}
+            {{ range .RegularPages }}
                 <li class="nav-item {{ if eq . $currentPage }}active{{ end }}">
                     <a href="{{ .RelPermalink }}" class="nav-link">
                         {{ .Title }}
@@ -41,7 +41,7 @@
             {{ end }}
         </li>
     {{ end }}
-    {{ range .page.Pages }}
+    {{ range .page.RegularPages }}
         <li class="nav-item {{ if eq . $.current }}active{{ end }}">
             <a href="{{ .RelPermalink }}" class="nav-link">
                 {{ .Title }}

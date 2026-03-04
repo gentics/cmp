@@ -108,4 +108,4 @@
   function getNumericStyleVal (el, prop) {
     return parseFloat(window.getComputedStyle(el)[prop])
   }
-})()
+})();

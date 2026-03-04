@@ -8,8 +8,7 @@
 
     <modules>
         <module>changelog</module>
-        <!-- TODO: Re-enable when building guides is fixed.-->
-        <!-- <module>guides</module> -->
+        <module>guides</module>
     </modules>
 
     <properties>
@@ -52,7 +51,7 @@
         <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
 
         <!-- ANDP -->
-        <andp.version>8.4.1</andp.version>
+        <andp.version>8.3.13-SNAPSHOT</andp.version>
     </properties>
 
 	<pluginRepositories>
