@@ -7,6 +7,8 @@ SCRIPT=$(realpath $0)
 BASEDIR=$(dirname $SCRIPT)
 ROOT=$(realpath $BASEDIR/..)
 
+MAJOR_VERSION=$1
+
 echo "Building css"
 cd $ROOT/themes/gentics
 yarn install && yarn build
@@ -27,11 +29,14 @@ cd $ROOT
 
 ls -ltrah ./
 
-hugo && echo "done generating"
+HUGO_PARAMS_CMPVERSION=$MAJOR_VERSION hugo --baseURL https://www.gentics.com/guides/$MAJOR_VERSION/  && echo "done generating"
 
 echo "Move output files"
 rm /html/* -Rf
-mv output/* /html/
+
+mkdir -p /html/$MAJOR_VERSION
+mv output/* /html/$MAJOR_VERSION
+
 
 echo "Finished"
 #chmod -R a+rwx $ROOT/static/docs

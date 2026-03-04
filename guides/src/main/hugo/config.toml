@@ -1,6 +1,6 @@
 languageCode = "en-us"
-title = "ANDP - Documentation"
-baseURL = "https://www.gentics.com/guides/html/"
+title = "Gentics CMP - Guides"
+baseURL = "https://www.gentics.com/guides/"
 theme = "gentics"
 
 DefaultContentLanguage = "en-us"

@@ -8,4 +8,8 @@
 
     <!-- Docs/Guides Specific styles -->
     <link href="/styles/{{if .Params.stylesheet }}{{ .Params.stylesheet }}{{else}}docs.css{{end}}" media="screen" rel="stylesheet">
+
+    <script>
+        window.major_version = "{{ .Site.Params.cmpversion }}";
+    </script>
 </head>
