@@ -5,7 +5,11 @@
             <!-- Brand -->
             <div class="brand">
                 <a href="https://www.gentics.com/infoportal"><img src="https://www.gentics.com/static/logos/gentics-logo-primaryblue.jpg" alt="Gentics Logo" class="brand-logo"></a>
-                <span class="brand-headline">{{ .Site.Title }}</span>
+                {{ with .Params.product }}
+                    <span class="brand-headline">{{ . }} - Guides</span>
+                {{ else }}
+                    <span class="brand-headline">{{ .Site.Title }}</span>
+                {{ end }}
             </div>
 
             <div class="header-actions">
@@ -13,6 +17,15 @@
                <button class="search-toggle" aria-label="Open search" aria-expanded="false" aria-controls="search-overlay">
                     <span class="search-icon" aria-hidden="true">🔍</span>
                 </button>
+
+                <details class="versions-switch">
+                    <summary class="current-version">
+                        <span class="version-name"></span>
+                        <span class="dropdown-indicator" aria-hidden="true">›</span>
+                    </summary>
+                    <div class="version-entries">
+                        </div>
+                </details>
 
                 <!-- Mobile Menu Toggle -->
                 <button class="mobile-menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="main-nav">
