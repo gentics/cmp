@@ -63,6 +63,21 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
+Name of the secret containing the CMS license key.
+Priority: local cms.license.secret (explicit override) → global license secret (umbrella chart)
+         → cms.fullname (sub-chart's own secret, when license.key is set locally).
+*/}}
+{{- define "cms.licenseSecretName" -}}
+{{- if .Values.cms.license.secret -}}
+{{ .Values.cms.license.secret }}
+{{- else if .Values.global.license.key -}}
+{{ .Release.Name }}-license
+{{- else -}}
+{{ include "cms.fullname" . }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Image pull secrets — local image.pullSecret overrides global; global is the default.
 Local accepts a plain secret name string; global uses the Kubernetes-native array format.
 */}}

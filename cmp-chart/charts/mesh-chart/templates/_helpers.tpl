@@ -110,6 +110,23 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
+Name of the secret containing the Mesh license key.
+Priority: local license.secret (explicit override) → global license secret (umbrella chart)
+         → mesh.fullname-secrets (sub-chart's own secret, when license.key is set locally).
+Note: Mesh mounts the license from the shared PVC, not directly from this secret.
+      This helper is provided for consistency and future use.
+*/}}
+{{- define "mesh.licenseSecretName" -}}
+{{- if .Values.license.secret -}}
+{{ .Values.license.secret }}
+{{- else if .Values.global.license.key -}}
+{{ .Release.Name }}-license
+{{- else -}}
+{{ include "mesh.fullname" . }}-secrets
+{{- end -}}
+{{- end -}}
+
+{{/*
 Image pull secrets for the main Mesh image.
 Local imagePullSecrets overrides global; global is the default. Both use the array format.
 */}}

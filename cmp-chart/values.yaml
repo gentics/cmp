@@ -20,6 +20,13 @@ global:
   ## Leave empty to use the cluster default.
   storageClass: ""
 
+  ## License key shared across all CMP components.
+  ## When set, the umbrella chart creates a single Secret named "<release>-license"
+  ## and each sub-chart is configured to reference it automatically.
+  ## Leave empty if you manage the license secret externally or per-component.
+  license:
+    key: ""
+
 # -----------------------------------------------------------------------
 # CMS
 # -----------------------------------------------------------------------

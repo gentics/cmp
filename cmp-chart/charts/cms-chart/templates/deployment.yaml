@@ -45,24 +45,11 @@ spec:
         {{- toYaml .Values.lifecycle | nindent 12 }}
         {{- end }}
         env:
-          {{- if $.Values.cms.license.secret }}
+          {{- if or $.Values.cms.license.secret $.Values.global.license.key $.Values.cms.license.key $.Values.cms.licenseKey }}
           - name: LICENSEKEY
             valueFrom:
               secretKeyRef:
-                name: {{ $.Values.cms.license.secret }}
-                key: licensekey
-          {{- else if $.Values.cms.license.key }}
-          - name: LICENSEKEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "cms.fullname" . }}
-                key: licensekey
-          ## only for backwards compatibility cmp < 8.2 - remove when Helmchart moved to cms repo
-          {{- else if $.Values.cms.licenseKey }}
-          - name: LICENSEKEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "cms.fullname" . }}
+                name: {{ include "cms.licenseSecretName" . }}
                 key: licensekey
           {{- end }}
           - name: NODE_DB_HOST

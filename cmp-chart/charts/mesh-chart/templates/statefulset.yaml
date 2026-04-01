@@ -139,7 +139,7 @@ spec:
             name: shared
             subPath: binaryImageCache
           {{- end }}
-          {{- if or .Values.license.key .Values.license.secret }}
+          {{- if or .Values.license.key .Values.license.secret .Values.global.license.key }}
           - name: shared
             mountPath: {{ .Values.license.path }}
             subPath: license
