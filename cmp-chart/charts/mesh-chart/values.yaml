@@ -224,7 +224,7 @@ tools:
     repository: docker.gentics.com/gentics/mesh/mesh-tools
     tag: 1.0.2
     pullPolicy: IfNotPresent
-    pullSecret: docker-gentics-com
+    pullSecret: ""
 
 # Restore settings. The restore operation is invoked when the initial cluster is being setup.
 # The restore will utilize the backup snapshot to populate the keystore and uploads folders.

@@ -61,3 +61,17 @@ Create the name of the service account to use
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Image pull secrets — local image.pullSecret overrides global; global is the default.
+Local accepts a plain secret name string; global uses the Kubernetes-native array format.
+*/}}
+{{- define "cms.imagePullSecrets" -}}
+{{- if .Values.image.pullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.image.pullSecret }}
+{{- else if .Values.global.imagePullSecrets }}
+imagePullSecrets:
+  {{- toYaml .Values.global.imagePullSecrets | nindent 2 }}
+{{- end }}
+{{- end }}

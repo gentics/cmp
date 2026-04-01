@@ -7,7 +7,7 @@ image:
   repository: "docker.gentics.com/gentics/cms"
   tag: 6.1.0
   pullPolicy: IfNotPresent
-  pullSecret: docker-gentics-com
+  pullSecret: ""
 
 database:
   name: "cms"

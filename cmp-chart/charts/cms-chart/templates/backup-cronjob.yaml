@@ -118,11 +118,8 @@ spec:
           imagePullSecrets:
             - name: {{ .Values.cms.backup.image.pullSecret }}
           {{- else }}
-          {{- if .Values.image.pullSecret }}
-          imagePullSecrets:
-            - name: {{ .Values.image.pullSecret }}
-          {{- end}}
-          {{- end}}
+          {{- include "cms.imagePullSecrets" . | nindent 10 }}
+          {{- end }}
           volumes:
             - name: config-cms
               configMap:

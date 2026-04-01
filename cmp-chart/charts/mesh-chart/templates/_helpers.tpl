@@ -108,3 +108,30 @@ Create the name of the service account to use
 {{- $inputVal := index . 1 -}}
 {{- include "hasKeyWithValue" (list $extraEnv "name" $inputVal) -}}
 {{- end -}}
+
+{{/*
+Image pull secrets for the main Mesh image.
+Local imagePullSecrets overrides global; global is the default. Both use the array format.
+*/}}
+{{- define "mesh.imagePullSecrets" -}}
+{{- $secrets := coalesce .Values.imagePullSecrets .Values.global.imagePullSecrets -}}
+{{- if $secrets }}
+imagePullSecrets:
+  {{- toYaml $secrets | nindent 2 }}
+{{- end }}
+{{- end }}
+
+{{/*
+Image pull secrets for the Mesh tools image.
+Local tools.image.pullSecret overrides global; global is the default.
+Local accepts a plain secret name string; global uses the array format.
+*/}}
+{{- define "mesh.toolsImagePullSecrets" -}}
+{{- if .Values.tools.image.pullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.tools.image.pullSecret }}
+{{- else if .Values.global.imagePullSecrets }}
+imagePullSecrets:
+  {{- toYaml .Values.global.imagePullSecrets | nindent 2 }}
+{{- end }}
+{{- end }}

@@ -25,10 +25,7 @@ spec:
             {{- toYaml .Values.podSecurityContext | nindent 12 }}
           restartPolicy: Never
           serviceAccountName: {{ include "mesh.serviceAccountName" . }}
-          {{- if .Values.tools.image.pullSecret }}
-          imagePullSecrets:
-          - name: {{ .Values.tools.image.pullSecret }}
-          {{- end }}
+          {{- include "mesh.toolsImagePullSecrets" . | nindent 10 }}
           containers:
           - name: backup
             securityContext:

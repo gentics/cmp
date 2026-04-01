@@ -1,0 +1,45 @@
+## CMP Umbrella Chart — Default Values
+##
+## Each component section corresponds to the dependency alias defined in Chart.yaml.
+## Values set here are merged with the sub-chart's own defaults.
+## Sub-chart defaults remain active unless explicitly overridden here.
+
+## Global values — shared across all enabled components.
+## Sub-charts must be updated to read from .Values.global (see Path A migration).
+global:
+  ## Container image registry used by all components.
+  ## Sub-charts will prefer this over their own image.repository prefix once global-aware.
+  imageRegistry: "docker.gentics.com"
+
+  ## Image pull secrets applied to all component pods.
+  ## Replaces the per-chart image.pullSecret / imagePullSecrets fields.
+  imagePullSecrets:
+    - name: docker-gentics-com
+
+  ## Default StorageClass for all PersistentVolumeClaims.
+  ## Leave empty to use the cluster default.
+  storageClass: ""
+
+# -----------------------------------------------------------------------
+# CMS
+# -----------------------------------------------------------------------
+cms:
+  enabled: true
+
+# -----------------------------------------------------------------------
+# Mesh
+# -----------------------------------------------------------------------
+mesh:
+  enabled: true
+
+# -----------------------------------------------------------------------
+# Portal | Java
+# -----------------------------------------------------------------------
+portal-java:
+  enabled: true
+
+# -----------------------------------------------------------------------
+# MariaDB (optional — disable if you provide an external database)
+# -----------------------------------------------------------------------
+mariadb:
+  enabled: false

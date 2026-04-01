@@ -24,6 +24,8 @@ spec:
           {{- if $job.image.pullSecret }}
           imagePullSecrets:
           - name: {{ $job.image.pullSecret }}
+          {{- else }}
+          {{- include "mesh.imagePullSecrets" $ | nindent 10 }}
           {{- end }}
 
           containers:
