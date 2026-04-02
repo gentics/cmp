@@ -63,6 +63,44 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
+Database host for CMS.
+Uses explicit database.host if set; falls back to the bundled MariaDB service name
+when global.mariadb.enabled is true; otherwise raises an error.
+*/}}
+{{- define "cms.databaseHost" -}}
+{{- if .Values.database.host -}}
+{{ .Values.database.host }}
+{{- else if .Values.global.mariadb.enabled -}}
+{{ .Release.Name }}-mariadb
+{{- else -}}
+{{ required "database.host is required when global.mariadb.enabled is false" "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Secret name and key for the CMS database password.
+Priority: explicit database.passwordSecret → umbrella MariaDB secret → sub-chart local secret.
+Returns a full secretKeyRef block.
+*/}}
+{{- define "cms.databasePasswordRef" -}}
+{{- if .Values.database.passwordSecret -}}
+secretKeyRef:
+  name: {{ .Values.database.passwordSecret }}
+  key: password
+{{- else if .Values.global.mariadb.enabled -}}
+secretKeyRef:
+  name: {{ .Release.Name }}-cms-db
+  key: password
+{{- else if .Values.database.password -}}
+secretKeyRef:
+  name: {{ include "cms.fullname" . }}
+  key: database-password
+{{- else -}}
+{{ required "Either database.password, database.passwordSecret, or global.mariadb.enabled are required" "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Name of the secret containing the CMS license key.
 Priority: local cms.license.secret (explicit override) → global license secret (umbrella chart)
          → cms.fullname (sub-chart's own secret, when license.key is set locally).

@@ -16,16 +16,18 @@ global:
   imagePullSecrets:
     - name: docker-gentics-com
 
-  ## Default StorageClass for all PersistentVolumeClaims.
-  ## Leave empty to use the cluster default.
-  storageClass: ""
-
   ## License key shared across all CMP components.
   ## When set, the umbrella chart creates a single Secret named "<release>-license"
   ## and each sub-chart is configured to reference it automatically.
   ## Leave empty if you manage the license secret externally or per-component.
   license:
     key: ""
+
+  ## MariaDB integration flag.
+  ## Must be set to true together with mariadb.enabled to activate auto-wiring of
+  ## database host and credentials in CMS and Mesh sub-charts.
+  mariadb:
+    enabled: false
 
 # -----------------------------------------------------------------------
 # CMS
@@ -50,3 +52,13 @@ portal-java:
 # -----------------------------------------------------------------------
 mariadb:
   enabled: false
+
+# -----------------------------------------------------------------------
+# Database init job
+# Image used by the post-install job that sets up databases and users.
+# Should be a MariaDB-compatible client image.
+# -----------------------------------------------------------------------
+dbInitJob:
+  image:
+    repository: "docker.io/bitnami/mariadb"
+    tag: "latest"

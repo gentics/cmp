@@ -14,7 +14,7 @@ database:
   username: "node"
   # password: "node"
   # passwordSecret: "cms.database.secret"
-  host: "mariadb"
+  host: ""
   port: "3306"
 
 # Add custom certificates to the jvm truststore

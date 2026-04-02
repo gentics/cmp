@@ -42,3 +42,14 @@ All sub-charts that support license.secret reference this name.
 {{- define "cmp.licenseSecretName" -}}
 {{- .Release.Name }}-license
 {{- end -}}
+
+{{/*
+Image pull secrets for umbrella-chart-owned pods (e.g. the db-init job).
+Uses global.imagePullSecrets when set.
+*/}}
+{{- define "cmp.imagePullSecrets" -}}
+{{- if .Values.global.imagePullSecrets }}
+imagePullSecrets:
+  {{- toYaml .Values.global.imagePullSecrets | nindent 2 }}
+{{- end }}
+{{- end }}

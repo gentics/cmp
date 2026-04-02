@@ -53,27 +53,14 @@ spec:
                 key: licensekey
           {{- end }}
           - name: NODE_DB_HOST
-            value: "{{ .Values.database.host }}"
+            value: {{ include "cms.databaseHost" . | quote }}
           - name: NODE_DB_PORT
             value: "{{ .Values.database.port }}"
           - name: NODE_DB_USER
             value: "{{ .Values.database.username }}"
-          {{- if $.Values.database.passwordSecret }}
           - name: NODE_DB_PASSWORD
             valueFrom:
-              secretKeyRef:
-                name: {{ $.Values.database.passwordSecret }}
-                key: password
-          {{- else if $.Values.database.password }}
-          - name: NODE_DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "cms.fullname" . }}
-                key: database-password
-          {{- else }}
-          - name: NODE_DB_PASSWORD
-            value: "{{ required "Either database.password or database.passwordSecret are required!" "" }}"
-          {{- end }}
+              {{- include "cms.databasePasswordRef" . | nindent 14 }}
           - name: NODE_DB_NAME
             value: "{{ .Values.database.name }}"
           - name: ADD_JAVA_OPTS

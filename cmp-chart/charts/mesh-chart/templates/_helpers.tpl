@@ -110,6 +110,86 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
+Database host for Mesh.
+Uses explicit database.host if set; falls back to the bundled MariaDB service name
+when global.mariadb.enabled is true; otherwise raises an error.
+*/}}
+{{- define "mesh.databaseHost" -}}
+{{- if .Values.database.host -}}
+{{ .Values.database.host }}
+{{- else if .Values.global.mariadb.enabled -}}
+{{ .Release.Name }}-mariadb
+{{- else -}}
+{{ required "database.host is required when global.mariadb.enabled is false" "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Database port for Mesh.
+Uses explicit database.port if set; falls back to 3306 when global.mariadb.enabled.
+*/}}
+{{- define "mesh.databasePort" -}}
+{{- if .Values.database.port -}}
+{{ .Values.database.port }}
+{{- else if .Values.global.mariadb.enabled -}}
+3306
+{{- else -}}
+{{ required "database.port is required when global.mariadb.enabled is false" "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Database name for Mesh.
+Uses explicit database.name if set; falls back to "mesh" when global.mariadb.enabled.
+*/}}
+{{- define "mesh.databaseName" -}}
+{{- if .Values.database.name -}}
+{{ .Values.database.name }}
+{{- else if .Values.global.mariadb.enabled -}}
+mesh
+{{- else -}}
+{{ required "database.name is required when global.mariadb.enabled is false" "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Database username for Mesh.
+Uses explicit database.username if set; falls back to "mesh" when global.mariadb.enabled.
+*/}}
+{{- define "mesh.databaseUsername" -}}
+{{- if .Values.database.username -}}
+{{ .Values.database.username }}
+{{- else if .Values.global.mariadb.enabled -}}
+mesh
+{{- else -}}
+{{ required "database.username is required when global.mariadb.enabled is false" "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Secret name and key for the Mesh database password.
+Priority: explicit database.passwordSecret → umbrella MariaDB secret → sub-chart local secret.
+Returns a full secretKeyRef block.
+*/}}
+{{- define "mesh.databasePasswordRef" -}}
+{{- if .Values.database.passwordSecret -}}
+secretKeyRef:
+  name: {{ .Values.database.passwordSecret }}
+  key: password
+{{- else if .Values.global.mariadb.enabled -}}
+secretKeyRef:
+  name: {{ .Release.Name }}-mesh-db
+  key: password
+{{- else if .Values.database.password -}}
+secretKeyRef:
+  name: {{ include "mesh.fullname" . }}-database
+  key: password
+{{- else -}}
+{{ required "Either database.password, database.passwordSecret, or global.mariadb.enabled are required" "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Name of the secret containing the Mesh license key.
 Priority: local license.secret (explicit override) → global license secret (umbrella chart)
          → mesh.fullname-secrets (sub-chart's own secret, when license.key is set locally).
