@@ -90,7 +90,7 @@
                 <span class="release-date">$changelog.date</span>
               </div>
               #foreach($component in $components)##
-                <section id="$component.id" class="component_${component.id}">
+                <section id="${changelog.version}_${component.id}" class="component_${component.id}">
                   <h4>$component.name $changelog.getComponentVersion($component)</h4>
                   #if($changelog.hasChangelogEntries($component))##
                     #foreach($entry in $changelog.getChangelogEntries($component))
