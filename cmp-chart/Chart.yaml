@@ -18,25 +18,19 @@ dependencies:
   - name: cms
     # TODO: replace with your published Helm repository URL
     repository: "https://charts.gentics.com"
-    version: "6.4.0"
+    version: "*.*.*"
     condition: cms.enabled
 
   - name: gentics-mesh
     alias: mesh
     # TODO: replace with your published Helm repository URL
     repository: "https://charts.gentics.com"
-    version: "0.0.0"
+    version: "*.*.*"
     condition: mesh.enabled
 
   - name: gentics-portal-java
     alias: portal-java
     # TODO: replace with your published Helm repository URL
     repository: "https://charts.gentics.com"
-    version: "1.2.9"
+    version: "*.*.*"
     condition: portal-java.enabled
-
-  - name: mariadb
-    repository: "https://charts.bitnami.com/bitnami"
-    # TODO: pin to a specific version after validating compatibility
-    version: ">=18.0.0"
-    condition: mariadb.enabled

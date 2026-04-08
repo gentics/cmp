@@ -93,9 +93,11 @@ spec:
           {{- if .Values.cms.extraEnv }}
           {{- toYaml .Values.cms.extraEnv | nindent 10 }}
           {{- end }}
-          {{- if and .Values.customCert .Values.customCert.secretName }}
+          {{- with .Values.customCert }}
+          {{- if .secretName }}
           - name: USE_SYSTEM_CA_CERTS
             value: "1"
+          {{- end }}
           {{- end }}
         volumeMounts:
           {{- range .Values.cmsExtraVolumes }}
@@ -163,10 +165,12 @@ spec:
           {{- end }}  
           {{- end }}
           {{- end }}
-          {{- if and .Values.customCert .Values.customCert.secretName }}
+          {{- with .Values.customCert }}
+          {{- if .secretName }}
           - name: cert-secret
             mountPath: "/certificates"
             readOnly: true
+          {{- end }}
           {{- end }}
         ports:
           - name: http
@@ -242,8 +246,10 @@ spec:
           claimName: {{ include "cms.fullname" . }}-backup
           {{- end }}
       {{- end }}
-      {{- if and .Values.customCert .Values.customCert.secretName }}
+      {{- with .Values.customCert }}
+      {{- if .secretName }}
       - name: cert-secret
         secret:
-          secretName: {{ .Values.customCert.secretName }}
+          secretName: {{ .secretName }}
+      {{- end }}
       {{- end }}

@@ -17,22 +17,25 @@ spec:
         app.kubernetes.io/name: {{ .Release.Name }}-db-init
     spec:
       restartPolicy: OnFailure
-      {{- include "cmp.imagePullSecrets" . | nindent 6 }}
+      {{- with .Values.mariadb.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: db-init
-          image: "{{ .Values.dbInitJob.image.repository }}:{{ .Values.dbInitJob.image.tag }}"
-          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}"
+          imagePullPolicy: {{ .Values.mariadb.image.pullPolicy }}
           command:
             - /bin/sh
             - -c
             - |
               set -e
 
-              ROOT_PASS=$(cat /secrets/mariadb/mariadb-root-password)
+              ROOT_PASS=$(cat /secrets/mariadb/root-password)
               MARIADB_HOST="{{ .Release.Name }}-mariadb"
 
               echo "Waiting for MariaDB at $MARIADB_HOST..."
-              until mysql -h "$MARIADB_HOST" -u root -p"$ROOT_PASS" -e "SELECT 1" 2>/dev/null; do
+              until mariadb -h "$MARIADB_HOST" -u root -p"$ROOT_PASS" -e "SELECT 1" 2>/dev/null; do
                 echo "  not ready yet, retrying in 5s..."
                 sleep 5
               done
@@ -42,10 +45,10 @@ spec:
 
               echo "Setting up CMS database..."
               CMS_PASS=$(cat /secrets/cms/password)
-              mysql -h "$MARIADB_HOST" -u root -p"$ROOT_PASS" \
-                -e "CREATE DATABASE IF NOT EXISTS \`{{ .Values.cms.database.name | default "cms" }}\`;" \
-                -e "CREATE USER IF NOT EXISTS '{{ .Values.cms.database.username | default "node" }}'@'%' IDENTIFIED BY '${CMS_PASS}';" \
-                -e "GRANT ALL PRIVILEGES ON \`{{ .Values.cms.database.name | default "cms" }}\`.* TO '{{ .Values.cms.database.username | default "node" }}'@'%';" \
+              mariadb -h "$MARIADB_HOST" -u root -p"$ROOT_PASS" \
+                -e "CREATE DATABASE IF NOT EXISTS \`{{ ((.Values.cms.database).name) | default "cms" }}\`;" \
+                -e "CREATE USER IF NOT EXISTS '{{ ((.Values.cms.database).username) | default "node" }}'@'%' IDENTIFIED BY '${CMS_PASS}';" \
+                -e "GRANT ALL PRIVILEGES ON \`{{ ((.Values.cms.database).name) | default "cms" }}\`.* TO '{{ ((.Values.cms.database).username) | default "node" }}'@'%';" \
                 -e "FLUSH PRIVILEGES;"
               echo "CMS database setup done."
               {{- end }}
@@ -54,10 +57,10 @@ spec:
 
               echo "Setting up Mesh database..."
               MESH_PASS=$(cat /secrets/mesh/password)
-              mysql -h "$MARIADB_HOST" -u root -p"$ROOT_PASS" \
-                -e "CREATE DATABASE IF NOT EXISTS \`{{ .Values.mesh.database.name | default "mesh" }}\`;" \
-                -e "CREATE USER IF NOT EXISTS '{{ .Values.mesh.database.username | default "mesh" }}'@'%' IDENTIFIED BY '${MESH_PASS}';" \
-                -e "GRANT ALL PRIVILEGES ON \`{{ .Values.mesh.database.name | default "mesh" }}\`.* TO '{{ .Values.mesh.database.username | default "mesh" }}'@'%';" \
+              mariadb -h "$MARIADB_HOST" -u root -p"$ROOT_PASS" \
+                -e "CREATE DATABASE IF NOT EXISTS \`{{ ((.Values.mesh.database).name) | default "mesh" }}\`;" \
+                -e "CREATE USER IF NOT EXISTS '{{ ((.Values.mesh.database).username) | default "mesh" }}'@'%' IDENTIFIED BY '${MESH_PASS}';" \
+                -e "GRANT ALL PRIVILEGES ON \`{{ ((.Values.mesh.database).name) | default "mesh" }}\`.* TO '{{ ((.Values.mesh.database).username) | default "mesh" }}'@'%';" \
                 -e "FLUSH PRIVILEGES;"
               echo "Mesh database setup done."
               {{- end }}
