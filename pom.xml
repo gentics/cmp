@@ -51,7 +51,7 @@
         <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
 
         <!-- ANDP -->
-        <andp.version>8.3.13</andp.version>
+        <andp.version>8.3.14</andp.version>
     </properties>
 
 	<pluginRepositories>
