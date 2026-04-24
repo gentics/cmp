@@ -220,7 +220,7 @@ function createChangelogOverview(){
   }
 
   const mainNav = document.querySelector('#main-nav');
-  const changelogBasePath = mainNav?.dataset?.changelogbasepath || './'.replace(/static\/$/, "") ;
+  const changelogBasePath = (mainNav?.dataset?.changelogbasepath || './').replace(/static\/$/, "") ;
 
   fetch(changelogBasePath + '/static/majorversions.json')
     .then(response => response.json())
