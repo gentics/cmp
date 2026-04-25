@@ -77,19 +77,16 @@ spec:
           - name: STATIC_SERVE_LIST
             value: {{ join "," .Values.cms.staticServePaths | quote }}
           {{- end }}
-          {{- if $.Values.cms.nodeUserPasswordSecret }}
           - name: NODE_USER_PASSWORD
             valueFrom:
               secretKeyRef:
+                {{- if $.Values.cms.nodeUserPasswordSecret }}
                 name: {{ $.Values.cms.nodeUserPasswordSecret }}
                 key: password
-          {{- else if $.Values.cms.nodeUserPassword }}
-          - name: NODE_USER_PASSWORD
-            valueFrom:
-              secretKeyRef:
+                {{- else }}
                 name: {{ template "cms.fullname" . }}
                 key: node-user-password
-          {{- end }}
+                {{- end }}
           {{- if .Values.cms.extraEnv }}
           {{- toYaml .Values.cms.extraEnv | nindent 10 }}
           {{- end }}

@@ -1,0 +1,12 @@
+{{- if and .Values.mariadb.enabled .Values.mariadb.config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-mariadb
+  labels:
+    {{- include "cmp.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mariadb
+data:
+  custom.cnf: |
+    {{- .Values.mariadb.config | nindent 4 }}
+{{- end }}

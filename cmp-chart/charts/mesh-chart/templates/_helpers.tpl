@@ -115,8 +115,9 @@ Uses explicit database.host if set; falls back to the bundled MariaDB service na
 when global.mariadb.enabled is true; otherwise raises an error.
 */}}
 {{- define "mesh.databaseHost" -}}
-{{- if .Values.database.host -}}
-{{ .Values.database.host }}
+{{- $db := .Values.database | default dict -}}
+{{- if $db.host -}}
+{{ $db.host }}
 {{- else if .Values.global.mariadb.enabled -}}
 {{ .Release.Name }}-mariadb
 {{- else -}}
@@ -129,8 +130,9 @@ Database port for Mesh.
 Uses explicit database.port if set; falls back to 3306 when global.mariadb.enabled.
 */}}
 {{- define "mesh.databasePort" -}}
-{{- if .Values.database.port -}}
-{{ .Values.database.port }}
+{{- $db := .Values.database | default dict -}}
+{{- if $db.port -}}
+{{ $db.port }}
 {{- else if .Values.global.mariadb.enabled -}}
 3306
 {{- else -}}
@@ -143,8 +145,9 @@ Database name for Mesh.
 Uses explicit database.name if set; falls back to "mesh" when global.mariadb.enabled.
 */}}
 {{- define "mesh.databaseName" -}}
-{{- if .Values.database.name -}}
-{{ .Values.database.name }}
+{{- $db := .Values.database | default dict -}}
+{{- if $db.name -}}
+{{ $db.name }}
 {{- else if .Values.global.mariadb.enabled -}}
 mesh
 {{- else -}}
@@ -157,8 +160,9 @@ Database username for Mesh.
 Uses explicit database.username if set; falls back to "mesh" when global.mariadb.enabled.
 */}}
 {{- define "mesh.databaseUsername" -}}
-{{- if .Values.database.username -}}
-{{ .Values.database.username }}
+{{- $db := .Values.database | default dict -}}
+{{- if $db.username -}}
+{{ $db.username }}
 {{- else if .Values.global.mariadb.enabled -}}
 mesh
 {{- else -}}
@@ -172,15 +176,16 @@ Priority: explicit database.passwordSecret → umbrella MariaDB secret → sub-c
 Returns a full secretKeyRef block.
 */}}
 {{- define "mesh.databasePasswordRef" -}}
-{{- if .Values.database.passwordSecret -}}
+{{- $db := .Values.database | default dict -}}
+{{- if $db.passwordSecret -}}
 secretKeyRef:
-  name: {{ .Values.database.passwordSecret }}
+  name: {{ $db.passwordSecret }}
   key: password
 {{- else if .Values.global.mariadb.enabled -}}
 secretKeyRef:
   name: {{ .Release.Name }}-mesh-db
   key: password
-{{- else if .Values.database.password -}}
+{{- else if $db.password -}}
 secretKeyRef:
   name: {{ include "mesh.fullname" . }}-database
   key: password

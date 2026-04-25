@@ -5,7 +5,7 @@ global:
 
 image:
   repository: "docker.gentics.com/gentics/cms"
-  tag: 6.1.0
+  tag: 6.4.4
   pullPolicy: IfNotPresent
   pullSecret: ""
 
@@ -137,6 +137,18 @@ cms:
     #allow to override default backup.sh script
     #backupScript: |-
 
+  preUpgrade:
+    enabled: false
+    #nodeUser: "node"
+
+    #image:
+    #  repository: "docker.gentics.com/gentics/cms"
+    #  tag: "6.4.4"
+    #  pullPolicy: IfNotPresent
+    #  pullSecret: docker-gentics-com
+
+    #allow to override default preUpgrade.sh script
+    #script: |-
 
 spellchecker:
   enabled: false

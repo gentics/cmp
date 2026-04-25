@@ -27,13 +27,26 @@ global:
   ## Must be set to true together with mariadb.enabled to activate auto-wiring of
   ## database host and credentials in CMS and Mesh sub-charts.
   mariadb:
-    enabled: false
+    enabled: true
 
 # -----------------------------------------------------------------------
 # CMS
 # -----------------------------------------------------------------------
 cms:
   enabled: true
+  image:
+    repository: "docker.gentics.com/gentics/cms"
+    tag: 6.4.3
+  #database:
+  #  host: mariadb
+  #  password: pass
+
+  cms:
+    preUpgrade:
+      enabled: true
+
+  # for all available options, please check the gentics/cms chart
+
 
 # -----------------------------------------------------------------------
 # Mesh
@@ -41,24 +54,79 @@ cms:
 mesh:
   enabled: true
 
+  image:
+    repository: docker.gentics.com/andp/mesh-mariadb
+    tag: andp-8.3.11
+
+
+  #database:
+  #  host: mariadb
+  #  port: 3306
+  #  name: mesh
+  #  username: db-user
+  #  password: db-pw
+
+  # for all available options, please check the gentics/gentics-mesh chart
+
 # -----------------------------------------------------------------------
 # Portal | Java
 # -----------------------------------------------------------------------
 portal-java:
-  enabled: true
+  enabled: false
+  image:
+    repository: docker.gentics.com/YOUR_ID/portal-PROJECT
+    tag: x.x.x
+
+  mesh:
+    apiKeyFromSecret: true
+
+  # for all available options, please check the gentics/gentics-portal-java chart
 
 # -----------------------------------------------------------------------
 # MariaDB (optional — disable if you provide an external database)
 # -----------------------------------------------------------------------
 mariadb:
-  enabled: false
+  enabled: true
 
-# -----------------------------------------------------------------------
-# Database init job
-# Image used by the post-install job that sets up databases and users.
-# Should be a MariaDB-compatible client image.
-# -----------------------------------------------------------------------
-dbInitJob:
   image:
-    repository: "docker.io/bitnami/mariadb"
-    tag: "latest"
+    repository: docker.io/library/mariadb
+    tag: "11"
+    pullPolicy: IfNotPresent
+  ## imagePullSecrets:
+  ##   - name: my-registry-secret
+
+  auth:
+    ## Root password. Leave empty to generate a random password on install.
+    ## The generated password is persisted in the Secret and reused on upgrades.
+    rootPassword: ""
+
+  persistence:
+    ## Storage size for the MariaDB data volume.
+    size: 5Gi
+    ## storageClass: ""   # leave empty to use the cluster default
+    ## Use a pre-created PVC instead of creating one via volumeClaimTemplates.
+    ## existingClaim: ""
+
+  service:
+    type: ClusterIP
+    port: 3306
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+  podSecurityContext: {}
+
+  securityContext: {}
+
+  ## Optional custom MariaDB configuration appended as /etc/mysql/conf.d/custom.cnf.
+  ## config: |
+  ##   [mysqld]
+  ##   max_connections = 300
+  ##   innodb_buffer_pool_size = 512M
+
+
