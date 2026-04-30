@@ -5,6 +5,9 @@ JobContext.set(this)
 final def gitCommitTag         = '[Jenkins | ' + env.JOB_BASE_NAME + ']';
 def tagName = null
 
+final def helmRepositoryProd   = 'https://repo.gentics.com/repository/helm/';
+final def helmRepositoryTest   = 'https://repo.gentics.com/repository/helm-snapshots/';
+
 pipeline {
     agent {
         label 'docker'
@@ -12,7 +15,7 @@ pipeline {
 
     parameters {
         booleanParam(name: 'skipMapping',         defaultValue: false, description: "Skip (re-)generation of mapping files.")
-        booleanParam(name: 'runDeploy',           defaultValue: false, description: "Deploy the Maven artifacts.")
+        booleanParam(name: 'runDeploy',           defaultValue: false, description: "Deploy the Maven and Helm artifacts.")
         booleanParam(name: 'release',             defaultValue: false, description: "Run a release build (this requires 'runDeploy').")
     }
 
@@ -73,6 +76,27 @@ pipeline {
 
                     sh "JAVA_HOME=\$JAVA_1_11_HOME mvn -U -B -fae " + mvnArguments + " clean " + mvnGoal
                 }
+            }
+        }
+
+        stage("Build & Deploy Helm Charts"){
+            when {
+                expression {
+                    return params.runDeploy
+                }
+            }
+            steps {
+                script {
+                    sh ".jenkins/build-helm-chart.sh ${version} cmp-chart/charts/cms-chart"
+                    sh 'ls -ltr target/'
+
+                    /*withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
+                        def helmPackageFilename = "cms-${version}.tgz"
+                        echo "Deploying CMS Helm Chart"
+                        sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${helmPackageFilename}"
+                    }*/
+                }
+
             }
         }
 
