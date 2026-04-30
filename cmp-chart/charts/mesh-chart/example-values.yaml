@@ -95,9 +95,10 @@ ssl:
   trustedCertPaths: "/certs/server.pem"
   existingSecret: "mesh-ssl-secret"
 
-credentials:
-  initialAdminPassword: "YOURPW"
-  forcePasswordReset: false
+
+initialAdminPassword:
+  password: "YOURPW"
+  forceReset: false
 
 cluster:
   enabled: true

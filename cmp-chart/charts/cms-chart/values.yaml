@@ -137,6 +137,34 @@ cms:
     #allow to override default backup.sh script
     #backupScript: |-
 
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    timeoutSeconds: 1
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 6
+
+  startupProbe:
+    httpGet:
+      path: /
+      port: http
+    timeoutSeconds: 1
+    periodSeconds: 2
+    successThreshold: 1
+    failureThreshold: 90 #3min bootup time
+   
+  readinessProbe:
+    httpGet:
+      path: /rest/info/maintenance
+      port: http
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+
+
   preUpgrade:
     enabled: false
     #nodeUser: "node"

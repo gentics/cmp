@@ -116,9 +116,10 @@ when global.mariadb.enabled is true; otherwise raises an error.
 */}}
 {{- define "mesh.databaseHost" -}}
 {{- $db := .Values.database | default dict -}}
+{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
 {{- if $db.host -}}
 {{ $db.host }}
-{{- else if .Values.global.mariadb.enabled -}}
+{{- else if $globalMariadb.enabled -}}
 {{ .Release.Name }}-mariadb
 {{- else -}}
 {{ required "database.host is required when global.mariadb.enabled is false" "" }}
@@ -131,9 +132,10 @@ Uses explicit database.port if set; falls back to 3306 when global.mariadb.enabl
 */}}
 {{- define "mesh.databasePort" -}}
 {{- $db := .Values.database | default dict -}}
+{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
 {{- if $db.port -}}
 {{ $db.port }}
-{{- else if .Values.global.mariadb.enabled -}}
+{{- else if $globalMariadb.enabled -}}
 3306
 {{- else -}}
 {{ required "database.port is required when global.mariadb.enabled is false" "" }}
@@ -146,9 +148,10 @@ Uses explicit database.name if set; falls back to "mesh" when global.mariadb.ena
 */}}
 {{- define "mesh.databaseName" -}}
 {{- $db := .Values.database | default dict -}}
+{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
 {{- if $db.name -}}
 {{ $db.name }}
-{{- else if .Values.global.mariadb.enabled -}}
+{{- else if $globalMariadb.enabled -}}
 mesh
 {{- else -}}
 {{ required "database.name is required when global.mariadb.enabled is false" "" }}
@@ -161,9 +164,10 @@ Uses explicit database.username if set; falls back to "mesh" when global.mariadb
 */}}
 {{- define "mesh.databaseUsername" -}}
 {{- $db := .Values.database | default dict -}}
+{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
 {{- if $db.username -}}
 {{ $db.username }}
-{{- else if .Values.global.mariadb.enabled -}}
+{{- else if $globalMariadb.enabled -}}
 mesh
 {{- else -}}
 {{ required "database.username is required when global.mariadb.enabled is false" "" }}
@@ -177,11 +181,12 @@ Returns a full secretKeyRef block.
 */}}
 {{- define "mesh.databasePasswordRef" -}}
 {{- $db := .Values.database | default dict -}}
+{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
 {{- if $db.passwordSecret -}}
 secretKeyRef:
   name: {{ $db.passwordSecret }}
   key: password
-{{- else if .Values.global.mariadb.enabled -}}
+{{- else if $globalMariadb.enabled -}}
 secretKeyRef:
   name: {{ .Release.Name }}-mesh-db
   key: password
@@ -202,9 +207,10 @@ Note: Mesh mounts the license from the shared PVC, not directly from this secret
       This helper is provided for consistency and future use.
 */}}
 {{- define "mesh.licenseSecretName" -}}
+{{- $globalLicense := ((.Values.global | default dict).license) | default dict -}}
 {{- if .Values.license.secret -}}
 {{ .Values.license.secret }}
-{{- else if .Values.global.license.key -}}
+{{- else if $globalLicense.key -}}
 {{ .Release.Name }}-license
 {{- else -}}
 {{ include "mesh.fullname" . }}-secrets
@@ -216,7 +222,8 @@ Image pull secrets for the main Mesh image.
 Local imagePullSecrets overrides global; global is the default. Both use the array format.
 */}}
 {{- define "mesh.imagePullSecrets" -}}
-{{- $secrets := coalesce .Values.imagePullSecrets .Values.global.imagePullSecrets -}}
+{{- $global := .Values.global | default dict -}}
+{{- $secrets := coalesce .Values.imagePullSecrets $global.imagePullSecrets -}}
 {{- if $secrets }}
 imagePullSecrets:
   {{- toYaml $secrets | nindent 2 }}
@@ -224,16 +231,33 @@ imagePullSecrets:
 {{- end }}
 
 {{/*
+Secret key ref for the Mesh initial admin password.
+Priority: existingSecret → chart-managed secret (explicit or auto-generated).
+*/}}
+{{- define "mesh.initialAdminPasswordRef" -}}
+{{- if .Values.initialAdminPassword.existingSecret -}}
+secretKeyRef:
+  name: {{ .Values.initialAdminPassword.existingSecret }}
+  key: {{ .Values.initialAdminPassword.existingSecretKey | default "password" }}
+{{- else -}}
+secretKeyRef:
+  name: {{ include "mesh.fullname" . }}-admin
+  key: password
+{{- end -}}
+{{- end -}}
+
+{{/*
 Image pull secrets for the Mesh tools image.
 Local tools.image.pullSecret overrides global; global is the default.
 Local accepts a plain secret name string; global uses the array format.
 */}}
 {{- define "mesh.toolsImagePullSecrets" -}}
+{{- $global := .Values.global | default dict -}}
 {{- if .Values.tools.image.pullSecret }}
 imagePullSecrets:
   - name: {{ .Values.tools.image.pullSecret }}
-{{- else if .Values.global.imagePullSecrets }}
+{{- else if $global.imagePullSecrets }}
 imagePullSecrets:
-  {{- toYaml .Values.global.imagePullSecrets | nindent 2 }}
+  {{- toYaml $global.imagePullSecrets | nindent 2 }}
 {{- end }}
 {{- end }}

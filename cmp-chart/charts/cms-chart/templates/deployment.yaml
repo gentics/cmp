@@ -45,7 +45,8 @@ spec:
         {{- toYaml .Values.lifecycle | nindent 12 }}
         {{- end }}
         env:
-          {{- if or $.Values.cms.license.secret $.Values.global.license.key $.Values.cms.license.key $.Values.cms.licenseKey }}
+          {{- $globalLicense := (($.Values.global | default dict).license) | default dict -}}
+          {{- if or $.Values.cms.license.secret $globalLicense.key $.Values.cms.license.key $.Values.cms.licenseKey }}
           - name: LICENSEKEY
             valueFrom:
               secretKeyRef:
@@ -173,18 +174,16 @@ spec:
           - name: http
             containerPort: 8080
             protocol: TCP
+
         livenessProbe:
-          httpGet:
-            path: /
-            port: http
-          initialDelaySeconds: 60
+          {{- toYaml .Values.cms.livenessProbe | nindent 10 }}
+
+        startupProbe:
+          {{- toYaml .Values.cms.startupProbe | nindent 10 }}
+
         readinessProbe:
-          httpGet:
-            path: /rest/info/maintenance
-            port: http
-          initialDelaySeconds: 15
-          timeoutSeconds: 5
-          failureThreshold: 3
+          {{- toYaml .Values.cms.readinessProbe | nindent 10 }}
+
         resources:
           {{- toYaml .Values.cms.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

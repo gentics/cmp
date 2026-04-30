@@ -29,6 +29,14 @@ global:
   mariadb:
     enabled: true
 
+  ## Example installation flag.
+  example:
+    enabled: false
+    ## Fixed portal-java image used when example is active.
+    portalJavaImage:
+      repository: docker.gentics.com/apps/portal-java-reference
+      tag: patrick
+
 # -----------------------------------------------------------------------
 # CMS
 # -----------------------------------------------------------------------
@@ -43,7 +51,7 @@ cms:
 
   cms:
     preUpgrade:
-      enabled: true
+      enabled: false
 
   # for all available options, please check the gentics/cms chart
 
@@ -79,6 +87,8 @@ portal-java:
 
   mesh:
     apiKeyFromSecret: true
+
+  licenseKeyPath: "/tmp"
 
   # for all available options, please check the gentics/gentics-portal-java chart
 
@@ -124,9 +134,10 @@ mariadb:
   securityContext: {}
 
   ## Optional custom MariaDB configuration appended as /etc/mysql/conf.d/custom.cnf.
-  ## config: |
-  ##   [mysqld]
-  ##   max_connections = 300
-  ##   innodb_buffer_pool_size = 512M
+  config: |
+    [mariadb]
+      max_connections = 300
+      innodb_snapshot_isolation = OFF
+       
 
 

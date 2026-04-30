@@ -3,7 +3,8 @@
 Expand the name of the chart.
 */}}
 {{- define "cms.name" -}}
-{{- default .Chart.Name .Values.global.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- $global := .Values.global | default dict -}}
+{{- default .Chart.Name $global.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -12,10 +13,11 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "cms.fullname" -}}
-{{- if .Values.global.fullnameOverride -}}
-{{- .Values.global.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- $global := .Values.global | default dict -}}
+{{- if $global.fullnameOverride -}}
+{{- $global.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.global.nameOverride -}}
+{{- $name := default .Chart.Name $global.nameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -68,9 +70,10 @@ Uses explicit database.host if set; falls back to the bundled MariaDB service na
 when global.mariadb.enabled is true; otherwise raises an error.
 */}}
 {{- define "cms.databaseHost" -}}
+{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
 {{- if .Values.database.host -}}
 {{ .Values.database.host }}
-{{- else if .Values.global.mariadb.enabled -}}
+{{- else if $globalMariadb.enabled -}}
 {{ .Release.Name }}-mariadb
 {{- else -}}
 {{ required "database.host is required when global.mariadb.enabled is false" "" }}
@@ -83,11 +86,12 @@ Priority: explicit database.passwordSecret → umbrella MariaDB secret → sub-c
 Returns a full secretKeyRef block.
 */}}
 {{- define "cms.databasePasswordRef" -}}
+{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
 {{- if .Values.database.passwordSecret -}}
 secretKeyRef:
   name: {{ .Values.database.passwordSecret }}
   key: password
-{{- else if .Values.global.mariadb.enabled -}}
+{{- else if $globalMariadb.enabled -}}
 secretKeyRef:
   name: {{ .Release.Name }}-cms-db
   key: password
@@ -106,9 +110,10 @@ Priority: local cms.license.secret (explicit override) → global license secret
          → cms.fullname (sub-chart's own secret, when license.key is set locally).
 */}}
 {{- define "cms.licenseSecretName" -}}
+{{- $globalLicense := ((.Values.global | default dict).license) | default dict -}}
 {{- if .Values.cms.license.secret -}}
 {{ .Values.cms.license.secret }}
-{{- else if .Values.global.license.key -}}
+{{- else if $globalLicense.key -}}
 {{ .Release.Name }}-license
 {{- else -}}
 {{ include "cms.fullname" . }}
@@ -120,11 +125,12 @@ Image pull secrets — local image.pullSecret overrides global; global is the de
 Local accepts a plain secret name string; global uses the Kubernetes-native array format.
 */}}
 {{- define "cms.imagePullSecrets" -}}
+{{- $global := .Values.global | default dict -}}
 {{- if .Values.image.pullSecret }}
 imagePullSecrets:
   - name: {{ .Values.image.pullSecret }}
-{{- else if .Values.global.imagePullSecrets }}
+{{- else if $global.imagePullSecrets }}
 imagePullSecrets:
-  {{- toYaml .Values.global.imagePullSecrets | nindent 2 }}
+  {{- toYaml $global.imagePullSecrets | nindent 2 }}
 {{- end }}
 {{- end }}
