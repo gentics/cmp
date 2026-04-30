@@ -3,7 +3,8 @@
 JobContext.set(this)
 
 final def gitCommitTag         = '[Jenkins | ' + env.JOB_BASE_NAME + ']';
-def tagName = null
+def tagName = null;
+def version = null;
 
 final def helmRepositoryProd   = 'https://repo.gentics.com/repository/helm/';
 final def helmRepositoryTest   = 'https://repo.gentics.com/repository/helm-snapshots/';
@@ -47,7 +48,7 @@ pipeline {
                 script {
                     def mvnGoal       = "install"
                     def mvnArguments  = ""
-                    def version = MavenHelper.getVersion()
+                    version = MavenHelper.getVersion()
 
                     if (params.runDeploy) {
                         mvnGoal = "deploy"
