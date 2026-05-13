@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gentics.cmp</groupId>
 	<artifactId>cmp</artifactId>
-	<version>8.4.9-SNAPSHOT</version>
+	<version>8.4.10-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
     <modules>
@@ -27,7 +27,7 @@
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
-        <aloha.version>2.1.16</aloha.version>
+        <aloha.version>2.1.17</aloha.version>
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
@@ -47,7 +47,7 @@
         <portal.java.changelog.version>${portal.java.version}</portal.java.changelog.version>
 
         <!-- Gentics Portal | php -->
-        <portal.php.version>3.3.5</portal.php.version>
+        <portal.php.version>3.3.6</portal.php.version>
         <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
 
         <!-- ANDP -->
