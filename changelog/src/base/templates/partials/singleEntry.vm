@@ -12,44 +12,42 @@
 #if ($entry.type == "note") 
 #set($labelTitle = "Note")
 #set($html="")
+
 #elseif ($entry.type == "bugfix") 
 #set($labelTitle = "Bugfix")
 #set($elemTitle = "$!{entry.ticketReference}")
-<!--<h4 id="$!{anchorTarget}" style="vertical-align:middle;"><img src="../static/images/changelog_types/bugfix_24.png" alt="" /> <strong>Bugfix $entry.ticketReference</strong>$!{anchorLinkHint}</h4>-->
+
 #elseif ($entry.type == "documentation")
 #set($labelTitle = "Documentation")
 #set($elemTitle = "${entry.ticketReference}")
-<!--<h4 id="$!{anchorTarget}" style="vertical-align:middle;"><img src="../static/images/changelog_types/doc_24.png" alt="" /> <strong>Documentation $entry.ticketReference</strong>$!{anchorLinkHint}</h4>-->
+
 #elseif ($entry.type == "enhancement")
 #set($labelTitle = "Enhancement")
 #set($elemTitle = "$!{entry.ticketReference}")
-<!--<h4 id="$!{anchorTarget}" style="vertical-align:middle;"><img src="../static/images/changelog_types/enhancement_24.png" alt="" /> <strong>Enhancement $entry.ticketReference</strong>$!{anchorLinkHint}</h4>-->
+
 #elseif ($entry.type == "feature") 
 #set($labelTitle = "Feature")
 #set($elemTitle = "$!{entry.ticketReference}")
-<!--<h4 id="$!{anchorTarget}" style="vertical-align:middle;"><img src="../static/images/changelog_types/feature_24.png" alt="" /> <strong>Feature $entry.ticketReference</strong>$!{anchorLinkHint}</h4>-->
+
 #elseif ($entry.type == "manualchange")
 #set($labelTitle = "Action required")
 #set($elemTitle = "Manual Change")
-<!--<div id="$!{anchorTarget}" class="warning"><h4><strong>Manual Change</strong>$!{anchorLinkHint}</h4>$entry.getHTMLHeadline()</div>-->
-#set($html = $entry.getHTMLWithoutHeadline())
+
 #elseif ($entry.type == "optional-manualchange")
 #set($labelTitle = "Optional Action")
 #set($elemTitle = "Optional Manual Change")
-<!--<div id="$!{anchorTarget}" class="warning"><h4><strong>Optional Manual Change</strong>$!{anchorLinkHint}</h4>$entry.getHTMLHeadline()</div>-->
-#set($html = $entry.getHTMLWithoutHeadline())
+
 #elseif ($entry.type == "security")
 #set($labelTitle = "Security")
 #set($elemTitle = "$!{entry.ticketReference}")
-<!--<h4 id="$!{anchorTarget}" style="vertical-align:middle;"><img src="../static/images/changelog_types/security_24.png" alt="" /> <strong>Security $entry.ticketReference</strong>$!{anchorLinkHint}</h4>-->
+
 #elseif ($entry.type == "newui")
-    #set($labelTitle = "New UI Update")
-    #set($elemTitle = "$!{entry.ticketReference}")
-    <!--<h4 id="$!{anchorTarget}" style="vertical-align:middle;"><img src="../static/images/changelog_types/newui_24.png" alt="" /> <strong>New UI Update</strong>$!{anchorLinkHint}</h4>-->
+#set($labelTitle = "New UI Update")
+#set($elemTitle = "$!{entry.ticketReference}")
+
 #else
 #set($labelTitle = "$!{entry.type}")
 #set($elemTitle = "$!{entry.ticketReference}")
-<!--<h4 id="$!{anchorTarget}" style="vertical-align:middle;"><strong>Unknown type: $entry.type</strong>$!{anchorLinkHint}</h4>-->
 #end
 
 #if("$!{elemTitle}" == "")
