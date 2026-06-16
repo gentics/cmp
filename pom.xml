@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gentics.cmp</groupId>
 	<artifactId>cmp</artifactId>
-	<version>8.4.10-SNAPSHOT</version>
+	<version>8.4.11-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
     <modules>
@@ -20,10 +20,10 @@
 		<skip.render>false</skip.render>
 
         <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.4.5</cms-oss.version>
+        <cms-oss.version>6.4.7</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.4.5</cms.version>
+        <cms.version>6.4.7</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
@@ -31,27 +31,27 @@
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>3.2.8</mesh.version>
+        <mesh.version>3.2.10</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Mesh SQL -->
-        <meshsql.version>3.2.8</meshsql.version>
+        <meshsql.version>3.2.10</meshsql.version>
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
-        <mesh.plugins.version>3.2.3</mesh.plugins.version>
+        <mesh.plugins.version>3.2.5</mesh.plugins.version>
         <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
 
         <!-- Gentics Portal | java -->
-        <portal.java.version>3.4.4</portal.java.version>
+        <portal.java.version>3.4.6</portal.java.version>
         <portal.java.changelog.version>${portal.java.version}</portal.java.changelog.version>
 
         <!-- Gentics Portal | php -->
-        <portal.php.version>3.3.6</portal.php.version>
+        <portal.php.version>3.3.7</portal.php.version>
         <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
 
         <!-- ANDP -->
-        <andp.version>8.4.5</andp.version>
+        <andp.version>8.4.7</andp.version>
     </properties>
 
 	<pluginRepositories>

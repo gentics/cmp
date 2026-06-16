@@ -1,6 +1,11 @@
 {
-  "changeLogEntryFileNames": [],
-  "componentVersion": "6.4.5",
+  "changeLogEntryFileNames": [
+    "8739.SUP-19770.bugfix",
+    "8740.SUP-19559.bugfix",
+    "8756.SUP-19595.bugfix",
+    "8753.SUP-19884.bugfix"
+  ],
+  "componentVersion": "6.4.6",
   "version": "8.4.9",
   "date": "13.05.2026",
   "genericProperties": {}
