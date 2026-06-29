@@ -21,6 +21,14 @@
 			<classifier>content</classifier>
 			<type>zip</type>
 		</dependency>
+		<!-- Mesh Commercial Plugin Guides -->
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<artifactId>mesh-commercial-plugins-guides</artifactId>
+			<version>${mesh.plugins.version}</version>
+			<classifier>content</classifier>
+			<type>zip</type>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -87,6 +95,15 @@
 								<artifactItem>
 									<groupId>com.gentics.andp</groupId>
 									<artifactId>andp-guides</artifactId>
+									<type>zip</type>
+									<classifier>content</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/src/main/hugo/content</outputDirectory>
+								</artifactItem>
+								<!-- Mesh Commercial Plugins -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<artifactId>mesh-commercial-plugins-guides</artifactId>
 									<type>zip</type>
 									<classifier>content</classifier>
 									<overWrite>true</overWrite>
