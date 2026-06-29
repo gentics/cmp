@@ -4,17 +4,15 @@
         {{ $currentPage := . }}
         {{ $currentSection := .CurrentSection }}
         {{ range .Site.Home.Sections }}
-            {{ range .Sections }}
-                {{ $isInPath := or (eq . $currentPage) (.IsAncestor $currentPage) }}
-                <li class="nav-item  {{ if $isInPath }}is-expanded{{ end }}">
-                    <a href="{{ .RelPermalink }}" class="nav-link {{ if eq . $currentPage }}active{{ end }}">
-                        {{ .Title | default .File.BaseFileName }}
-                    </a>
-                    {{ if or .Sections .Pages }}
-                        {{ template "nav-recursive" (dict "page" . "current" $currentPage "currentSection" $currentSection) }}
-                    {{ end }}
-                </li>
-            {{ end }}
+            {{ $isInPath := or (eq . $currentPage) (.IsAncestor $currentPage) }}
+            <li class="nav-item  {{ if $isInPath }}is-expanded{{ end }}">
+                <a href="{{ .RelPermalink }}" class="nav-link {{ if eq . $currentPage }}active{{ end }}">
+                    {{ .Title | default .File.BaseFileName }}
+                </a>
+                {{ if or .Sections .Pages }}
+                    {{ template "nav-recursive" (dict "page" . "current" $currentPage "currentSection" $currentSection) }}
+                {{ end }}
+            </li>
             {{ range .RegularPages }}
                 <li class="nav-item {{ if eq . $currentPage }}active{{ end }}">
                     <a href="{{ .RelPermalink }}" class="nav-link">
