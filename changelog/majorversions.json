@@ -1,6 +1,11 @@
 {
     "majorversions": [
         {
+            "version": "8.5",
+            "date": "03.07.2026",
+            "description" : "CMP 8.5 takes the Forms feature to the next level. Form rendering on the website is now powered by a modern, state-of-the-art React frontend application, delivering better performance and a smoother user experience. Editing forms in the CMS was significantly improved for a more intuitive workflow, and expanded customization options allow forms to be tailored flexibly to project-specific requirements."
+        },
+        {
             "version": "8.4",
             "date": "16.12.2025",
             "description" : "CMP 8.4 delivers major platform updates including Angular v20, Mesh Client 3.2.0, and full Elasticsearch 9 support with improved stateless search_after indexing. It introduces Partial Multichannelling for flexible page localization, aligns the Helm chart versioning with CMS releases, and adds new Helm configuration options for Mesh. Core components were upgraded (Vert.x 5.0.5, Hibernate 7.1.8), documentation was streamlined, and overall search and infrastructure capabilities were modernized."

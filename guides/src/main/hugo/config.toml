@@ -10,6 +10,7 @@ canonifyurls = true
 enableRobotsTXT = true
 publishDir = "output" # if you use GitHub to deploy
 disableKinds = ["RSS"]
+uglyURLs = true # we want ugly urls because otherwise hugo generates for every doc.adoc file a doc/index.html instead of just a doc.html. This leads to errors with images / includes and local preview
 
 pluralizeListTitles = false
 
@@ -18,9 +19,11 @@ pluralizeListTitles = false
     allow = ["asciidoctor"]
 
 
+#dont set workingFolderCurrent=true - otherwise images won't work anymore, use includes with absolute path
 [markup]
   [markup.asciidocExt]
-    workingFolderCurrent = true
+    [markup.asciidocExt.attributes]
+      imagesdir = "."
 
 [outputs]
   home = ["HTML", "JSON"]
