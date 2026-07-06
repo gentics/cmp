@@ -1,0 +1,11 @@
+{
+  "changeLogEntryFileNames": [
+    "8819.GPU-2257.manualchange",
+    "8825.bugfix",
+    "8812.security"
+  ],
+  "componentVersion": "3.4.1",
+  "version": "8.5.0",
+  "date": "06.07.2026",
+  "genericProperties": {}
+}
