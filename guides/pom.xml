@@ -29,6 +29,14 @@
 			<classifier>content</classifier>
 			<type>zip</type>
 		</dependency>
+		<!-- Mesh Portal | Java -->
+		<dependency>
+			<groupId>com.gentics.mesh.portal</groupId>
+			<artifactId>mesh-portal-docs</artifactId>
+			<version>${portal.java.version}</version>
+			<classifier>content</classifier>
+			<type>zip</type>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -106,6 +114,15 @@
 									<artifactId>mesh-commercial-plugins-guides</artifactId>
 									<type>zip</type>
 									<classifier>content</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/src/main/hugo/content</outputDirectory>
+								</artifactItem>
+								<!-- Mesh Portal | Java -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.portal</groupId>
+									<artifactId>mesh-portal-docs</artifactId>
+									<classifier>content</classifier>
+									<type>zip</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/src/main/hugo/content</outputDirectory>
 								</artifactItem>
