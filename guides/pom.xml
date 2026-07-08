@@ -37,6 +37,14 @@
 			<classifier>content</classifier>
 			<type>zip</type>
 		</dependency>
+		<!-- Mesh Portal | php -->
+		<dependency>
+			<groupId>com.gentics.mesh.portal-php</groupId>
+			<artifactId>mesh-portal-php-docs</artifactId>
+			<version>${portal.php.version}</version>
+			<classifier>content</classifier>
+			<type>zip</type>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -121,6 +129,15 @@
 								<artifactItem>
 									<groupId>com.gentics.mesh.portal</groupId>
 									<artifactId>mesh-portal-docs</artifactId>
+									<classifier>content</classifier>
+									<type>zip</type>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/src/main/hugo/content</outputDirectory>
+								</artifactItem>
+								<!-- Mesh Portal | php -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.portal-php</groupId>
+									<artifactId>mesh-portal-php-docs</artifactId>
 									<classifier>content</classifier>
 									<type>zip</type>
 									<overWrite>true</overWrite>
