@@ -20,10 +20,10 @@
 		<skip.render>false</skip.render>
 
         <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.5.0</cms-oss.version>
+        <cms-oss.version>6.5.1</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.5.0</cms.version>
+        <cms.version>6.5.1</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
@@ -51,7 +51,7 @@
         <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
 
         <!-- ANDP -->
-        <andp.version>8.5.0</andp.version>
+        <andp.version>8.5.1</andp.version>
     </properties>
 
 	<pluginRepositories>
