@@ -1,0 +1,15 @@
+{{- if and (not .Values.persistence.shared.existingClaim) (.Values.persistence.enabled) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "gentics-portal.fullname" . }}-shared
+  labels:
+    {{- include "gentics-portal.labels" . | nindent 4 }}
+  {{- with .Values.persistence.shared.annotations }}
+  annotations:
+    {{ toYaml . }}
+  {{- end }}
+
+spec:
+  {{- toYaml .Values.persistence.shared.spec | nindent 2 }}
+{{- end }}
