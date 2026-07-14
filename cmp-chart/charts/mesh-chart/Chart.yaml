@@ -4,3 +4,8 @@ description: Gentics Mesh
 type: application
 version: 0.0.0
 appVersion: 0.0.0
+
+dependencies:
+  - name: gentics-common
+    version: 0.1.0
+    repository: "file://../gentics-common"

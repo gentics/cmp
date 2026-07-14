@@ -115,15 +115,7 @@ Uses explicit database.host if set; falls back to the bundled MariaDB service na
 when global.mariadb.enabled is true; otherwise raises an error.
 */}}
 {{- define "mesh.databaseHost" -}}
-{{- $db := .Values.database | default dict -}}
-{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
-{{- if $db.host -}}
-{{ $db.host }}
-{{- else if $globalMariadb.enabled -}}
-{{ .Release.Name }}-mariadb
-{{- else -}}
-{{ required "database.host is required when global.mariadb.enabled is false" "" }}
-{{- end -}}
+{{- include "gentics-common.databaseHost" (dict "root" . "db" .Values.database) -}}
 {{- end -}}
 
 {{/*
@@ -131,15 +123,7 @@ Database port for Mesh.
 Uses explicit database.port if set; falls back to 3306 when global.mariadb.enabled.
 */}}
 {{- define "mesh.databasePort" -}}
-{{- $db := .Values.database | default dict -}}
-{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
-{{- if $db.port -}}
-{{ $db.port }}
-{{- else if $globalMariadb.enabled -}}
-3306
-{{- else -}}
-{{ required "database.port is required when global.mariadb.enabled is false" "" }}
-{{- end -}}
+{{- include "gentics-common.databaseValue" (dict "root" . "db" .Values.database "key" "port" "default" 3306 "requiredMsg" "database.port is required when global.mariadb.enabled is false") -}}
 {{- end -}}
 
 {{/*
@@ -147,15 +131,7 @@ Database name for Mesh.
 Uses explicit database.name if set; falls back to "mesh" when global.mariadb.enabled.
 */}}
 {{- define "mesh.databaseName" -}}
-{{- $db := .Values.database | default dict -}}
-{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
-{{- if $db.name -}}
-{{ $db.name }}
-{{- else if $globalMariadb.enabled -}}
-mesh
-{{- else -}}
-{{ required "database.name is required when global.mariadb.enabled is false" "" }}
-{{- end -}}
+{{- include "gentics-common.databaseValue" (dict "root" . "db" .Values.database "key" "name" "default" "mesh" "requiredMsg" "database.name is required when global.mariadb.enabled is false") -}}
 {{- end -}}
 
 {{/*
@@ -163,15 +139,7 @@ Database username for Mesh.
 Uses explicit database.username if set; falls back to "mesh" when global.mariadb.enabled.
 */}}
 {{- define "mesh.databaseUsername" -}}
-{{- $db := .Values.database | default dict -}}
-{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
-{{- if $db.username -}}
-{{ $db.username }}
-{{- else if $globalMariadb.enabled -}}
-mesh
-{{- else -}}
-{{ required "database.username is required when global.mariadb.enabled is false" "" }}
-{{- end -}}
+{{- include "gentics-common.databaseValue" (dict "root" . "db" .Values.database "key" "username" "default" "mesh" "requiredMsg" "database.username is required when global.mariadb.enabled is false") -}}
 {{- end -}}
 
 {{/*
@@ -180,23 +148,7 @@ Priority: explicit database.passwordSecret → umbrella MariaDB secret → sub-c
 Returns a full secretKeyRef block.
 */}}
 {{- define "mesh.databasePasswordRef" -}}
-{{- $db := .Values.database | default dict -}}
-{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
-{{- if $db.passwordSecret -}}
-secretKeyRef:
-  name: {{ $db.passwordSecret }}
-  key: password
-{{- else if $globalMariadb.enabled -}}
-secretKeyRef:
-  name: {{ .Release.Name }}-mesh-db
-  key: password
-{{- else if $db.password -}}
-secretKeyRef:
-  name: {{ include "mesh.fullname" . }}-database
-  key: password
-{{- else -}}
-{{ required "Either database.password, database.passwordSecret, or global.mariadb.enabled are required" "" }}
-{{- end -}}
+{{- include "gentics-common.databasePasswordRef" (dict "root" . "db" .Values.database "component" "mesh" "localSecretName" (printf "%s-database" (include "mesh.fullname" .)) "localSecretKey" "password") -}}
 {{- end -}}
 
 {{/*
@@ -207,14 +159,7 @@ Note: Mesh mounts the license from the shared PVC, not directly from this secret
       This helper is provided for consistency and future use.
 */}}
 {{- define "mesh.licenseSecretName" -}}
-{{- $globalLicense := ((.Values.global | default dict).license) | default dict -}}
-{{- if .Values.license.secret -}}
-{{ .Values.license.secret }}
-{{- else if $globalLicense.key -}}
-{{ .Release.Name }}-license
-{{- else -}}
-{{ include "mesh.fullname" . }}-secrets
-{{- end -}}
+{{- include "gentics-common.licenseSecretName" (dict "root" . "localSecret" .Values.license.secret "fallbackName" (printf "%s-secrets" (include "mesh.fullname" .))) -}}
 {{- end -}}
 
 {{/*
@@ -222,12 +167,7 @@ Image pull secrets for the main Mesh image.
 Local imagePullSecrets overrides global; global is the default. Both use the array format.
 */}}
 {{- define "mesh.imagePullSecrets" -}}
-{{- $global := .Values.global | default dict -}}
-{{- $secrets := coalesce .Values.imagePullSecrets $global.imagePullSecrets -}}
-{{- if $secrets }}
-imagePullSecrets:
-  {{- toYaml $secrets | nindent 2 }}
-{{- end }}
+{{- include "gentics-common.imagePullSecretsList" (dict "root" . "localList" .Values.imagePullSecrets) -}}
 {{- end }}
 
 {{/*
@@ -252,12 +192,5 @@ Local tools.image.pullSecret overrides global; global is the default.
 Local accepts a plain secret name string; global uses the array format.
 */}}
 {{- define "mesh.toolsImagePullSecrets" -}}
-{{- $global := .Values.global | default dict -}}
-{{- if .Values.tools.image.pullSecret }}
-imagePullSecrets:
-  - name: {{ .Values.tools.image.pullSecret }}
-{{- else if $global.imagePullSecrets }}
-imagePullSecrets:
-  {{- toYaml $global.imagePullSecrets | nindent 2 }}
-{{- end }}
+{{- include "gentics-common.imagePullSecrets" (dict "root" . "localName" .Values.tools.image.pullSecret) -}}
 {{- end }}

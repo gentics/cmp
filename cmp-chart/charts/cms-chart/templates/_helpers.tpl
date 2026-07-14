@@ -70,14 +70,7 @@ Uses explicit database.host if set; falls back to the bundled MariaDB service na
 when global.mariadb.enabled is true; otherwise raises an error.
 */}}
 {{- define "cms.databaseHost" -}}
-{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
-{{- if .Values.database.host -}}
-{{ .Values.database.host }}
-{{- else if $globalMariadb.enabled -}}
-{{ .Release.Name }}-mariadb
-{{- else -}}
-{{ required "database.host is required when global.mariadb.enabled is false" "" }}
-{{- end -}}
+{{- include "gentics-common.databaseHost" (dict "root" . "db" .Values.database) -}}
 {{- end -}}
 
 {{/*
@@ -86,22 +79,7 @@ Priority: explicit database.passwordSecret → umbrella MariaDB secret → sub-c
 Returns a full secretKeyRef block.
 */}}
 {{- define "cms.databasePasswordRef" -}}
-{{- $globalMariadb := ((.Values.global | default dict).mariadb) | default dict -}}
-{{- if .Values.database.passwordSecret -}}
-secretKeyRef:
-  name: {{ .Values.database.passwordSecret }}
-  key: password
-{{- else if $globalMariadb.enabled -}}
-secretKeyRef:
-  name: {{ .Release.Name }}-cms-db
-  key: password
-{{- else if .Values.database.password -}}
-secretKeyRef:
-  name: {{ include "cms.fullname" . }}
-  key: database-password
-{{- else -}}
-{{ required "Either database.password, database.passwordSecret, or global.mariadb.enabled are required" "" }}
-{{- end -}}
+{{- include "gentics-common.databasePasswordRef" (dict "root" . "db" .Values.database "component" "cms" "localSecretName" (include "cms.fullname" .) "localSecretKey" "database-password") -}}
 {{- end -}}
 
 {{/*
@@ -110,14 +88,7 @@ Priority: local cms.license.secret (explicit override) → global license secret
          → cms.fullname (sub-chart's own secret, when license.key is set locally).
 */}}
 {{- define "cms.licenseSecretName" -}}
-{{- $globalLicense := ((.Values.global | default dict).license) | default dict -}}
-{{- if .Values.cms.license.secret -}}
-{{ .Values.cms.license.secret }}
-{{- else if $globalLicense.key -}}
-{{ .Release.Name }}-license
-{{- else -}}
-{{ include "cms.fullname" . }}
-{{- end -}}
+{{- include "gentics-common.licenseSecretName" (dict "root" . "localSecret" .Values.cms.license.secret "fallbackName" (include "cms.fullname" .)) -}}
 {{- end -}}
 
 {{/*
@@ -125,12 +96,5 @@ Image pull secrets — local image.pullSecret overrides global; global is the de
 Local accepts a plain secret name string; global uses the Kubernetes-native array format.
 */}}
 {{- define "cms.imagePullSecrets" -}}
-{{- $global := .Values.global | default dict -}}
-{{- if .Values.image.pullSecret }}
-imagePullSecrets:
-  - name: {{ .Values.image.pullSecret }}
-{{- else if $global.imagePullSecrets }}
-imagePullSecrets:
-  {{- toYaml $global.imagePullSecrets | nindent 2 }}
-{{- end }}
+{{- include "gentics-common.imagePullSecrets" (dict "root" . "localName" .Values.image.pullSecret) -}}
 {{- end }}
