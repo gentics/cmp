@@ -81,9 +81,11 @@ mesh:
 # -----------------------------------------------------------------------
 portal-java:
   enabled: false
-  image:
-    repository: docker.gentics.com/YOUR_ID/portal-PROJECT
-    tag: x.x.x
+  # The Portal | Java has no pre-built image — build your portal image and reference it here.
+  # image.repository is required when portal-java.enabled is true.
+  #image:
+  #  repository: docker.gentics.com/YOUR_ID/portal-PROJECT
+  #  tag: x.x.x
 
   mesh:
     apiKeyFromSecret: true

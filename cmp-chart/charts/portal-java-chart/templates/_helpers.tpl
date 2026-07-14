@@ -72,3 +72,12 @@ Create the name Mesh secret
 {{ .Release.Name }}-mesh-secret
 {{- end -}}
 {{- end -}}
+
+{{/*
+Name of the secret containing the Portal license key.
+Priority: local license.secret -> umbrella global license secret ("<release>-license")
+         -> chart-local "<fullname>-secrets" (holds license.key or legacy licenseKey).
+*/}}
+{{- define "gentics-portal.licenseSecretName" -}}
+{{- include "gentics-common.licenseSecretName" (dict "root" . "localSecret" .Values.license.secret "fallbackName" (printf "%s-secrets" (include "gentics-portal.fullname" .))) -}}
+{{- end -}}

@@ -15,6 +15,11 @@ maintainers:
   - name: Gentics
 
 dependencies:
+  # Shared template library used by the sub-charts. Renders nothing itself.
+  - name: gentics-common
+    repository: "file://charts/gentics-common"
+    version: "0.1.0"
+
   - name: cms
     # TODO: replace with your published Helm repository URL
     repository: "https://charts.gentics.com"

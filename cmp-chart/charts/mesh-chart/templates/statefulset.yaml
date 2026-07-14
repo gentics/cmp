@@ -184,13 +184,6 @@ spec:
       {{ end }}
       {{- end }}
 
-      - name: data
-      {{- if .Values.persistence.enabled }}
-        persistentVolumeClaim:
-      {{- else }}
-        emptyDir: {}
-      {{- end }}
-
       {{- if eq .Values.backup.enabled true }}
       - name: snapshots
         persistentVolumeClaim:
