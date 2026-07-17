@@ -10,6 +10,15 @@ autoscaling:
   minReplicas: 3
   targetCPUUtilizationPercentage: 80
 
+## PodDisruptionBudget — applied when replicaCount > 1 or autoscaling.enabled is true.
+podDisruptionBudget:
+  ## Minimum number/percentage of pods that must stay available during
+  ## voluntary disruptions (node drains, cluster upgrades).
+  minAvailable: "50%"
+  ## Alternative to minAvailable — if set, it is used INSTEAD of minAvailable
+  ## (Kubernetes allows only one of the two).
+  # maxUnavailable: 1
+
 image:
   # The portal | php has no pre-built image. A CI job needs to be setup to provide the image.
   # Reference the image which you build here.
