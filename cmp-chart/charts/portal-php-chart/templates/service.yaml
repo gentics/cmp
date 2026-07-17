@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "gentics-portal.fullname" . }}
+  name: {{ include "gentics-portal-php.fullname" . }}
   labels:
-    {{- include "gentics-portal.labels" . | nindent 4 }}
+    {{- include "gentics-portal-php.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -15,4 +15,4 @@ spec:
       appProtocol: h2c
       {{- end }}
   selector:
-    {{- include "gentics-portal.selectorLabels" . | nindent 4 }}
+    {{- include "gentics-portal-php.selectorLabels" . | nindent 4 }}

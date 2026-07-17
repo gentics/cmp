@@ -116,6 +116,22 @@ portal-java:
   # for all available options, please check the gentics/gentics-portal-java chart
 
 # -----------------------------------------------------------------------
+# Portal | PHP
+# -----------------------------------------------------------------------
+portal-php:
+  enabled: false
+  # The Portal | PHP has no pre-built image — build your portal image and reference it here.
+  # image.repository is required when portal-php.enabled is true.
+  #image:
+  #  repository: docker.gentics.com/YOUR_ID/PROJECT-portal
+  #  tag: x.x.x
+
+  # Mesh connection is auto-wired to the bundled Mesh service.
+  # The API key is read from the "<release>-mesh-secret" secret (shared with portal-java).
+
+  # for all available options, please check the gentics/gentics-portal-php chart
+
+# -----------------------------------------------------------------------
 # MariaDB configuration (deployed when global.mariadb.enabled is true)
 # -----------------------------------------------------------------------
 mariadb:

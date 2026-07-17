@@ -44,3 +44,10 @@ dependencies:
     repository: "https://charts.gentics.com"
     version: "*.*.*"
     condition: portal-java.enabled
+
+  - name: gentics-portal-php
+    alias: portal-php
+    # TODO: replace with your published Helm repository URL
+    repository: "https://charts.gentics.com"
+    version: "*.*.*"
+    condition: portal-php.enabled

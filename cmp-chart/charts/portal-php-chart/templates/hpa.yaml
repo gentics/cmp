@@ -1,20 +1,22 @@
 {{- if .Values.autoscaling.enabled -}}
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "gentics-portal.fullname" . }}
+  name: {{ include "gentics-portal-php.fullname" . }}
   labels:
-    {{- include "gentics-portal.labels" . | nindent 4 }}
+    {{- include "gentics-portal-php.labels" . | nindent 4 }}
 spec:
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
-    name: {{ template "gentics-portal.fullname" . }}-replicas
+    name: {{ include "gentics-portal-php.fullname" . }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
 {{- end }}

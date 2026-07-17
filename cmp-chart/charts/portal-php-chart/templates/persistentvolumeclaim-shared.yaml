@@ -2,14 +2,20 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: shared-{{ include "gentics-portal.fullname" . }}
+  name: shared-{{ include "gentics-portal-php.fullname" . }}
 
   labels:
-    {{- include "gentics-portal.labels" . | nindent 4 }}
+    {{- include "gentics-portal-php.labels" . | nindent 4 }}
 
-  {{- with .Values.persistence.shared.annotations }}
+  {{- $keepAnnotations := include "gentics-common.pvcKeepAnnotations" (dict "root" . "local" (.Values.persistence).keepOnUninstall) }}
+  {{- if or $keepAnnotations .Values.persistence.shared.annotations }}
   annotations:
+    {{- with $keepAnnotations }}
+    {{- . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.persistence.shared.annotations }}
     {{ toYaml . }}
+  {{- end }}
   {{- end }}
 
 spec:

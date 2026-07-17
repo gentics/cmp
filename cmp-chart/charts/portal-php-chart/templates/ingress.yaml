@@ -1,12 +1,11 @@
-{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "gentics-portal.fullname" . -}}
+{{- $fullName := include "gentics-portal-php.fullname" . -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "gentics-portal.labels" . | nindent 4 }}
+    {{- include "gentics-portal-php.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -36,5 +35,4 @@ spec:
                 name: {{ $fullName }}
                 port: 
                   name: http
-{{- end }}
 {{- end }}

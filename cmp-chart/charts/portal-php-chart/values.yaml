@@ -12,8 +12,11 @@ autoscaling:
 
 image:
   # The portal | php has no pre-built image. A CI job needs to be setup to provide the image.
-  # Reference the image which you build here
-  #repository: docker.gentics.com/YOUR_ID/PROJECT-portal
+  # Reference the image which you build here.
+  # registry and repository are combined to "registry/repository:tag";
+  # global.imageRegistry (umbrella mirror override) takes precedence over registry.
+  #registry: docker.gentics.com
+  #repository: YOUR_ID/PROJECT-portal
   tag: 1.3.5
   pullPolicy: IfNotPresent
 
@@ -42,6 +45,10 @@ service:
   type: ClusterIP
   port: 80
   useHttp2: false
+  ## targetPort of the service (default: the "http" container port).
+  #targetPort: http
+  ## Name of the service port (default "http").
+  #name: http
 
 ingress:
   enabled: false
@@ -73,11 +80,10 @@ affinity: {}
 ## It is possible to specify new variables on project level
 extraEnv: []
 
-## Optional custom config map which can be
-## used to override the generated configmap.
-## Please note that helm values will not be 
-## utilized in a custom configmap and thus setting
-## those values may not have any effect.
+## Name of an EXISTING ConfigMap that is mounted as the complete /portal/config
+## directory. WARNING: the mount replaces ALL config files shipped in the image —
+## the ConfigMap must contain every config file the portal needs.
+## Leave empty (default) to use the configuration built into the image.
 existingConfigmap: ""
 
 # Define additional volumes which can be
@@ -107,6 +113,14 @@ existingConfigmap: ""
 persistence:
   enabled: true
 
+  ## Whether the shared Portal volume survives "helm uninstall".
+  ## Unset: follows global.persistence.keepOnUninstall, defaulting to true (keep).
+  ## Leave commented so the global umbrella switch stays effective.
+  ## NOTE: the per-pod "data" volumes come from volumeClaimTemplates and always
+  ## survive uninstall (Kubernetes behavior); remove them with the purge command
+  ## from the README.
+  # keepOnUninstall: true
+
   data:
     disablePersistentCache: false
     # existingClaim: ""
@@ -130,6 +144,13 @@ persistence:
         requests:
           storage: 1Gi
 
+## Container ports (named "http" / "https" in the pod spec).
+#httpPort: 80
+#httpsPort: 443
+
+## Host header sent with the liveness/readiness probes (default "portal").
+#portalHost: "portal"
+
 #Liveness / Readiness Probe
 portalProbeScheme: HTTP
 portalProbePortName: http
@@ -145,14 +166,18 @@ readiness:
   failureThreshold: 2
 
 
-# Use the config files provided with the values (mounting it)
-portalConfigOverride: false
-
 # Controls whether the session storage volume should be mounted.
 # Set to `false` to disable the mounting of /portal/storage/framework/sessions.
 disableSessionsMount: false
 
 mesh:
-  url: http://mesh.local:8080
+  ## URL of the Gentics Mesh instance the portal connects to.
+  ## REQUIRED for standalone installs. Under the CMP umbrella chart it is
+  ## auto-wired to the bundled Mesh service ("http://<release>-mesh:80") when left empty.
+  url: ""
   #secretName: "my-mesh-secret" ## Gentics Mesh API Key secret
   #apikey: "" ## Or pre-defined Gentics Mesh API KEY (if not set, the secret will be used)
+  ## Key inside the API-key secret (default "apikey").
+  #secretKey: "apikey"
+  ## Let the portal image generate the Mesh API key itself (AUTOGENERATE_MESH_API_KEY).
+  #autogenerate_apikey: "false"
