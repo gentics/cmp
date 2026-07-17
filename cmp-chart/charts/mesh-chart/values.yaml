@@ -365,56 +365,76 @@ customjobs:
   #  #    subPath: runme.sh
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Gentics Mesh MCP Server (Sub-Komponente)
+# Gentics Mesh MCP Server (sub-component)
 #
-# Stellt eine Model-Context-Protocol-Schnittstelle für LLM-Clients bereit
+# Provides a Model Context Protocol interface for LLM clients
 # (Claude Desktop, OpenAI Agents, LangChain, n8n, Open WebUI, …).
-# Sechs read-only Tools, separater Deployment-Pod neben Mesh.
+# Six read-only tools, runs as a separate Deployment pod next to Mesh.
 #
-# Standardmäßig deaktiviert – per `mcpServer.enabled=true` einschalten.
-# Quelle: mesh-enterprise/mcp-server/
+# Disabled by default — enable via `mcpServer.enabled=true`.
+# Source: mesh-enterprise/mcp-server/
 # ─────────────────────────────────────────────────────────────────────────────
 mcpServer:
   enabled: false
 
   image:
-    repository: repo.gentics.com/mesh/mcp-server
+    ## Registry and repository are combined to "registry/repository:tag".
+    ## global.imageRegistry (umbrella mirror override) takes precedence over registry.
+    registry: repo.gentics.com
+    repository: mesh/mcp-server
     # tag: ""   # default: Chart.AppVersion
     pullPolicy: IfNotPresent
+    ## Pull secret for the MCP-server image (overrides global.imagePullSecrets).
+    ## Note: the image lives on repo.gentics.com — it may need a DIFFERENT pull
+    ## secret than the docker.gentics.com images.
     # pullSecret: docker-gentics-com
 
   replicaCount: 1
 
-  # Transport-Modus.
-  #   "stdio" – nur via `kubectl exec -i` oder Sidecar erreichbar (kein Service).
-  #   "http"  – legt Service + optional Ingress an, JSON-RPC über POST /mcp.
+  ## PodDisruptionBudget — only applied when replicaCount > 1.
+  podDisruptionBudget:
+    ## Minimum number/percentage of pods that must stay available during
+    ## voluntary disruptions (node drains, cluster upgrades).
+    minAvailable: "50%"
+    ## Alternative to minAvailable — if set, it is used INSTEAD of minAvailable
+    ## (Kubernetes allows only one of the two).
+    # maxUnavailable: 1
+
+  # Transport mode.
+  #   "stdio" – only reachable via `kubectl exec -i` or a sidecar (no Service).
+  #   "http"  – creates Service + optional Ingress, JSON-RPC via POST /mcp.
   transport:
     mode: http
     http:
       port: 3001
       host: "0.0.0.0"
     auth:
-      # Wenn true: Server akzeptiert Requests ohne Auth (nur hinter Reverse-Proxy zulässig).
+      # If true: the server accepts requests without auth (only acceptable behind a reverse proxy).
       disabled: false
-      # Inline-Token (nur für Tests). Empfehlung: existingSecret verwenden.
+      # Inline token (testing only). Empty: a token is generated once at install
+      # and reused across upgrades (see NOTES for the retrieval command).
       token: ""
-      # Existierendes Secret mit Key MCP_AUTH_TOKEN.
+      # Existing Secret with key MCP_AUTH_TOKEN.
+      # Recommended for GitOps/Argo CD (see README "Deploying with Argo CD").
       existingSecret: ""
     cors:
-      # Kommagetrennte CORS-Origin-Allowlist; "*" erlaubt alle.
+      # Comma-separated CORS origin allowlist; "*" allows all.
       origins: []
 
-  # Mesh-Anbindung.
-  # Default: nutzt die Mesh-Admin-Credentials aus dem Mesh-Pod (selber Release).
-  # Über mesh.existingSecret kann ein anderes Secret eingehängt werden,
-  # das Schlüssel MESH_USERNAME + MESH_PASSWORD bereitstellt.
+  # Mesh connection.
+  # Default (password and existingSecret empty): automatically uses this release's
+  # Mesh admin secret ("<release>-mesh-admin" or initialAdminPassword.existingSecret)
+  # with user "admin" — works without any further configuration.
   mesh:
-    # Default: in-cluster Service-DNS auf die Mesh-Komponente desselben Release.
-    # Wenn leer, wird aus `mesh.fullname` + service.mesh.port abgeleitet.
+    # Default: in-cluster service DNS of the Mesh component of this release.
+    # When empty, derived from `mesh.fullname` + service.mesh.port.
     baseUrl: ""
     username: "admin"
-    password: ""   # nur für Tests; sonst existingSecret nutzen
+    password: ""   # for testing only; otherwise use existingSecret or the default (admin secret)
+    # Existing Secret containing the Mesh password (key: existingSecretKey).
     existingSecret: ""
+    # Key inside existingSecret (default: MESH_PASSWORD).
+    # existingSecretKey: "MESH_PASSWORD"
     allowedProjects: "demo"
     allowedSchemas: ""           # leer = alle erlaubt
     allowedLanguages: "de,en"
@@ -422,7 +442,7 @@ mcpServer:
     graphqlMaxDepth: 6
     graphqlTimeoutMs: 5000
 
-  # Schutzschichten: verhindern, dass ein LLM Mesh mit Anfragen flutet.
+  # Protection layers: prevent an LLM from flooding Mesh with requests.
   protection:
     rateLimit:
       globalPerSecond: 50
@@ -437,13 +457,13 @@ mcpServer:
 
   logLevel: "info"
 
-  # Zusätzliche Umgebungsvariablen direkt durchgereicht.
+  # Additional environment variables passed through directly.
   extraEnv: []
 
   service:
     type: ClusterIP
     annotations: {}
-    # Wenn transport.mode = "stdio", wird kein Service angelegt.
+    # When transport.mode = "stdio", no Service is created.
 
   ingress:
     enabled: false
@@ -487,17 +507,19 @@ mcpServer:
   podAnnotations: {}
   podLabels: {}
 
-  # Probes – HTTP wenn transport.mode=http, sonst pgrep auf Java-Prozess.
+
+  startupProbe:
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 30
   livenessProbe:
-    enabled: true
     initialDelaySeconds: 30
-    periodSeconds: 30
+    periodSeconds: 20
     timeoutSeconds: 5
     failureThreshold: 3
   readinessProbe:
-    enabled: true
     initialDelaySeconds: 15
-    periodSeconds: 20
+    periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 3
 

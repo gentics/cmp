@@ -235,10 +235,20 @@ app.kubernetes.io/name: {{ include "mesh.name" . }}-mcp-server
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{/* Image reference (repo:tag), tag falls back to Chart.AppVersion */}}
+{{/*
+Fully qualified MCP-server image (registry/repository:tag, global.imageRegistry aware).
+Tag falls back to Chart.AppVersion (the MCP server is versioned with mesh-enterprise).
+*/}}
 {{- define "mesh.mcpServer.image" -}}
-{{- $tag := default .Chart.AppVersion .Values.mcpServer.image.tag -}}
-{{- printf "%s:%s" .Values.mcpServer.image.repository $tag -}}
+{{- include "gentics-common.image" (dict "root" . "image" .Values.mcpServer.image "tag" (default .Chart.AppVersion .Values.mcpServer.image.tag)) -}}
+{{- end -}}
+
+{{/*
+Image pull secrets for the MCP-server image.
+Local mcpServer.image.pullSecret (string) overrides global.imagePullSecrets.
+*/}}
+{{- define "mesh.mcpServer.imagePullSecrets" -}}
+{{- include "gentics-common.imagePullSecrets" (dict "root" . "localName" .Values.mcpServer.image.pullSecret) -}}
 {{- end -}}
 
 {{/* Bearer-token secret name: existingSecret or chart-generated */}}
@@ -256,6 +266,26 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- .Values.mcpServer.mesh.existingSecret -}}
 {{- else -}}
 {{- printf "%s-mesh" (include "mesh.mcpServer.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Secret key ref for the Mesh password used by the MCP server.
+Priority: mcpServer.mesh.existingSecret (key mcpServer.mesh.existingSecretKey,
+default "MESH_PASSWORD") -> explicit mcpServer.mesh.password (chart-managed secret)
+-> the release's Mesh admin secret (initialAdminPassword logic, user "admin").
+*/}}
+{{- define "mesh.mcpServer.meshPasswordRef" -}}
+{{- if .Values.mcpServer.mesh.existingSecret -}}
+secretKeyRef:
+  name: {{ .Values.mcpServer.mesh.existingSecret }}
+  key: {{ .Values.mcpServer.mesh.existingSecretKey | default "MESH_PASSWORD" }}
+{{- else if .Values.mcpServer.mesh.password -}}
+secretKeyRef:
+  name: {{ printf "%s-mesh" (include "mesh.mcpServer.fullname" .) }}
+  key: MESH_PASSWORD
+{{- else -}}
+{{- include "mesh.initialAdminPasswordRef" . -}}
 {{- end -}}
 {{- end -}}
 

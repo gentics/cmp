@@ -27,9 +27,8 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.mcpServer.image.pullSecret }}
-      imagePullSecrets:
-        - name: {{ . }}
+      {{- with (include "mesh.mcpServer.imagePullSecrets" .) }}
+      {{- . | nindent 6 }}
       {{- end }}
       securityContext:
         {{- toYaml .Values.mcpServer.podSecurityContext | nindent 8 }}
@@ -53,19 +52,31 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "mesh.mcpServer.fullname" . }}
-            - secretRef:
-                name: {{ include "mesh.mcpServer.meshSecretName" . }}
             {{- if and $http (not .Values.mcpServer.transport.auth.disabled) }}
             - secretRef:
                 name: {{ include "mesh.mcpServer.authSecretName" . }}
             {{- end }}
-          {{- with .Values.mcpServer.extraEnv }}
           env:
+            - name: MESH_USERNAME
+              value: {{ .Values.mcpServer.mesh.username | default "admin" | quote }}
+            - name: MESH_PASSWORD
+              valueFrom:
+                {{- include "mesh.mcpServer.meshPasswordRef" . | nindent 16 }}
+            {{- with .Values.mcpServer.extraEnv }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- end }}
           resources:
             {{- toYaml .Values.mcpServer.resources | nindent 12 }}
-          {{- if .Values.mcpServer.livenessProbe.enabled }}
+          startupProbe:
+            {{- if $http }}
+            httpGet:
+              path: /healthz
+              port: mcp-http
+            {{- else }}
+            exec:
+              command: ["/bin/sh", "-c", "pgrep -f 'java.*app.jar' >/dev/null"]
+            {{- end }}
+            {{- toYaml .Values.mcpServer.startupProbe | nindent 12 }}
           livenessProbe:
             {{- if $http }}
             httpGet:
@@ -75,12 +86,7 @@ spec:
             exec:
               command: ["/bin/sh", "-c", "pgrep -f 'java.*app.jar' >/dev/null"]
             {{- end }}
-            initialDelaySeconds: {{ .Values.mcpServer.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.mcpServer.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.mcpServer.livenessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.mcpServer.livenessProbe.failureThreshold }}
-          {{- end }}
-          {{- if .Values.mcpServer.readinessProbe.enabled }}
+            {{- toYaml .Values.mcpServer.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- if $http }}
             httpGet:
@@ -90,11 +96,7 @@ spec:
             exec:
               command: ["/bin/sh", "-c", "pgrep -f 'java.*app.jar' >/dev/null"]
             {{- end }}
-            initialDelaySeconds: {{ .Values.mcpServer.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.mcpServer.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.mcpServer.readinessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.mcpServer.readinessProbe.failureThreshold }}
-          {{- end }}
+            {{- toYaml .Values.mcpServer.readinessProbe | nindent 12 }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp
