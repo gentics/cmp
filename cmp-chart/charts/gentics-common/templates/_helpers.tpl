@@ -58,17 +58,81 @@ imagePullSecrets:
 
 {{/*
 Fully qualified image reference "registry/repository:tag".
-global.imageRegistry (umbrella) wins over the chart-local image.registry.
-When no registry is set, emits "repository:tag" (back-compat with full-path repositories).
-Args: (dict "root" $ "image" <image map with .registry .repository .tag>)
-NOTE: defined for #20; not yet wired into any chart.
+global.imageRegistry (umbrella-wide mirror override) wins over the chart-local
+image.registry. When neither is set, emits "repository:tag" (back-compat with
+registry-qualified repository paths).
+Args: (dict "root" $ "image" <image map with .registry .repository .tag>
+            "tag" <optional tag override, e.g. a resolved appVersion fallback>)
 */}}
 {{- define "gentics-common.image" -}}
 {{- $registry := coalesce ((.root.Values.global | default dict).imageRegistry) .image.registry -}}
+{{- $tag := coalesce .tag .image.tag -}}
 {{- if $registry -}}
-{{ $registry }}/{{ .image.repository }}:{{ .image.tag }}
+{{ $registry }}/{{ .image.repository }}:{{ $tag }}
 {{- else -}}
-{{ .image.repository }}:{{ .image.tag }}
+{{ .image.repository }}:{{ $tag }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Annotations for PersistentVolumeClaims so data survives uninstall/prune by default:
+Helm skips deletion (resource-policy: keep), Argo CD skips pruning (Delete=false).
+Keep/delete is decided at render time with this precedence:
+  1. chart-local flag (pass as "local", e.g. .Values.persistence.keepOnUninstall)
+  2. global.persistence.keepOnUninstall (umbrella-wide switch)
+  3. unset everywhere -> keep (safe default)
+Booleans need three-state logic here: default/coalesce would treat an explicit
+`false` as "unset", so we use hasKey / kindIs "invalid" instead.
+Full removal regardless of flags: kubectl delete pvc -l app.kubernetes.io/instance=<release>
+Args: (dict "root" $ "local" <bool or nil>)
+*/}}
+{{- define "gentics-common.pvcKeepAnnotations" -}}
+{{- $keep := true -}}
+{{- $globalPersistence := ((.root.Values.global | default dict).persistence) | default dict -}}
+{{- if hasKey $globalPersistence "keepOnUninstall" -}}
+{{- if not (kindIs "invalid" $globalPersistence.keepOnUninstall) -}}
+{{- $keep = $globalPersistence.keepOnUninstall -}}
+{{- end -}}
+{{- end -}}
+{{- if not (kindIs "invalid" .local) -}}
+{{- $keep = .local -}}
+{{- end -}}
+{{- if $keep -}}
+helm.sh/resource-policy: keep
+argocd.argoproj.io/sync-options: Delete=false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Gentics Mesh service host for components that talk to Mesh (e.g. Portal).
+Priority: explicit local host -> umbrella Mesh service ("<release>-mesh", requires
+global.mesh.enabled) -> required error.
+Args: (dict "root" $ "local" <host string>)
+*/}}
+{{- define "gentics-common.meshServiceHost" -}}
+{{- $globalMesh := ((.root.Values.global | default dict).mesh) | default dict -}}
+{{- if .local -}}
+{{ .local }}
+{{- else if $globalMesh.enabled -}}
+{{ .root.Release.Name }}-mesh
+{{- else -}}
+{{ required "mesh.host is required when not running under the CMP umbrella (global.mesh.enabled=false)" "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Gentics Mesh service port. Same priority as meshServiceHost; umbrella default is 80
+(the Mesh chart's service.mesh.port default).
+Args: (dict "root" $ "local" <port>)
+*/}}
+{{- define "gentics-common.meshServicePort" -}}
+{{- $globalMesh := ((.root.Values.global | default dict).mesh) | default dict -}}
+{{- if .local -}}
+{{ .local }}
+{{- else if $globalMesh.enabled -}}
+80
+{{- else -}}
+{{ required "mesh.port is required when not running under the CMP umbrella (global.mesh.enabled=false)" "" }}
 {{- end -}}
 {{- end -}}
 

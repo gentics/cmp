@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: "{{ include "gentics-common.image" (dict "root" . "image" (dict "registry" "" "repository" "busybox" "tag" "latest")) }}"
       command: ['wget']
       args:  ['{{ include "gentics-portal.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never

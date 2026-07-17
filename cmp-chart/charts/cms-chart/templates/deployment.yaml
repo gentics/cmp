@@ -31,7 +31,7 @@ spec:
         {{- end }}
       containers:
       - name: cms
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ include "cms.image" . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- if .Values.cms.securityContext }}
         securityContext:

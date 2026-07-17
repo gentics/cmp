@@ -1,4 +1,3 @@
-{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "gentics-portal.fullname" . -}}
 apiVersion: networking.k8s.io/v1
@@ -36,5 +35,4 @@ spec:
                 name: {{ $fullName }}
                 port: 
                   name: http
-{{- end }}
 {{- end }}

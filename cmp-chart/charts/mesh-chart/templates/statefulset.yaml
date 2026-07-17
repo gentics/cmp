@@ -32,7 +32,7 @@ spec:
       initContainers:
       {{- if and (.Values.restore.enabled) (eq (.Values.replicaCount | int) 1) }}
         - name: restore-from-snapshot
-          image: "{{ .Values.tools.image.repository }}:{{ .Values.tools.image.tag }}"
+          image: "{{ include "mesh.toolsImage" . }}"
           imagePullPolicy: {{ .Values.tools.image.pullPolicy }}
           command: ["/bin/sh"]
           args:
@@ -58,7 +58,7 @@ spec:
         securityContext:
         {{- toYaml .Values.securityContext | nindent 12 }}
         {{- end }}
-        image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+        image: "{{ include "mesh.image" . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
 {{- include "mesh.envVars" . | nindent 8 }}

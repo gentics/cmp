@@ -19,9 +19,8 @@ spec:
         {{- toYaml . | nindent 8}}
       {{- end }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+    {{- with (include "gentics-portal.imagePullSecrets" .) }}
+      {{- . | nindent 6 }}
     {{- end }}
       serviceAccountName: {{ include "gentics-portal.serviceAccountName" . }}
       securityContext:
@@ -59,7 +58,7 @@ spec:
         securityContext:
            {{- toYaml .Values.securityContext | nindent 12 }}
         {{- end }}
-        image: "{{ required "portal-java has no pre-built image. Build your portal image and set image.repository (see README)." .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ include "gentics-portal.image" . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
           {{- if .Values.keycloak.enabled }}
@@ -118,13 +117,13 @@ spec:
             value: {{ required "A valid Gentics Mesh api key is required!" .Values.mesh.apikey | quote }}
           {{- end }}
           - name: MESH_HOST
-            value: "{{ .Values.mesh.host }}"
+            value: "{{ include "gentics-portal.meshHost" . }}"
           - name: MESH_PORT
-            value: "{{ .Values.mesh.port }}"
+            value: "{{ include "gentics-portal.meshPort" . }}"
           - name: MESH_PROJECT
             value: "{{ .Values.mesh.project }}"
           - name: MESH_SSL
-            value: "false"
+            value: "{{ .Values.mesh.ssl | default false }}"
 
           ## License
           {{- $globalLicense := (($.Values.global | default dict).license) | default dict }}

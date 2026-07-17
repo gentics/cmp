@@ -7,9 +7,11 @@
 ## Global values — shared across all enabled components.
 ## Sub-charts must be updated to read from .Values.global (see Path A migration).
 global:
-  ## Container image registry used by all components.
-  ## Sub-charts will prefer this over their own image.repository prefix once global-aware.
-  imageRegistry: "docker.gentics.com"
+  ## Optional registry mirror override for ALL component images (Bitnami-style).
+  ## When set, it replaces every chart's image.registry — including Docker Hub images
+  ## (MariaDB, spellchecker) — so your mirror must proxy those too.
+  ## Leave empty to use each chart's own image.registry default.
+  imageRegistry: ""
 
   ## Image pull secrets applied to all component pods.
   ## Replaces the per-chart image.pullSecret / imagePullSecrets fields.
@@ -23,9 +25,26 @@ global:
   license:
     key: ""
 
-  ## MariaDB integration flag.
-  ## Must be set to true together with mariadb.enabled to activate auto-wiring of
-  ## database host and credentials in CMS and Mesh sub-charts.
+  ## Tells global-aware sub-charts (e.g. Portal) that the umbrella deploys Gentics Mesh,
+  ## so they can auto-wire their Mesh connection to the bundled service ("<release>-mesh").
+  ## MUST match mesh.enabled below — a mismatch fails rendering (see templates/validation.yaml).
+  mesh:
+    enabled: true
+
+  ## Whether persistent volumes (database, CMS data, Mesh uploads, ...) survive
+  ## "helm uninstall" / Argo CD prune. Default true — an accidental uninstall is
+  ## never a data-loss event. Set false for throwaway/test installs so uninstall
+  ## removes the PVCs too. Per-component override: set keepOnUninstall under the
+  ## component's own persistence section (e.g. mariadb.persistence.keepOnUninstall).
+  persistence:
+    keepOnUninstall: true
+
+  ## Bundled MariaDB — single switch.
+  ## true:  the umbrella deploys MariaDB and auto-wires database host and credentials
+  ##        into the CMS and Mesh sub-charts.
+  ## false: no MariaDB is deployed; you must set cms.database.* and mesh.database.*
+  ##        to point at your external database.
+  ## The bundled instance is configured via the top-level "mariadb:" section below.
   mariadb:
     enabled: true
 
@@ -43,7 +62,8 @@ global:
 cms:
   enabled: true
   image:
-    repository: "docker.gentics.com/gentics/cms"
+    ## registry defaults to docker.gentics.com (sub-chart default)
+    repository: "gentics/cms"
     tag: 6.4.3
   #database:
   #  host: mariadb
@@ -63,7 +83,8 @@ mesh:
   enabled: true
 
   image:
-    repository: docker.gentics.com/andp/mesh-mariadb
+    ## registry defaults to docker.gentics.com (sub-chart default)
+    repository: andp/mesh-mariadb
     tag: andp-8.3.11
 
 
@@ -95,13 +116,12 @@ portal-java:
   # for all available options, please check the gentics/gentics-portal-java chart
 
 # -----------------------------------------------------------------------
-# MariaDB (optional — disable if you provide an external database)
+# MariaDB configuration (deployed when global.mariadb.enabled is true)
 # -----------------------------------------------------------------------
 mariadb:
-  enabled: true
-
   image:
-    repository: docker.io/library/mariadb
+    registry: docker.io
+    repository: library/mariadb
     tag: "11"
     pullPolicy: IfNotPresent
   ## imagePullSecrets:
@@ -111,10 +131,16 @@ mariadb:
     ## Root password. Leave empty to generate a random password on install.
     ## The generated password is persisted in the Secret and reused on upgrades.
     rootPassword: ""
+    ## Reference an existing Secret (key "root-password") instead of generating one.
+    ## Recommended for GitOps/Argo CD deployments — see README "Deploying with Argo CD".
+    ## When set, no Secret is created by the chart and rootPassword is ignored.
+    existingSecret: ""
 
   persistence:
     ## Storage size for the MariaDB data volume.
     size: 5Gi
+    ## Override global.persistence.keepOnUninstall for the MariaDB volume only.
+    ## keepOnUninstall: true
     ## storageClass: ""   # leave empty to use the cluster default
     ## Use a pre-created PVC instead of creating one via volumeClaimTemplates.
     ## existingClaim: ""
@@ -131,9 +157,26 @@ mariadb:
       cpu: 1000m
       memory: 1Gi
 
-  podSecurityContext: {}
+  ## Probes use the official image's healthcheck.sh (no password in the process list).
+  ## NOTE: healthcheck.sh relies on the healthcheck@localhost user the mariadb
+  ## entrypoint creates at FIRST initialization. Data directories initialized by other
+  ## images/versions may lack it — override the probes below in that case.
+  # livenessProbe: {}
+  # readinessProbe: {}
 
-  securityContext: {}
+  ## Default hardening for the bundled MariaDB (official image runs as uid/gid 999).
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    seccompProfile:
+      type: RuntimeDefault
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
 
   ## Optional custom MariaDB configuration appended as /etc/mysql/conf.d/custom.cnf.
   config: |

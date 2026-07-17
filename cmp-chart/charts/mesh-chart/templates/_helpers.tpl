@@ -171,6 +171,21 @@ Local imagePullSecrets overrides global; global is the default. Both use the arr
 {{- end }}
 
 {{/*
+Fully qualified Mesh image (registry/repository:tag, global.imageRegistry aware).
+Falls back to the chart appVersion when image.tag is unset.
+*/}}
+{{- define "mesh.image" -}}
+{{- include "gentics-common.image" (dict "root" . "image" .Values.image "tag" (default .Chart.AppVersion .Values.image.tag)) -}}
+{{- end -}}
+
+{{/*
+Fully qualified Mesh tools image (registry/repository:tag, global.imageRegistry aware).
+*/}}
+{{- define "mesh.toolsImage" -}}
+{{- include "gentics-common.image" (dict "root" . "image" .Values.tools.image) -}}
+{{- end -}}
+
+{{/*
 Secret key ref for the Mesh initial admin password.
 Priority: existingSecret → chart-managed secret (explicit or auto-generated).
 */}}

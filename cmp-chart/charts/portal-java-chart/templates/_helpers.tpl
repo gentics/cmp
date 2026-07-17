@@ -74,6 +74,35 @@ Create the name Mesh secret
 {{- end -}}
 
 {{/*
+Gentics Mesh host/port the portal connects to.
+Priority: explicit mesh.host/mesh.port -> umbrella Mesh service ("<release>-mesh":80,
+requires global.mesh.enabled) -> required error.
+*/}}
+{{- define "gentics-portal.meshHost" -}}
+{{- include "gentics-common.meshServiceHost" (dict "root" . "local" .Values.mesh.host) -}}
+{{- end -}}
+
+{{- define "gentics-portal.meshPort" -}}
+{{- include "gentics-common.meshServicePort" (dict "root" . "local" .Values.mesh.port) -}}
+{{- end -}}
+
+{{/*
+Fully qualified Portal image (registry/repository:tag, global.imageRegistry aware).
+image.repository stays required — there is no pre-built portal image.
+*/}}
+{{- define "gentics-portal.image" -}}
+{{- $_ := required "portal-java has no pre-built image. Build your portal image and set image.repository (see README)." .Values.image.repository -}}
+{{- include "gentics-common.image" (dict "root" . "image" .Values.image) -}}
+{{- end -}}
+
+{{/*
+Image pull secrets — local imagePullSecrets (array) overrides global; global is the default.
+*/}}
+{{- define "gentics-portal.imagePullSecrets" -}}
+{{- include "gentics-common.imagePullSecretsList" (dict "root" . "localList" .Values.imagePullSecrets) -}}
+{{- end }}
+
+{{/*
 Name of the secret containing the Portal license key.
 Priority: local license.secret -> umbrella global license secret ("<release>-license")
          -> chart-local "<fullname>-secrets" (holds license.key or legacy licenseKey).

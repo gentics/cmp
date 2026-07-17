@@ -1,9 +1,5 @@
 {{- if .Values.backup.enabled }}
-{{- if semverCompare "<=1.21-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: batch/v1beta1
-{{- else -}}
 apiVersion: batch/v1
-{{- end }}
 kind: CronJob
 metadata:
   name: {{ include "mesh.fullname" . }}-backup
@@ -30,7 +26,7 @@ spec:
           - name: backup
             securityContext:
               {{- toYaml .Values.securityContext | nindent 14 }}
-            image: "{{ .Values.tools.image.repository }}:{{ .Values.tools.image.tag }}"
+            image: "{{ include "mesh.toolsImage" . }}"
             imagePullPolicy: {{ .Values.tools.image.pullPolicy }}
             command: ["/bin/sh"]
             args:

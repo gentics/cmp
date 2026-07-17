@@ -8,6 +8,11 @@ version: 8.4.5
 # CMP application version this chart installs
 appVersion: "8.4.5"
 
+# Minimum supported Kubernetes version (autoscaling/v2 GA).
+# The "-0" suffix is required so pre-release-style cluster versions
+# (e.g. v1.28.3-eks-...) satisfy the constraint.
+kubeVersion: ">=1.23.0-0"
+
 home: https://www.gentics.com/Content.Node/cmp8/guides/
 icon: https://www.gentics.com/genticscms/assets/images/gentics/gentics_logo.png
 

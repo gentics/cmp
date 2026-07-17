@@ -12,8 +12,11 @@ autoscaling:
 
 image:
   # The portal | java has no pre-built image. A CI job needs to be setup to provide the image.
-  # Reference the image which you build here
-  #repository: docker.gentics.com/YOUR_ID/portal-PROJECT
+  # Reference the image which you build here.
+  # registry and repository are combined to "registry/repository:tag";
+  # global.imageRegistry (umbrella mirror override) takes precedence over registry.
+  #registry: docker.gentics.com
+  #repository: YOUR_ID/portal-PROJECT
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -122,8 +125,13 @@ startupProbe:
 existingConfigmap: ""
 
 mesh:
-  host: mesh.local
-  port: 8080
+  ## Hostname and port of the Gentics Mesh instance the portal connects to.
+  ## REQUIRED for standalone installs. Under the CMP umbrella chart both are
+  ## auto-wired to the bundled Mesh service ("<release>-mesh":80) when left empty.
+  host: ""
+  port: null
+  ## Whether to connect to Mesh via SSL.
+  ssl: false
   project: demo
   apiKeyFromSecret: false
   #secretName: "my-mesh-secret" ## Gentics Mesh API Key secret
@@ -193,6 +201,11 @@ portal:
 
 persistence:
   enabled: false
+
+  ## Whether the shared Portal volume survives "helm uninstall".
+  ## Unset: follows global.persistence.keepOnUninstall, defaulting to true (keep).
+  ## Leave commented so the global umbrella switch stays effective.
+  # keepOnUninstall: true
 
   # Volume for shared data
   # This volume should be a network volume (NFS) and will be shared across all instances

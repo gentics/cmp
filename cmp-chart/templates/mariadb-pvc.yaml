@@ -1,4 +1,4 @@
-{{- if and .Values.mariadb.enabled (not .Values.mariadb.persistence.existingClaim) }}
+{{- if and .Values.global.mariadb.enabled (not .Values.mariadb.persistence.existingClaim) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -6,6 +6,10 @@ metadata:
   labels:
     {{- include "cmp.labels" . | nindent 4 }}
     app.kubernetes.io/component: mariadb
+  {{- with (include "gentics-common.pvcKeepAnnotations" (dict "root" . "local" (.Values.mariadb.persistence).keepOnUninstall)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
 spec:
   accessModes:
     - ReadWriteOnce

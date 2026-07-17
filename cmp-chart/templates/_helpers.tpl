@@ -44,6 +44,31 @@ All sub-charts that support license.secret reference this name.
 {{- end -}}
 
 {{/*
+Name of the secret holding the MariaDB root password.
+Uses mariadb.auth.existingSecret when set (key "root-password" expected),
+otherwise the chart-managed "<release>-mariadb" secret.
+*/}}
+{{- define "cmp.mariadbRootSecretName" -}}
+{{- ((.Values.mariadb.auth).existingSecret) | default (printf "%s-mariadb" .Release.Name) -}}
+{{- end -}}
+
+{{/*
+Name of the secret holding the CMS database password (key "password").
+Uses cms.database.passwordSecret when set, otherwise the chart-managed secret.
+*/}}
+{{- define "cmp.cmsDbSecretName" -}}
+{{- (((.Values.cms).database).passwordSecret) | default (printf "%s-cms-db" .Release.Name) -}}
+{{- end -}}
+
+{{/*
+Name of the secret holding the Mesh database password (key "password").
+Uses mesh.database.passwordSecret when set, otherwise the chart-managed secret.
+*/}}
+{{- define "cmp.meshDbSecretName" -}}
+{{- (((.Values.mesh).database).passwordSecret) | default (printf "%s-mesh-db" .Release.Name) -}}
+{{- end -}}
+
+{{/*
 Image pull secrets for umbrella-chart-owned pods (e.g. the db-init job).
 Uses global.imagePullSecrets when set.
 */}}

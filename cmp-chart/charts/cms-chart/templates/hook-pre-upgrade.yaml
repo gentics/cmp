@@ -26,9 +26,9 @@ spec:
       containers:
         - name: pre-upgrade
           {{- if .Values.cms.preUpgrade.image }}
-          image: "{{ .Values.cms.preUpgrade.image.repository }}:{{ .Values.cms.preUpgrade.image.tag }}"
+          image: "{{ include "gentics-common.image" (dict "root" . "image" .Values.cms.preUpgrade.image) }}"
           {{- else }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ include "cms.image" . }}"
           {{- end }}
           imagePullPolicy: {{ ((.Values.cms.preUpgrade.image).pullPolicy) | default .Values.image.pullPolicy }}
           env:

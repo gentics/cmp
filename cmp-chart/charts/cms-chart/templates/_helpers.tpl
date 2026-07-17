@@ -98,3 +98,10 @@ Local accepts a plain secret name string; global uses the Kubernetes-native arra
 {{- define "cms.imagePullSecrets" -}}
 {{- include "gentics-common.imagePullSecrets" (dict "root" . "localName" .Values.image.pullSecret) -}}
 {{- end }}
+
+{{/*
+Fully qualified CMS image (registry/repository:tag, global.imageRegistry aware).
+*/}}
+{{- define "cms.image" -}}
+{{- include "gentics-common.image" (dict "root" . "image" .Values.image) -}}
+{{- end -}}

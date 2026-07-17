@@ -1,0 +1,7 @@
+{{- /*
+Cross-value consistency checks for the umbrella chart.
+This template renders nothing — it only fails fast on inconsistent configurations.
+*/ -}}
+{{- if and .Values.global.mesh.enabled (not .Values.mesh.enabled) }}
+{{- fail "Inconsistent values: global.mesh.enabled is true but mesh.enabled is false. Either enable the bundled Mesh (mesh.enabled=true) or set global.mesh.enabled=false and configure portal-java.mesh.host/port to point at your external Mesh." }}
+{{- end }}

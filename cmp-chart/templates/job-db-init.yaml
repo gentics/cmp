@@ -1,4 +1,4 @@
-{{- if and .Values.mariadb.enabled (or .Values.cms.enabled .Values.mesh.enabled) }}
+{{- if and .Values.global.mariadb.enabled (or .Values.cms.enabled .Values.mesh.enabled) }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -23,7 +23,7 @@ spec:
       {{- end }}
       containers:
         - name: db-init
-          image: "{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}"
+          image: "{{ include "gentics-common.image" (dict "root" . "image" .Values.mariadb.image) }}"
           imagePullPolicy: {{ .Values.mariadb.image.pullPolicy }}
           command:
             - /bin/sh
@@ -41,7 +41,7 @@ spec:
               done
               echo "MariaDB is ready."
 
-              {{- if and .Values.cms.enabled .Values.mariadb.enabled }}
+              {{- if .Values.cms.enabled }}
 
               echo "Setting up CMS database..."
               CMS_PASS=$(cat /secrets/cms/password)
@@ -53,7 +53,7 @@ spec:
               echo "CMS database setup done."
               {{- end }}
 
-              {{- if and .Values.mesh.enabled .Values.mariadb.enabled }}
+              {{- if .Values.mesh.enabled }}
 
               echo "Setting up Mesh database..."
               MESH_PASS=$(cat /secrets/mesh/password)
@@ -82,15 +82,15 @@ spec:
       volumes:
         - name: mariadb-root
           secret:
-            secretName: {{ .Release.Name }}-mariadb
+            secretName: {{ include "cmp.mariadbRootSecretName" . }}
         {{- if .Values.cms.enabled }}
         - name: cms-db
           secret:
-            secretName: {{ .Release.Name }}-cms-db
+            secretName: {{ include "cmp.cmsDbSecretName" . }}
         {{- end }}
         {{- if .Values.mesh.enabled }}
         - name: mesh-db
           secret:
-            secretName: {{ .Release.Name }}-mesh-db
+            secretName: {{ include "cmp.meshDbSecretName" . }}
         {{- end }}
 {{- end }}
