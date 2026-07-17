@@ -1,0 +1,190 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "gentics-portal.fullname" . }}
+  labels:
+    {{- include "gentics-portal.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "gentics-portal.selectorLabels" . | nindent 6 }}
+  serviceName: "portal"
+  template:
+    metadata:
+      labels:
+        {{- include "gentics-portal.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "gentics-portal.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        {{- range .Values.extraVolumes }}
+        - name: {{ .name }}
+          {{- toYaml .volume | nindent 10 }}
+        {{- end }}
+        - name: data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+          {{- if and (.Values.persistence.data.existingClaim) (eq (.Values.replicaCount | int) 1) }}
+            claimName: {{ .Values.persistence.data.existingClaim }}
+          {{- end }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+
+        - name: shared
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+          {{- if (.Values.persistence.shared.existingClaim) }}
+            claimName: {{ .Values.persistence.shared.existingClaim }}
+          {{- else }}
+            claimName: shared-{{ include "gentics-portal.fullname" . }}
+          {{- end }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+
+        {{- if .Values.portalConfigOverride }}
+        - name: config
+          configMap:
+          {{- if .Values.existingConfigmap }}
+            name: {{ .Values.existingConfigmap }}
+          {{- else }}
+            name: config-{{ template "gentics-portal.fullname" . }}
+          {{- end }}
+        {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        {{- if .Values.securityContext }}
+        securityContext:
+           {{- toYaml .Values.securityContext | nindent 12 }}
+        {{- end }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+        env:
+          ## Mesh Settings
+          - name: MESH_APIKEY
+          {{- if .Values.mesh.apikey }}
+            value: {{ required "A valid Gentics Mesh api key is required!" .Values.mesh.apikey | quote }}
+          {{- else }}
+            valueFrom:
+                secretKeyRef:
+                  name: {{ include "gentics-portal.mesh.secretName" . }}
+                  key: {{ .Values.mesh.secretKey | default "apikey" | quote }}
+          {{- end }}
+          - name: MESH_URL
+            value: {{ .Values.mesh.url | quote }}
+          - name: AUTOGENERATE_MESH_API_KEY
+            value: {{ .Values.mesh.autogenerate_apikey | default "false" | quote }}
+
+{{- if .Values.extraEnv }}
+{{ toYaml .Values.extraEnv | indent 10 }}
+{{- end }}
+
+        ports:
+          - name: http
+            containerPort: {{ default "80" .Values.httpPort }}
+            protocol: TCP
+          - name: https
+            containerPort: {{ default "443" .Values.httpsPort }}
+            protocol: TCP
+
+        livenessProbe:
+          httpGet:
+            path: /api/health/live
+            scheme: {{ default "HTTP" .Values.portalProbeScheme }}
+            port: {{ default "http" .Values.portalProbePortName }}
+            httpHeaders:
+            - name: Host
+              value: {{ default "portal" .Values.portalHost | quote }}
+          periodSeconds: {{ default 15 .Values.liveness.period }}
+          timeoutSeconds: {{ default 3 .Values.liveness.timeout }}
+          failureThreshold: {{ default 2 .Values.liveness.failureThreshold }}
+        readinessProbe:
+          httpGet:
+            path: /api/health/ready
+            scheme: {{ default "HTTP" .Values.portalProbeScheme }}
+            port: {{ default "http" .Values.portalProbePortName }}
+            httpHeaders:
+            - name: Host
+              value: {{ default "portal" .Values.portalHost | quote }}
+          periodSeconds: {{ default 15 .Values.readiness.period }}
+          timeoutSeconds: {{ default 3 .Values.readiness.timeout }}
+          failureThreshold: {{ default 2 .Values.readiness.failureThreshold }}
+
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+
+        volumeMounts:
+          {{- range .Values.extraVolumes }}
+          - name: {{ .name }}
+            {{- toYaml .mount | nindent 12 }}
+          {{- end }}
+          {{- if .Values.extraVolumeMounts }}
+          {{- range .Values.extraVolumeMounts }}
+          - mountPath: {{ .mountPath }}
+            name: {{ .name }}
+            subPath: {{ .subPath }}
+          {{- end }}
+          {{- end }}
+          {{- if and .Values.persistence.enabled (not .Values.persistence.data.disablePersistentCache) }}
+          - mountPath: "/portal/bootstrap/cache"
+            name: data
+            subPath: "bootstrap-cache"
+          - mountPath: "/portal/storage/framework/cache"
+            name: data
+            subPath: "storage-cache"
+          {{- end }}
+        {{- if not .Values.disableSessionsMount }}
+          - mountPath: "/portal/storage/framework/sessions"
+            name: shared
+            subPath: "storage-sessions"
+        {{- end }}
+        {{- if .Values.portalConfigOverride }}
+          - mountPath: "/portal/config"
+            name: config
+        {{- end }}
+
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      affinity:
+    {{- with .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/instance
+                      operator: In
+                      values:
+                        - "{{ .Release.Name }}"
+                topologyKey: kubernetes.io/hostname
+{{- if and .Values.persistence.enabled (not .Values.persistence.data.existingClaim) }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        
+        {{- with .Values.persistence.data.annotations }}
+        annotations:
+          {{ toYaml . }}
+        {{- end }}
+      
+      spec:
+        {{- toYaml .Values.persistence.data.spec | nindent 8 }}
+{{ end }}

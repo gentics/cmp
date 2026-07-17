@@ -1,0 +1,7 @@
+apiVersion: v2
+name: gentics-portal-php
+description: Helm chart for Gentics Portal | php
+
+type: application
+version: 1.1.2
+appVersion: 1.4.11
