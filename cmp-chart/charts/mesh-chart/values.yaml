@@ -280,6 +280,40 @@ backup:
       memory: 1Gi
       cpu: 250m
 
+## Generate a Gentics Mesh API key and store it in the "<release>-mesh-secret"
+## Secret (key "apikey") — the CMP portals read this secret by default.
+## The (empty) Secret is ALWAYS rendered by this chart; when generateApiKey is
+## true, a Job waits for Mesh, logs in with the admin credentials
+## (login -> auth/me -> POST /users/{uuid}/token) and patches the token into it.
+## Create-once: an existing key is never regenerated, because Mesh invalidates
+## the previous token when a new one is issued. Disabling the flag on a later
+## upgrade removes only the job — the stored key stays intact.
+## Force regeneration: kubectl delete secret <release>-mesh-secret, re-run with
+## the flag enabled (helm upgrade / Argo sync).
+generateApiKey: false
+
+## Configuration for the API-key job (only used when generateApiKey is true).
+apiKeyJob:
+  ## Mesh user whose API token is generated. The password is taken from the
+  ## initialAdminPassword secret (or its existingSecret).
+  ## NOTE: issuing the token invalidates any previously issued API token of
+  ## this user.
+  username: admin
+  image:
+    registry: docker.io
+    repository: curlimages/curl
+    tag: "8.11.1"
+    pullPolicy: IfNotPresent
+  ## Completed jobs are cleaned up automatically after this many seconds.
+  ttlSecondsAfterFinished: 3600
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 200m
+      memory: 64Mi
+
 # Initial admin credentials
 initialAdminPassword:
   ## Explicit password. Leave empty to auto-generate a random 24-char password on install.

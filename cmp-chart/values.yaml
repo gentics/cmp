@@ -82,6 +82,13 @@ cms:
 mesh:
   enabled: true
 
+  ## Generate the Mesh API key for the portals on first install:
+  ##   helm install ... --set mesh.generateApiKey=true
+  ## The job is create-once (an existing key is never regenerated) and the
+  ## "<release>-mesh-secret" Secret itself is always rendered (empty) by the
+  ## mesh chart, so disabling the flag later keeps the stored key intact.
+  # generateApiKey: true
+
   image:
     ## registry defaults to docker.gentics.com (sub-chart default)
     repository: andp/mesh-mariadb
@@ -182,10 +189,6 @@ mariadb:
 
   ## Default hardening for the bundled MariaDB (official image runs as uid/gid 999).
   podSecurityContext:
-    runAsNonRoot: true
-    runAsUser: 999
-    runAsGroup: 999
-    fsGroup: 999
     seccompProfile:
       type: RuntimeDefault
 
