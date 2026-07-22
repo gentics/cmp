@@ -135,7 +135,7 @@ pipeline {
                        "gentics-portal-java=${portalJavaVersion} " +
                        "gentics-portal-php=${portalPhpVersion}"
 
-                    sh "ci/build-helm-chart.sh ${version} cmp-chart/"
+                    sh "ci/build-helm-chart.sh ${helmVersion} cmp-chart/"
                     
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
