@@ -106,6 +106,7 @@ pipeline {
                         returnStdout: true
                     ).trim()
 
+                    def helmVersion = version
                     if (Boolean.valueOf(params.runDeployTesting)) {
                         def helmTestVersion = version;
                         cmsVersion = "0-" + helmTestVersion
@@ -113,6 +114,7 @@ pipeline {
                         portalJavaVersion = "0-" + helmTestVersion
                         portalPhpVersion = "0-" + helmTestVersion
                         genticsCommonVersion = "0-" + helmTestVersion
+                        helmVersion = "0-" + helmTestVersion
                     }
 
                     //Release gentics-common first - it's used in the cmp chart too
