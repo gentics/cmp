@@ -106,7 +106,7 @@ pipeline {
                         returnStdout: true
                     ).trim()
 
-                    if (Boolean.valueOf(params.deployTesting)) {
+                    if (Boolean.valueOf(params.runDeployTesting)) {
                         def helmTestVersion = version;
                         cmsVersion = "0-" + helmTestVersion
                         meshVersion = "0-" + helmTestVersion
