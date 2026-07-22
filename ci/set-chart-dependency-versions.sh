@@ -12,7 +12,7 @@ for ENTRY in "$@"; do
     NAME=${ENTRY%%=*}
 
     echo "Setting repository '${REPOSITORY_URL}' for dependency '${NAME}' in ${CHART_FILE}"
-    docker run --rm -v $(pwd):/apps -w /apps \
+    docker run --rm -v $(pwd):/apps -w /apps --user "$(id -u):$(id -g)" \
         mikefarah/yq:4 eval -i \
         "(.dependencies[] | select(.name == \"${NAME}\") | .repository) = \"${REPOSITORY_URL}\"" \
         "${CHART_FILE}"
@@ -20,7 +20,7 @@ for ENTRY in "$@"; do
     if [[ "${ENTRY}" == *=* ]]; then
         VERSION=${ENTRY#*=}
         echo "Setting dependency '${NAME}' to version ${VERSION} in ${CHART_FILE}"
-        docker run --rm -v $(pwd):/apps -w /apps \
+        docker run --rm -v $(pwd):/apps -w /apps --user "$(id -u):$(id -g)" \
             mikefarah/yq:4 eval -i \
             "(.dependencies[] | select(.name == \"${NAME}\") | .version) = \"${VERSION}\"" \
             "${CHART_FILE}"

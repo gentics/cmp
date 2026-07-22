@@ -101,29 +101,45 @@ pipeline {
 
                     echo "cms.version=${cmsVersion} mesh.version=${meshVersion} portal.java.version=${portalJavaVersion} portal.php.version=${portalPhpVersion}"
 
+                    def genticsCommonVersion = sh(
+                        script: "docker run --rm -v \$(pwd):/apps -w /apps mikefarah/yq:4 eval '.version' cmp-chart/charts/gentics-common/Chart.yaml",
+                        returnStdout: true
+                    ).trim()
+
                     if (Boolean.valueOf(params.deployTesting)) {
                         def helmTestVersion = version;
                         cmsVersion = "0-" + helmTestVersion
                         meshVersion = "0-" + helmTestVersion
                         portalJavaVersion = "0-" + helmTestVersion
                         portalPhpVersion = "0-" + helmTestVersion
+                        genticsCommonVersion = "0-" + helmTestVersion
                     }
 
+                    //Release gentics-common first - it's used in the cmp chart too
+                    sh "ci/build-helm-chart.sh ${genticsCommonVersion} cmp-chart/charts/gentics-common"
+
+                    withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
+                        def genticsCommonPackageFilename = "gentics-common-${genticsCommonVersion}.tgz"
+                        echo "Deploying gentics-common Helm Chart"
+                        sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${genticsCommonPackageFilename}"
+                    }
+
+
+                    //update dependencies for cmp-sub-charts - use versions from pom.xml or test-version
                     sh "ci/set-chart-dependency-versions.sh cmp-chart/Chart.yaml ${helmRepository} " +
-                       "gentics-common " +
+                       "gentics-common=${genticsCommonVersion} " +
                        "cms=${cmsVersion} " +
                        "gentics-mesh=${meshVersion} " +
                        "gentics-portal-java=${portalJavaVersion} " +
                        "gentics-portal-php=${portalPhpVersion}"
 
                     sh "ci/build-helm-chart.sh ${version} cmp-chart/"
-
+                    
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
                         def packageFilename = "cmp-${version}.tgz"
                         echo "Deploying CMS Helm Chart"
                         sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${packageFilename}"
-
                     }
                 }
 
