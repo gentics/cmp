@@ -18,6 +18,7 @@ pipeline {
     parameters {
         booleanParam(name: 'skipMapping',         defaultValue: false, description: "Skip (re-)generation of mapping files.")
         booleanParam(name: 'runDeploy',           defaultValue: false, description: "Deploy the Maven and Helm artifacts.")
+        booleanParam(name: 'runDeployTesting',    defaultValue: false, description: "Deploy the Maven and Helm artifacts to the snapshot repo.")
         booleanParam(name: 'release',             defaultValue: false, description: "Run a release build (this requires 'runDeploy').")
     }
 
@@ -51,7 +52,7 @@ pipeline {
                     def mvnArguments  = ""
                     version = MavenHelper.getVersion()
 
-                    if (params.runDeploy) {
+                    if (params.runDeploy || params.runDeployTesting) {
                         mvnGoal = "deploy"
 
                         if (params.release) {
@@ -81,36 +82,48 @@ pipeline {
             }
         }
 
-        stage("Build & Deploy Helm Charts"){
+        stage("Build Helm Charts"){
             when {
                 expression {
-                    return params.runDeploy
+                    return params.runDeploy || params.runDeployTesting
                 }
             }
             steps {
                 script {
-                    sh ".jenkins/build-helm-chart.sh ${version} cmp-chart/charts/cms-chart"
-                    sh ".jenkins/build-helm-chart.sh ${version} cmp-chart/charts/mesh-chart"
-                    sh ".jenkins/build-helm-chart.sh ${version} cmp-chart/charts/portal-java-chart"
-
-                    sh 'ls -ltr target/'
-
                     if (Boolean.valueOf(params.release)) {
                         helmRepository = helmRepositoryProd;
                     }
-                    withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
-                        def cmsPackageFilename = "cms-${version}.tgz"
-                        echo "Deploying CMS Helm Chart"
-                        sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${cmsPackageFilename}"
 
-                        def meshPackageFilename = "gentics-mesh-${version}.tgz"
-                        echo "Deploying Mesh Helm Chart"
-                        sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${meshPackageFilename}"
+                    def cmsVersion        = sh(script: "mvn help:evaluate -Dexpression=cms.version -q -DforceStdout", returnStdout: true).trim()
+                    def meshVersion       = sh(script: "mvn help:evaluate -Dexpression=mesh.version -q -DforceStdout", returnStdout: true).trim()
+                    def portalJavaVersion = sh(script: "mvn help:evaluate -Dexpression=portal.java.version -q -DforceStdout", returnStdout: true).trim()
+                    def portalPhpVersion  = sh(script: "mvn help:evaluate -Dexpression=portal.php.version -q -DforceStdout", returnStdout: true).trim()
 
-                        def portaljavaPackageFilename = "gentics-portal-java-${version}.tgz"
-                        echo "Deploying Portal-Java Helm Chart"
-                        sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${portaljavaPackageFilename}"
+                    echo "cms.version=${cmsVersion} mesh.version=${meshVersion} portal.java.version=${portalJavaVersion} portal.php.version=${portalPhpVersion}"
+
+                    if (Boolean.valueOf(params.deployTesting)) {
+                        def helmTestVersion = version;
+                        cmsVersion = "0-" + helmTestVersion
+                        meshVersion = "0-" + helmTestVersion
+                        portalJavaVersion = "0-" + helmTestVersion
+                        portalPhpVersion = "0-" + helmTestVersion
                     }
+
+                    sh "ci/set-chart-dependency-versions.sh cmp-chart/Chart.yaml ${helmRepository} " +
+                       "gentics-common " +
+                       "cms=${cmsVersion} " +
+                       "gentics-mesh=${meshVersion} " +
+                       "gentics-portal-java=${portalJavaVersion} " +
+                       "gentics-portal-php=${portalPhpVersion}"
+
+                    sh "ci/build-helm-chart.sh ${version} cmp-chart/"
+
+
+                    withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
+                        def packageFilename = "cmp-${version}.tgz"
+                        echo "Deploying CMS Helm Chart"
+                        sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${packageFilename}"
+
                 }
 
             }
