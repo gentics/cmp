@@ -118,8 +118,8 @@ pipeline {
                     }
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
-                        sh 'helm repo add --username ${repoUsername} --password ${repoPassword} gentics https://repo.gentics.com/repository/helm/'
-                        sh 'helm repo add --username ${repoUsername} --password ${repoPassword} gentics-snapshots https://repo.gentics.com/repository/helm-snapshots/'
+                        sh 'helm repo add --username ${repoUsername} --password ${repoPassword} gentics https://repo.gentics.com/repository/helm/ || true'
+                        sh 'helm repo add --username ${repoUsername} --password ${repoPassword} gentics-snapshots https://repo.gentics.com/repository/helm-snapshots/ || true'
                         sh 'helm repo update'
                     }
 
