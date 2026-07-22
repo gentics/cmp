@@ -117,6 +117,12 @@ pipeline {
                         helmVersion = "0-" + helmTestVersion
                     }
 
+                    withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
+                        sh 'helm repo add --username ${repoUsername} --password ${repoPassword} gentics https://repo.gentics.com/repository/helm/'
+                        sh 'helm repo add --username ${repoUsername} --password ${repoPassword} gentics-snapshots https://repo.gentics.com/repository/helm-snapshots/'
+                        sh 'helm repo update'
+                    }
+
                     //Release gentics-common first - it's used in the cmp chart too
                     sh "ci/build-helm-chart.sh ${genticsCommonVersion} cmp-chart/charts/gentics-common"
 

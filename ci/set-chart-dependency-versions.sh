@@ -26,3 +26,7 @@ for ENTRY in "$@"; do
             "${CHART_FILE}"
     fi
 done
+
+echo "helm dependency update"
+docker run --rm -v $(pwd):/apps -w /apps \
+    alpine/helm:3.11.1 dependency update
