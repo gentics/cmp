@@ -126,14 +126,15 @@ pipeline {
                         sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${genticsCommonPackageFilename}"
                     }
 
+                    //update dependencies for cmp-sub-charts - use versions from pom.xml or test-version
+                    sh "ci/set-chart-dependency-versions.sh cmp-chart/Chart.yaml " +
+                        "gentics-common=${genticsCommonVersion} " +
+                        "cms=${cmsVersion} " +
+                        "gentics-mesh=${meshVersion} " +
+                        "gentics-portal-java=${portalJavaVersion} " +
+                        "gentics-portal-php=${portalPhpVersion}"
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
-                        //update dependencies for cmp-sub-charts - use versions from pom.xml or test-version
-                        sh "REPO_USERNAME=${repoUsername} REPO_PASSWORD=${repoPassword} ci/set-chart-dependency-versions.sh cmp-chart/Chart.yaml " +
-                           "gentics-common=${genticsCommonVersion} " +
-                           "cms=${cmsVersion} " +
-                           "gentics-mesh=${meshVersion} " +
-                           "gentics-portal-java=${portalJavaVersion} " +
-                           "gentics-portal-php=${portalPhpVersion}"
+                        sh "REPO_USERNAME=${repoUsername} REPO_PASSWORD=${repoPassword} ci/update-helm-dependencies.sh
                     }
 
 
