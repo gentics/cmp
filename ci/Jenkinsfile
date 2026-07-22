@@ -139,7 +139,7 @@ pipeline {
                     
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
-                        def packageFilename = "cmp-${version}.tgz"
+                        def packageFilename = "cmp-${helmVersion}.tgz"
                         echo "Deploying CMS Helm Chart"
                         sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${packageFilename}"
                     }
