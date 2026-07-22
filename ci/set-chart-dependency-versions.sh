@@ -4,6 +4,7 @@ set -o nounset
 set -o errexit
 
 CHART_FILE=${1}
+REPOSITORY_URL=${2}
 shift 2
 
 

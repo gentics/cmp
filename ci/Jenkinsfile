@@ -127,7 +127,7 @@ pipeline {
                     }
 
                     //update dependencies for cmp-sub-charts - use versions from pom.xml or test-version
-                    sh "ci/set-chart-dependency-versions.sh cmp-chart/Chart.yaml " +
+                    sh "ci/set-chart-dependency-versions.sh cmp-chart/Chart.yaml ${helmRepository} " +
                         "gentics-common=${genticsCommonVersion} " +
                         "cms=${cmsVersion} " +
                         "gentics-mesh=${meshVersion} " +
