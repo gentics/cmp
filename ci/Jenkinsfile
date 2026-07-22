@@ -133,8 +133,9 @@ pipeline {
                         "gentics-mesh=${meshVersion} " +
                         "gentics-portal-java=${portalJavaVersion} " +
                         "gentics-portal-php=${portalPhpVersion}"
+
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
-                        sh "REPO_USERNAME=${repoUsername} REPO_PASSWORD=${repoPassword} ci/update-helm-dependencies.sh"
+                        sh "REPO_USERNAME=${repoUsername} REPO_PASSWORD=${repoPassword} ci/update-helm-dependencies.sh cmp-chart/"
                     }
 
 
