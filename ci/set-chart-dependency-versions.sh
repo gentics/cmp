@@ -32,7 +32,7 @@ done
 
 echo "Adding Helm repositories and updating dependencies"
 docker run --rm -v $(pwd):/apps -w /apps \
-    -e REPO_USERNAME="${REPO_USERNAME}" -e REPO_PASSWORD="${REPO_PASSWORD}"" \
+    -e REPO_USERNAME="${REPO_USERNAME}" -e REPO_PASSWORD="${REPO_PASSWORD}" \
     --entrypoint sh \
     alpine/helm:3.11.1 -c '
         helm repo add --username "$REPO_USERNAME" --password "$REPO_PASSWORD" gentics https://repo.gentics.com/repository/helm/
