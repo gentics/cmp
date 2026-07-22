@@ -124,6 +124,7 @@ pipeline {
                         echo "Deploying CMS Helm Chart"
                         sh "curl -u ${repoUsername}:${repoPassword} ${helmRepository} --upload-file target/${packageFilename}"
 
+                    }
                 }
 
             }
