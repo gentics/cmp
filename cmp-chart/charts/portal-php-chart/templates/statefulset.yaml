@@ -1,0 +1,193 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "gentics-portal-php.fullname" . }}
+  labels:
+    {{- include "gentics-portal-php.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "gentics-portal-php.selectorLabels" . | nindent 6 }}
+  serviceName: "portal"
+  template:
+    metadata:
+      labels:
+        {{- include "gentics-portal-php.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with (include "gentics-portal-php.imagePullSecrets" .) }}
+      {{- . | nindent 6 }}
+    {{- end }}
+      serviceAccountName: {{ include "gentics-portal-php.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        {{- range .Values.extraVolumes }}
+        - name: {{ .name }}
+          {{- toYaml .volume | nindent 10 }}
+        {{- end }}
+        {{- if not .Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+        {{- else if .Values.persistence.data.existingClaim }}
+        {{- if ne (.Values.replicaCount | int) 1 }}
+        {{- fail "persistence.data.existingClaim requires replicaCount=1 — with multiple replicas the data volume is provisioned per pod via volumeClaimTemplates (leave existingClaim unset)" }}
+        {{- end }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.data.existingClaim }}
+        {{- end }}
+        {{- /* persistence enabled without existingClaim: the "data" volume is provided
+               by the volumeClaimTemplates below — no pod volume must be declared. */}}
+
+        - name: shared
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+          {{- if (.Values.persistence.shared.existingClaim) }}
+            claimName: {{ .Values.persistence.shared.existingClaim }}
+          {{- else }}
+            claimName: shared-{{ include "gentics-portal-php.fullname" . }}
+          {{- end }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+
+        {{- if .Values.existingConfigmap }}
+        - name: config
+          configMap:
+            name: {{ .Values.existingConfigmap }}
+        {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        {{- if .Values.securityContext }}
+        securityContext:
+           {{- toYaml .Values.securityContext | nindent 12 }}
+        {{- end }}
+        image: "{{ include "gentics-portal-php.image" . }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+        env:
+          ## Mesh Settings
+          - name: MESH_APIKEY
+          {{- if .Values.mesh.apikey }}
+            value: {{ required "A valid Gentics Mesh api key is required!" .Values.mesh.apikey | quote }}
+          {{- else }}
+            valueFrom:
+                secretKeyRef:
+                  name: {{ include "gentics-portal-php.mesh.secretName" . }}
+                  key: {{ .Values.mesh.secretKey | default "apikey" | quote }}
+          {{- end }}
+          - name: MESH_URL
+            value: {{ include "gentics-portal-php.meshUrl" . | quote }}
+          - name: AUTOGENERATE_MESH_API_KEY
+            value: {{ .Values.mesh.autogenerate_apikey | default "false" | quote }}
+
+{{- if .Values.extraEnv }}
+{{ toYaml .Values.extraEnv | indent 10 }}
+{{- end }}
+
+        ports:
+          - name: http
+            containerPort: {{ default "80" .Values.httpPort }}
+            protocol: TCP
+          - name: https
+            containerPort: {{ default "443" .Values.httpsPort }}
+            protocol: TCP
+
+        livenessProbe:
+          httpGet:
+            path: /api/health/live
+            scheme: {{ default "HTTP" .Values.portalProbeScheme }}
+            port: {{ default "http" .Values.portalProbePortName }}
+            httpHeaders:
+            - name: Host
+              value: {{ default "portal" .Values.portalHost | quote }}
+          periodSeconds: {{ default 15 .Values.liveness.period }}
+          timeoutSeconds: {{ default 3 .Values.liveness.timeout }}
+          failureThreshold: {{ default 2 .Values.liveness.failureThreshold }}
+        readinessProbe:
+          httpGet:
+            path: /api/health/ready
+            scheme: {{ default "HTTP" .Values.portalProbeScheme }}
+            port: {{ default "http" .Values.portalProbePortName }}
+            httpHeaders:
+            - name: Host
+              value: {{ default "portal" .Values.portalHost | quote }}
+          periodSeconds: {{ default 15 .Values.readiness.period }}
+          timeoutSeconds: {{ default 3 .Values.readiness.timeout }}
+          failureThreshold: {{ default 2 .Values.readiness.failureThreshold }}
+
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+
+        volumeMounts:
+          {{- range .Values.extraVolumes }}
+          - name: {{ .name }}
+            {{- toYaml .mount | nindent 12 }}
+          {{- end }}
+          {{- if .Values.extraVolumeMounts }}
+          {{- range .Values.extraVolumeMounts }}
+          - mountPath: {{ .mountPath }}
+            name: {{ .name }}
+            subPath: {{ .subPath }}
+          {{- end }}
+          {{- end }}
+          {{- if and .Values.persistence.enabled (not .Values.persistence.data.disablePersistentCache) }}
+          - mountPath: "/portal/bootstrap/cache"
+            name: data
+            subPath: "bootstrap-cache"
+          - mountPath: "/portal/storage/framework/cache"
+            name: data
+            subPath: "storage-cache"
+          {{- end }}
+        {{- if not .Values.disableSessionsMount }}
+          - mountPath: "/portal/storage/framework/sessions"
+            name: shared
+            subPath: "storage-sessions"
+        {{- end }}
+        {{- if .Values.existingConfigmap }}
+          - mountPath: "/portal/config"
+            name: config
+        {{- end }}
+
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      affinity:
+    {{- with .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/instance
+                      operator: In
+                      values:
+                        - "{{ .Release.Name }}"
+                topologyKey: kubernetes.io/hostname
+{{- if and .Values.persistence.enabled (not .Values.persistence.data.existingClaim) }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        {{- /* Labels so release-wide PVC operations (e.g. the purge command
+               "kubectl delete pvc -l app.kubernetes.io/instance=<release>") also
+               cover the per-pod data claims (data-<fullname>-N). */}}
+        labels:
+          app.kubernetes.io/name: {{ include "gentics-portal-php.name" . }}
+          app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- with .Values.persistence.data.annotations }}
+        annotations:
+          {{ toYaml . }}
+        {{- end }}
+      spec:
+        {{- toYaml .Values.persistence.data.spec | nindent 8 }}
+{{ end }}
