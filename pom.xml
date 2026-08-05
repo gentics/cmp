@@ -20,26 +20,26 @@
 		<skip.render>false</skip.render>
 
         <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.4.8</cms-oss.version>
+        <cms-oss.version>6.4.9</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.4.8</cms.version>
+        <cms.version>6.4.9</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
-        <aloha.version>2.1.18</aloha.version>
+        <aloha.version>2.1.19</aloha.version>
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>3.2.12</mesh.version>
+        <mesh.version>3.2.13</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Mesh SQL -->
-        <meshsql.version>3.2.12</meshsql.version>
+        <meshsql.version>3.2.13</meshsql.version>
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
-        <mesh.plugins.version>3.2.5</mesh.plugins.version>
+        <mesh.plugins.version>3.2.6</mesh.plugins.version>
         <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
 
         <!-- Gentics Portal | java -->
