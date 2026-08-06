@@ -63,8 +63,8 @@ cms:
   enabled: true
   image:
     ## registry defaults to docker.gentics.com (sub-chart default)
-    repository: "gentics/cms"
-    tag: 6.4.3
+    ## repository: "gentics/cms"
+    ## tag: x.x.x defaults to the version of the cmp chart
   #database:
   #  host: mariadb
   #  password: pass
@@ -91,8 +91,8 @@ mesh:
 
   image:
     ## registry defaults to docker.gentics.com (sub-chart default)
-    repository: andp/mesh-mariadb
-    tag: andp-8.3.11
+    ## repository: gentics/mesh-enterprise-mariadb
+    ## tag: x.x.x #defaults to the version of the cmp chart
 
 
   #database:
