@@ -48,13 +48,45 @@ global:
   mariadb:
     enabled: true
 
-  ## Example installation flag.
+  ## Example installation — deploys a ready-made reference project instead of
+  ## requiring you to build and supply your own portal image.
+  ##
+  ## Requires portal-java.enabled=true as well. 
+  ##
+  ##   helm install cmp gentics/cmp \
+  ##     --set global.example.enabled=true \
+  ##     --set portal-java.enabled=true
+  ##
+  ## When active, portalJavaImage below replaces portal-java.image entirely —
+  ## anything you set under portal-java.image is ignored.
   example:
     enabled: false
     ## Fixed portal-java image used when example is active.
     portalJavaImage:
-      repository: docker.gentics.com/apps/portal-java-reference
+      registry: docker.gentics.com
+      repository: apps/portal-java-reference
       tag: patrick
+
+    env:
+      - name: INIT_EXAMPLE
+        value: "true"
+      - name: CMS_HOST
+        value: "http://{{ .Release.Name }}-cms"
+      - name: CMS_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: "{{ .Release.Name }}-cms"
+            key: node-user-password
+      - name: MESH_ADMIN_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: "{{ .Release.Name }}-mesh-admin"
+            key: password
+
+      - name: MESH_SCHEMA_PREFIX
+        value: "example"
+      - name: MESH_PROJECT
+        value: "Example"
 
 # -----------------------------------------------------------------------
 # CMS

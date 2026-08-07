@@ -5,3 +5,12 @@ This template renders nothing — it only fails fast on inconsistent configurati
 {{- if and .Values.global.mesh.enabled (not .Values.mesh.enabled) }}
 {{- fail "Inconsistent values: global.mesh.enabled is true but mesh.enabled is false. Either enable the bundled Mesh (mesh.enabled=true) or set global.mesh.enabled=false and configure portal-java.mesh.host/port to point at your external Mesh." }}
 {{- end }}
+
+{{- /*
+Helm resolves dependency conditions before any template renders, so the example
+flag cannot switch portal-java on by itself — it can only refuse to install
+silently-broken. Fail instead of rendering a CMP without the example portal.
+*/ -}}
+{{- if and .Values.global.example.enabled (not (index .Values "portal-java" "enabled")) }}
+{{- fail "Inconsistent values: global.example.enabled is true but portal-java.enabled is false, so the example portal would not be deployed. The example installation needs both: --set global.example.enabled=true --set portal-java.enabled=true" }}
+{{- end }}
