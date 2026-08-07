@@ -7,10 +7,41 @@ This template renders nothing — it only fails fast on inconsistent configurati
 {{- end }}
 
 {{- /*
-Helm resolves dependency conditions before any template renders, so the example
-flag cannot switch portal-java on by itself — it can only refuse to install
-silently-broken. Fail instead of rendering a CMP without the example portal.
+Requirements for the example installation. Every problem is collected before
+failing so one "helm install" reports the full list — fixing them one error per
+attempt is a poor first experience for what is meant to be the easy path.
 */ -}}
-{{- if and .Values.global.example.enabled (not (index .Values "portal-java" "enabled")) }}
-{{- fail "Inconsistent values: global.example.enabled is true but portal-java.enabled is false, so the example portal would not be deployed. The example installation needs both: --set global.example.enabled=true --set portal-java.enabled=true" }}
+{{- if .Values.global.example.enabled }}
+{{- $problems := list }}
+{{- $portalJava := (index .Values "portal-java") | default dict }}
+
+{{- /*
+Helm resolves dependency conditions before any template renders, so the example
+flag cannot switch portal-java on by itself.
+*/ -}}
+{{- if not $portalJava.enabled }}
+{{- $problems = append $problems "portal-java.enabled is false — the example portal would not be deployed at all. Helm resolves dependency conditions before templates render, so global.example.enabled cannot switch the sub-chart on by itself.\n      Fix: --set portal-java.enabled=true" }}
+{{- end }}
+
+{{- /*
+A license must be reachable, but not necessarily as a literal key: GitOps/Argo CD
+installs reference a pre-created Secret instead of putting the key in values.
+Accept either route so the check does not reject a working deployment.
+*/ -}}
+{{- $globalLicense := .Values.global.license | default dict }}
+{{- $portalLicense := $portalJava.license | default dict }}
+{{- if not (or $globalLicense.key $portalLicense.secret $portalLicense.key) }}
+{{- $problems = append $problems "No CMP license is configured — the example portal, CMS and Mesh all need one.\n      Fix (either route):\n        --set global.license.key=<your-license-key>   (umbrella creates the \"<release>-license\" Secret)\n        --set portal-java.license.secret=<secret-name> (Argo CD/GitOps: reference a pre-created Secret holding key \"licensekey\")" }}
+{{- end }}
+
+{{- $serverUrl := ((($portalJava.portal | default dict).server) | default dict).url }}
+{{- if not $serverUrl }}
+{{- $problems = append $problems "portal-java.portal.server.url is empty — the portal needs its externally reachable URL to resolve links correctly.\n      Fix: --set portal-java.portal.server.url=https://portal.example.com" }}
+{{- end }}
+
+{{- if $problems }}
+{{- $list := "" }}
+{{- range $i, $p := $problems }}{{ $list = printf "%s\n  %d. %s\n" $list (add1 $i) $p }}{{ end }}
+{{- fail (printf "\n\nThe example installation (global.example.enabled=true) cannot be installed — %d value(s) missing:\n%s\nSee the \"example\" section in values.yaml for details.\n" (len $problems) $list) }}
+{{- end }}
 {{- end }}
