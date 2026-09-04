@@ -10,6 +10,10 @@ final def helmRepositoryProd   = 'https://repo.gentics.com/repository/helm/';
 final def helmRepositoryTest   = 'https://repo.gentics.com/repository/helm-snapshots/';
 def helmRepository = helmRepositoryTest;
 
+def prependZeroIfNotDigitPrefixed(String ver) {
+    return (ver ==~ /^[0-9].*/) ? ver : "0-" + ver
+}
+
 pipeline {
     agent {
         label 'docker'
@@ -40,6 +44,11 @@ pipeline {
 
     stages {
         stage("Build") {
+            when {
+                expression {
+                    return !params.runDeployTesting
+                }
+            }
             steps {
                 script {
                     currentBuild.description = env.GIT_COMMIT + "\n" + GitHelper.getLastCommitMessage().readLines()[0]
@@ -94,6 +103,7 @@ pipeline {
                         helmRepository = helmRepositoryProd;
                     }
 
+                    version = MavenHelper.getVersion()
                     def cmsVersion        = sh(script: "mvn help:evaluate -Dexpression=cms.version -q -DforceStdout", returnStdout: true).trim()
                     def meshVersion       = sh(script: "mvn help:evaluate -Dexpression=mesh.version -q -DforceStdout", returnStdout: true).trim()
                     def portalJavaVersion = sh(script: "mvn help:evaluate -Dexpression=portal.java.version -q -DforceStdout", returnStdout: true).trim()
@@ -108,13 +118,12 @@ pipeline {
 
                     def helmVersion = version
                     if (Boolean.valueOf(params.runDeployTesting)) {
-                        def helmTestVersion = version;
-                        cmsVersion = "0-" + helmTestVersion
-                        meshVersion = "0-" + helmTestVersion
-                        portalJavaVersion = "0-" + helmTestVersion
-                        portalPhpVersion = "0-" + helmTestVersion
-                        genticsCommonVersion = "0-" + helmTestVersion
-                        helmVersion = "0-" + helmTestVersion
+                        cmsVersion = prependZeroIfNotDigitPrefixed(cmsVersion)
+                        meshVersion = prependZeroIfNotDigitPrefixed(meshVersion)
+                        portalJavaVersion = prependZeroIfNotDigitPrefixed(portalJavaVersion)
+                        portalPhpVersion = prependZeroIfNotDigitPrefixed(portalPhpVersion)
+                        genticsCommonVersion = prependZeroIfNotDigitPrefixed(genticsCommonVersion)
+                        helmVersion = prependZeroIfNotDigitPrefixed(helmVersion)
                     }
 
                     //Release gentics-common first - it's used in the cmp chart too
