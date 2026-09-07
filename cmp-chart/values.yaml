@@ -58,7 +58,9 @@ global:
   ##     --set portal-java.enabled=true
   ##
   ## When active, portalJavaImage below replaces portal-java.image entirely —
-  ## anything you set under portal-java.image is ignored.
+  ## anything you set under portal-java.image is ignored, and
+  ## global.persistence.keepOnUninstall is forced to false so "helm uninstall"
+  ## removes the demo's volumes with it.
   example:
     enabled: false
     ## Fixed portal-java image used when example is active.

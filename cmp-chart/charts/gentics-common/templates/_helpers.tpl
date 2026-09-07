@@ -94,6 +94,17 @@ Args: (dict "root" $ "local" <bool or nil>)
 {{- $keep = $globalPersistence.keepOnUninstall -}}
 {{- end -}}
 {{- end -}}
+{{- /*
+CMP example installation: a throwaway demo, so its volumes go away with it.
+This deliberately overrides global.persistence.keepOnUninstall rather than
+deferring to it — the umbrella writes that key explicitly (default true), so
+there is no "unset" state to detect and deferring would make this a no-op.
+A chart-local keepOnUninstall still wins below, as the per-component escape.
+*/ -}}
+{{- $example := ((.root.Values.global | default dict).example) | default dict -}}
+{{- if $example.enabled -}}
+{{- $keep = false -}}
+{{- end -}}
 {{- if not (kindIs "invalid" .local) -}}
 {{- $keep = .local -}}
 {{- end -}}

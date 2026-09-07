@@ -39,6 +39,14 @@ Accept either route so the check does not reject a working deployment.
 {{- $problems = append $problems "portal-java.portal.server.url is empty — the portal needs its externally reachable URL to resolve links correctly.\n      Fix: --set portal-java.portal.server.url=https://portal.example.com" }}
 {{- end }}
 
+{{- $portalMesh := $portalJava.mesh | default dict }}
+{{- $meshValues := .Values.mesh | default dict }}
+{{- if and $meshValues.enabled $portalMesh.apiKeyFromSecret (not $portalMesh.secretName) }}
+{{- if not $meshValues.generateApiKey }}
+{{- $problems = append $problems "mesh.generateApiKey is false, but the example portal reads its Mesh API key from the \"<release>-mesh-secret\" Secret (portal-java.mesh.apiKeyFromSecret=true). That Secret is always rendered but stays EMPTY unless the key-generating Job runs, so the portal pod would hang in CreateContainerConfigError.\n      Fix (any one):\n        --set mesh.generateApiKey=true                  (Mesh issues the key on install; create-once, safe to leave on)\n        --set portal-java.mesh.secretName=<secret-name> (reference a Secret you manage, key \"apikey\")\n        --set portal-java.mesh.apiKeyFromSecret=false --set portal-java.mesh.apikey=<key>" }}
+{{- end }}
+{{- end }}
+
 {{- if $problems }}
 {{- $list := "" }}
 {{- range $i, $p := $problems }}{{ $list = printf "%s\n  %d. %s\n" $list (add1 $i) $p }}{{ end }}
