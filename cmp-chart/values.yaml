@@ -66,8 +66,8 @@ global:
     ## Fixed portal-java image used when example is active.
     portalJavaImage:
       registry: docker.gentics.com
-      repository: apps/portal-java-reference
-      tag: patrick
+      repository: gentics/portal-java-example
+      tag: "8.6"
 
     env:
       - name: INIT_EXAMPLE
