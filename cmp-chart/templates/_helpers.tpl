@@ -67,14 +67,3 @@ Uses mesh.database.passwordSecret when set, otherwise the chart-managed secret.
 {{- define "cmp.meshDbSecretName" -}}
 {{- (((.Values.mesh).database).passwordSecret) | default (printf "%s-mesh-db" .Release.Name) -}}
 {{- end -}}
-
-{{/*
-Image pull secrets for umbrella-chart-owned pods (e.g. the db-init job).
-Uses global.imagePullSecrets when set.
-*/}}
-{{- define "cmp.imagePullSecrets" -}}
-{{- if .Values.global.imagePullSecrets }}
-imagePullSecrets:
-  {{- toYaml .Values.global.imagePullSecrets | nindent 2 }}
-{{- end }}
-{{- end }}

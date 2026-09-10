@@ -15,8 +15,8 @@ global:
 
   ## Image pull secrets applied to all component pods.
   ## Replaces the per-chart image.pullSecret / imagePullSecrets fields.
-  imagePullSecrets:
-    - name: docker-gentics-com
+  ##imagePullSecrets:
+  ##  - name: docker-gentics-com
 
   ## License key shared across all CMP components.
   ## When set, the umbrella chart creates a single Secret named "<release>-license"

@@ -17,10 +17,7 @@ spec:
         app.kubernetes.io/name: {{ .Release.Name }}-db-init
     spec:
       restartPolicy: OnFailure
-      {{- with .Values.mariadb.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "gentics-common.imagePullSecretsList" (dict "root" . "localList" .Values.mariadb.imagePullSecrets) | nindent 6 }}
       containers:
         - name: db-init
           image: "{{ include "gentics-common.image" (dict "root" . "image" .Values.mariadb.image) }}"
