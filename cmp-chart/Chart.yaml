@@ -4,9 +4,9 @@ description: Gentics CMP - Content Management Platform (Umbrella Chart)
 type: application
 
 # Chart version — bump this on every release of the umbrella chart
-version: 8.4.5
+version: 8.6.0
 # CMP application version this chart installs
-appVersion: "8.4.5"
+appVersion: "8.6.0"
 
 # Minimum supported Kubernetes version (autoscaling/v2 GA).
 # The "-0" suffix is required so pre-release-style cluster versions
