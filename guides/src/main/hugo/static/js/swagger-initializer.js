@@ -5,6 +5,18 @@ window.onload = function() {
   window.ui = SwaggerUIBundle({
     urls: [
       {
+        url: "../cms-oss/openapi.yaml",
+        name: "Gentics CMS OSS"
+      },
+      {
+        url: "../cms-ee/openapi.yaml",
+        name: "Gentics CMS EE"
+      },
+      {
+        url: "../mesh/openapi.yaml",
+        name: "Gentics Mesh"
+      },
+      {
         url: "../plugins/comment-plugin/openapi.yaml",
         name: "Mesh Comment Plugin"
       },
@@ -39,6 +51,10 @@ window.onload = function() {
       {
         url: "../plugins/search-plugin/openapi.yaml",
         name: "Mesh Search Plugin"
+      },
+      {
+        url: "../portal-java/examples/api/openapi.yaml",
+        name: "Gentics Portal | Java"
       }
     ],
     dom_id: '#swagger-ui',

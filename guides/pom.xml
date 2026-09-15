@@ -45,6 +45,46 @@
 			<classifier>content</classifier>
 			<type>zip</type>
 		</dependency>
+		<!-- Mesh Guides, currently only used for openapi.yaml -->
+		<dependency>
+			<groupId>com.gentics.mesh</groupId>
+			<artifactId>mesh-doc</artifactId>
+			<version>${mesh.version}</version>
+			<classifier>src</classifier>
+			<type>zip</type>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- CMS OSS Server, currently used for extracting openapi.yaml -->
+		<dependency>
+			<groupId>com.gentics.cms-oss</groupId>
+			<artifactId>cms-oss-server</artifactId>
+			<version>${cms-oss.version}</version>
+			<type>jar</type>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- CMS EE Server, currently used for extracting openapi.yaml -->
+		<dependency>
+			<groupId>com.gentics.cms</groupId>
+			<artifactId>cms-server</artifactId>
+			<version>${cms.version}</version>
+			<type>jar</type>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -142,6 +182,43 @@
 									<type>zip</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/src/main/hugo/content</outputDirectory>
+								</artifactItem>
+								<!-- Mesh Guides -->
+								<artifactItem>
+									<groupId>com.gentics.mesh</groupId>
+									<artifactId>mesh-doc</artifactId>
+									<classifier>src</classifier>
+									<type>zip</type>
+									<overWrite>true</overWrite>
+									<includes>docs/generated/api/openapi.yaml</includes>
+									<outputDirectory>${project.build.directory}/src/main/hugo/content/mesh</outputDirectory>
+									<fileMappers>
+										<org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+									</fileMappers>
+								</artifactItem>
+								<!-- CMS OSS -->
+								<artifactItem>
+									<groupId>com.gentics.cms-oss</groupId>
+									<artifactId>cms-oss-server</artifactId>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<includes>webroot/openapi/openapi.yaml</includes>
+									<outputDirectory>${project.build.directory}/src/main/hugo/content/cms-oss</outputDirectory>
+									<fileMappers>
+										<org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+									</fileMappers>
+								</artifactItem>
+								<!-- CMS EE -->
+								<artifactItem>
+									<groupId>com.gentics.cms</groupId>
+									<artifactId>cms-server</artifactId>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<includes>webroot/openapi/openapi.yaml</includes>
+									<outputDirectory>${project.build.directory}/src/main/hugo/content/cms-ee</outputDirectory>
+									<fileMappers>
+										<org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+									</fileMappers>
 								</artifactItem>
 							</artifactItems>
 							<includes>**/*</includes>
