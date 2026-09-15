@@ -7,7 +7,12 @@
     <link href="https://www.gentics.com/static/css/common.css" media="screen" rel="stylesheet">
 
     <!-- Docs/Guides Specific styles -->
-    <link href="/styles/{{if .Params.stylesheet }}{{ .Params.stylesheet }}{{else}}docs.css{{end}}" media="screen" rel="stylesheet">
+    {{ $stylesheets := .Params.stylesheet }}
+    {{ if not $stylesheets }}{{ $stylesheets = slice "docs.css" }}{{ end }}
+    {{ if not (reflect.IsSlice $stylesheets) }}{{ $stylesheets = slice $stylesheets }}{{ end }}
+    {{ range $stylesheets }}
+    <link href="/styles/{{ . }}" media="screen" rel="stylesheet">
+    {{ end }}
 
     <script>
         window.major_version = "{{ .Site.Params.cmpversion }}";
