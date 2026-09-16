@@ -55,6 +55,10 @@ window.onload = function() {
       {
         url: "../portal-java/examples/api/openapi.yaml",
         name: "Gentics Portal | Java"
+      },
+      {
+        url: "../portal-php/examples/api/openapi.yaml",
+        name: "Gentics Portal | PHP"
       }
     ],
     dom_id: '#swagger-ui',
