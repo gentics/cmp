@@ -29,30 +29,81 @@ Args: (dict "root" $ "localSecret" <string> "fallbackName" <string>)
 {{- end -}}
 
 {{/*
-Image pull secrets block — local secret NAME (string) overrides global array.
-Args: (dict "root" $ "localName" <string>)
+The image pull secret every Gentics chart falls back to when nothing else is
+configured. Kept here so all consuming charts (cms, mesh, portal-java, ...) and
+the CMP umbrella share one value instead of repeating it in each values.yaml.
+Priority:
+  1. global.defaultImagePullSecret  (umbrella-wide override, e.g. a mirror)
+  2. chart-local .Values.defaultImagePullSecret
+  3. the built-in default below
+Setting either value to "" disables the fallback entirely (no imagePullSecrets
+block is emitted); an ABSENT key falls through to the next level, which is why
+this uses kindIs "invalid" rather than default/coalesce.
+Args: (dict "root" $)
+*/}}
+{{- define "gentics-common.defaultImagePullSecret" -}}
+{{- $global := .root.Values.global | default dict -}}
+{{- if not (kindIs "invalid" $global.defaultImagePullSecret) -}}
+{{- $global.defaultImagePullSecret -}}
+{{- else if not (kindIs "invalid" .root.Values.defaultImagePullSecret) -}}
+{{- .root.Values.defaultImagePullSecret -}}
+{{- else -}}
+docker-gentics-com
+{{- end -}}
+{{- end -}}
+
+{{/*
+Image pull secrets block — local secret NAME (string), three-state.
+Priority:
+  1. local set, non-empty -> that secret alone (global is ignored, never merged)
+  2. local set, but EMPTY -> no imagePullSecrets at all (explicit opt-out)
+  3. local absent (no key) -> global.imagePullSecrets
+  4. nothing set anywhere -> gentics-common.defaultImagePullSecret
+Three-state logic is required here: `default`/`coalesce` cannot tell an explicit
+empty value from an absent key (same reason as pvcKeepAnnotations below), so the
+"was it set at all?" test is kindIs "invalid".
+NOTE for consuming charts: do NOT ship `pullSecret: ""` as a default in values.yaml
+— that is case 2 and would silently disable pull secrets for every install. Leave
+the key out (commented) so it resolves as case 3.
+Args: (dict "root" $ "localName" <string or nil>)
 */}}
 {{- define "gentics-common.imagePullSecrets" -}}
 {{- $global := .root.Values.global | default dict -}}
+{{- $fallback := include "gentics-common.defaultImagePullSecret" (dict "root" .root) -}}
+{{- if not (kindIs "invalid" .localName) }}
 {{- if .localName }}
 imagePullSecrets:
   - name: {{ .localName }}
+{{- end }}
 {{- else if $global.imagePullSecrets }}
 imagePullSecrets:
   {{- toYaml $global.imagePullSecrets | nindent 2 }}
+{{- else if $fallback }}
+imagePullSecrets:
+  - name: {{ $fallback }}
 {{- end }}
 {{- end }}
 
 {{/*
-Image pull secrets block — local LIST (array) overrides global array.
-Args: (dict "root" $ "localList" <list>)
+Image pull secrets block — local LIST (array), three-state.
+Same priority as gentics-common.imagePullSecrets above, except that here the
+explicit opt-out is an empty list ([]).
+Args: (dict "root" $ "localList" <list or nil>)
 */}}
 {{- define "gentics-common.imagePullSecretsList" -}}
 {{- $global := .root.Values.global | default dict -}}
-{{- $secrets := coalesce .localList $global.imagePullSecrets -}}
-{{- if $secrets }}
+{{- $fallback := include "gentics-common.defaultImagePullSecret" (dict "root" .root) -}}
+{{- if not (kindIs "invalid" .localList) }}
+{{- if .localList }}
 imagePullSecrets:
-  {{- toYaml $secrets | nindent 2 }}
+  {{- toYaml .localList | nindent 2 }}
+{{- end }}
+{{- else if $global.imagePullSecrets }}
+imagePullSecrets:
+  {{- toYaml $global.imagePullSecrets | nindent 2 }}
+{{- else if $fallback }}
+imagePullSecrets:
+  - name: {{ $fallback }}
 {{- end }}
 {{- end }}
 
