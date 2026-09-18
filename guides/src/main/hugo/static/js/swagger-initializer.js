@@ -33,14 +33,6 @@ window.onload = function() {
         name: "Mesh Forms Plugin"
       },
       {
-        url: "../plugins/gcms-plugin/openapi.yaml",
-        name: "Mesh GCMS Plugin"
-      },
-      {
-        url: "../plugins/keycloak-plugin/openapi.yaml",
-        name: "Mesh Keycloak Plugin"
-      },
-      {
         url: "../plugins/like-plugin/openapi.yaml",
         name: "Mesh Like Plugin"
       },
