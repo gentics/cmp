@@ -3,7 +3,7 @@
         {
             "version": "8.6",
             "date": "18.09.2026",
-            "description" : "CMP 8.6 focuses on deployment, integration and extensibility. A new CMP Helm chart simplifies and standardizes the rollout of the complete platform in Kubernetes environments. All components now ship with OpenAPI specifications for their REST APIs, making integrations easier to build, document and validate. API token management was enhanced in both Gentics CMS and Gentics Mesh, giving administrators finer control over access and token lifecycles. For implementers, the new JSON and Groovy part types allow structured data and custom logic to be used directly within the CMS."
+            "description" : "CMP 8.6 focuses on deployment, integration and extensibility. A new CMP Helm chart simplifies and standardizes the rollout of the complete platform in Kubernetes environments, and all components now ship with OpenAPI specifications for their REST APIs, making integrations easier to build, document and validate. A key highlight is the new MCP Server for Gentics Mesh together with Content-RAG, making content directly accessible to AI assistants and retrieval-based applications. API token management was enhanced in both Gentics CMS and Gentics Mesh, giving administrators finer control over access and token lifecycles. Gentics Mesh further gains a native JSON field type and the ability to purge obsolete schema versions. For implementers, the new JSON and Groovy part types allow structured data and custom logic to be used directly within the CMS."
         },
         {
             "version": "8.5",
