@@ -13,7 +13,8 @@
     "8897.SUP-20178.bugfix",
     "8898.SUP-20211.bugfix",
     "8900.GPU-2195.enhancement",
-    "8687.GPU-2196.enhancement"
+    "8687.GPU-2196.enhancement",
+    "8942.GPU-2205.enhancement"
   ],
   "componentVersion": "6.6.0",
   "version": "8.6.0",
