@@ -1,2 +1,5 @@
 target/
 .vscode/
+cmp-chart/charts/*.tgz
+cmp-chart/Chart.lock
+
