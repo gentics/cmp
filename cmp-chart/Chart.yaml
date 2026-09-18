@@ -2,52 +2,43 @@ apiVersion: v2
 name: cmp
 description: Gentics CMP - Content Management Platform (Umbrella Chart)
 type: application
-
 # Chart version — bump this on every release of the umbrella chart
 version: 8.6.0
 # CMP application version this chart installs
 appVersion: "8.6.0"
-
 # Minimum supported Kubernetes version (autoscaling/v2 GA).
 # The "-0" suffix is required so pre-release-style cluster versions
 # (e.g. v1.28.3-eks-...) satisfy the constraint.
 kubeVersion: ">=1.23.0-0"
-
 home: https://www.gentics.com/Content.Node/cmp8/guides/
 icon: https://www.gentics.com/genticscms/assets/images/gentics/gentics_logo.png
-
 maintainers:
   - name: Gentics
-
 dependencies:
   # Shared template library used by the sub-charts. Renders nothing itself.
   - name: gentics-common
-    repository: "file://charts/gentics-common"
+    repository: "https://repo.gentics.com/repository/helm/"
     version: "0.1.0"
-
   - name: cms
     # TODO: replace with your published Helm repository URL
-    repository: "https://charts.gentics.com"
-    version: "*.*.*"
+    repository: "https://repo.gentics.com/repository/helm/"
+    version: "6.6.0"
     condition: cms.enabled
-
   - name: gentics-mesh
     alias: mesh
     # TODO: replace with your published Helm repository URL
-    repository: "https://charts.gentics.com"
-    version: "*.*.*"
+    repository: "https://repo.gentics.com/repository/helm/"
+    version: "3.3.0"
     condition: mesh.enabled
-
   - name: gentics-portal-java
     alias: portal-java
     # TODO: replace with your published Helm repository URL
-    repository: "https://charts.gentics.com"
-    version: "*.*.*"
+    repository: "https://repo.gentics.com/repository/helm/"
+    version: "3.6.0"
     condition: portal-java.enabled
-
   - name: gentics-portal-php
     alias: portal-php
     # TODO: replace with your published Helm repository URL
-    repository: "https://charts.gentics.com"
-    version: "*.*.*"
+    repository: "https://repo.gentics.com/repository/helm/"
+    version: "3.5.0"
     condition: portal-php.enabled

@@ -1,0 +1,15 @@
+{
+  "changeLogEntryFileNames": [
+    "8917.SUP-20235.bugfix",
+    "8905.GPU-2195.optional-manualchange",
+    "8674.SUP-19446.bugfix",
+    "8932.GPU-2607.optional-manualchange",
+    "8931.GPU-2607.enhancement",
+    "8854.GPU-2648.enhancement",
+    "8906.GPU-2195.enhancement"
+  ],
+  "componentVersion": "3.6.0",
+  "version": "8.6.0",
+  "date": "18.09.2026",
+  "genericProperties": {}
+}

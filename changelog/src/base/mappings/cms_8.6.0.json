@@ -1,0 +1,22 @@
+{
+  "changeLogEntryFileNames": [
+    "8904.SUP-20229.bugfix",
+    "8893.GPU-2602.enhancement",
+    "8896.SUP-20114.bugfix",
+    "8751.GPU-2187.enhancement",
+    "8899.GPU-2195.optional-manualchange",
+    "8883.SUP-27013.bugfix",
+    "8857.GPU-2192.manualchange",
+    "8867.SUP-19935.bugfix",
+    "8889.SUP-20161.bugfix",
+    "8858.GPU-2192.optional-manualchange",
+    "8897.SUP-20178.bugfix",
+    "8898.SUP-20211.bugfix",
+    "8900.GPU-2195.enhancement",
+    "8687.GPU-2196.enhancement"
+  ],
+  "componentVersion": "6.6.0",
+  "version": "8.6.0",
+  "date": "18.09.2026",
+  "genericProperties": {}
+}

@@ -1,0 +1,18 @@
+dependencies:
+- name: gentics-common
+  repository: https://repo.gentics.com/repository/helm/
+  version: 0.1.0
+- name: cms
+  repository: https://repo.gentics.com/repository/helm/
+  version: 6.6.0
+- name: gentics-mesh
+  repository: https://repo.gentics.com/repository/helm/
+  version: 3.3.0
+- name: gentics-portal-java
+  repository: https://repo.gentics.com/repository/helm/
+  version: 3.6.0
+- name: gentics-portal-php
+  repository: https://repo.gentics.com/repository/helm/
+  version: 3.5.0
+digest: sha256:300c1726a13ef124e378f1a5470d531d9e82fd1a0a0a1805129680957e5482bb
+generated: "2026-09-18T09:16:41.052757989Z"

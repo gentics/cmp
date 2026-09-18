@@ -1,0 +1,14 @@
+{
+  "changeLogEntryFileNames": [
+    "8921.GPU-2195.enhancement",
+    "8934.GPU-2607.optional-manualchange",
+    "8869.GPU-2600.security",
+    "8919.GPU-2195.optional-manualchange",
+    "8703.GPU-2196.enhancement",
+    "8933.GPU-2607.enhancement"
+  ],
+  "componentVersion": "3.5.0",
+  "version": "8.6.0",
+  "date": "18.09.2026",
+  "genericProperties": {}
+}
