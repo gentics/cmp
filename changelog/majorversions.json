@@ -1,6 +1,11 @@
 {
     "majorversions": [
         {
+            "version": "8.6",
+            "date": "18.09.2026",
+            "description" : "CMP 8.6 focuses on deployment, integration and extensibility. A new CMP Helm chart simplifies and standardizes the rollout of the complete platform in Kubernetes environments. All components now ship with OpenAPI specifications for their REST APIs, making integrations easier to build, document and validate. API token management was enhanced in both Gentics CMS and Gentics Mesh, giving administrators finer control over access and token lifecycles. For implementers, the new JSON and Groovy part types allow structured data and custom logic to be used directly within the CMS."
+        },
+        {
             "version": "8.5",
             "date": "03.07.2026",
             "description" : "CMP 8.5 takes the Forms feature to the next level. Form rendering on the website is now powered by a modern, state-of-the-art React frontend application, delivering better performance and a smoother user experience. Editing forms in the CMS was significantly improved for a more intuitive workflow, and expanded customization options allow forms to be tailored flexibly to project-specific requirements."
