@@ -16,7 +16,7 @@
     "8687.GPU-2196.enhancement",
     "8942.GPU-2205.enhancement",
     "8947.GPU-2603.enhancement",
-    "8948.GPU-2603.optional-manual-change"
+    "8948.GPU-2603.optional-manualchange"
   ],
   "componentVersion": "6.6.0",
   "version": "8.6.0",
