@@ -14,7 +14,9 @@
     "8898.SUP-20211.bugfix",
     "8900.GPU-2195.enhancement",
     "8687.GPU-2196.enhancement",
-    "8942.GPU-2205.enhancement"
+    "8942.GPU-2205.enhancement",
+    "8947.GPU-2603.enhancement",
+    "8948.GPU-2603.optional-manual-change"
   ],
   "componentVersion": "6.6.0",
   "version": "8.6.0",
