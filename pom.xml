@@ -39,7 +39,7 @@
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
-        <mesh.plugins.version>3.2.7</mesh.plugins.version>
+        <mesh.plugins.version>3.2.8</mesh.plugins.version>
         <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
 
         <!-- Gentics Portal | java -->
@@ -51,7 +51,7 @@
         <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
 
         <!-- ANDP -->
-        <andp.version>8.4.10</andp.version>
+        <andp.version>8.4.11</andp.version>
     </properties>
 
 	<pluginRepositories>
