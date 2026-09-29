@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gentics.cmp</groupId>
 	<artifactId>cmp</artifactId>
-	<version>8.4.14</version>
+	<version>8.4.15-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
     <modules>

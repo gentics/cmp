@@ -1,0 +1,21 @@
+{
+  "changeLogEntryFileNames": [
+    "8904.SUP-20229.bugfix",
+    "8866.SUP-19854.bugfix",
+    "8883.SUP-27013.bugfix",
+    "8920.SUP-20138.bugfix",
+    "8907.SUP-20181.bugfix",
+    "8864.SUP-20156.bugfix",
+    "8867.SUP-19935.bugfix",
+    "8884.SUP-19740.bugfix",
+    "8945.SUP-20182.bugfix",
+    "8963.security",
+    "8950.SUP-20240.bugfix",
+    "8897.SUP-20178.bugfix",
+    "8938.SUP-20215.bugfix"
+  ],
+  "componentVersion": "6.4.11",
+  "version": "8.4.14",
+  "date": "29.09.2026",
+  "genericProperties": {}
+}
