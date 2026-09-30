@@ -1,0 +1,29 @@
+{
+  "changeLogEntryFileNames": [
+    "8946.SUP-20248.bugfix",
+    "8908.SUP-20206.enhancement",
+    "8866.SUP-19854.bugfix",
+    "8903.SUP-20198.bugfix",
+    "8941.SUP-20237.bugfix",
+    "8930.SUP-20164.bugfix",
+    "8951.SUP-20233.enhancement",
+    "8920.SUP-20138.bugfix",
+    "8939.SUP-20213.bugfix",
+    "8907.SUP-20181.bugfix",
+    "8864.SUP-20156.bugfix",
+    "8884.SUP-19740.bugfix",
+    "8945.SUP-20182.bugfix",
+    "8936.SUP-20254.bugfix",
+    "8935.SUP-20151.bugfix",
+    "8890.SUP-20188.bugfix",
+    "8955.SUP-20265.bugfix",
+    "8963.security",
+    "8940.SUP-20224.bugfix",
+    "8950.SUP-20240.bugfix",
+    "8938.SUP-20215.bugfix"
+  ],
+  "componentVersion": "6.6.1",
+  "version": "8.6.1",
+  "date": "30.09.2026",
+  "genericProperties": {}
+}
