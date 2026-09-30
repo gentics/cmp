@@ -22,19 +22,19 @@ dependencies:
   - name: cms
     # TODO: replace with your published Helm repository URL
     repository: "https://repo.gentics.com/repository/helm/"
-    version: "6.6.0"
+    version: "6.6.1"
     condition: cms.enabled
   - name: gentics-mesh
     alias: mesh
     # TODO: replace with your published Helm repository URL
     repository: "https://repo.gentics.com/repository/helm/"
-    version: "3.3.0"
+    version: "3.3.1"
     condition: mesh.enabled
   - name: gentics-portal-java
     alias: portal-java
     # TODO: replace with your published Helm repository URL
     repository: "https://repo.gentics.com/repository/helm/"
-    version: "3.6.0"
+    version: "3.6.1"
     condition: portal-java.enabled
   - name: gentics-portal-php
     alias: portal-php
