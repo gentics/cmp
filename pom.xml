@@ -20,22 +20,22 @@
 		<skip.render>false</skip.render>
 
         <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.4.11</cms-oss.version>
+        <cms-oss.version>6.4.12</cms-oss.version>
 
         <!-- Gentics CMS EE -->
-        <cms.version>6.4.11</cms.version>
+        <cms.version>6.4.12</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
-        <aloha.version>2.1.20</aloha.version>
+        <aloha.version>2.1.21</aloha.version>
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>3.2.15</mesh.version>
+        <mesh.version>3.2.16</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Mesh SQL -->
-        <meshsql.version>3.2.15</meshsql.version>
+        <meshsql.version>3.2.16</meshsql.version>
         <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
 
         <!-- Gentics Mesh Commercial Plugins -->
@@ -43,11 +43,11 @@
         <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
 
         <!-- Gentics Portal | java -->
-        <portal.java.version>3.4.9</portal.java.version>
+        <portal.java.version>3.4.10</portal.java.version>
         <portal.java.changelog.version>${portal.java.version}</portal.java.changelog.version>
 
         <!-- Gentics Portal | php -->
-        <portal.php.version>3.3.8</portal.php.version>
+        <portal.php.version>3.3.9</portal.php.version>
         <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
 
         <!-- ANDP -->
