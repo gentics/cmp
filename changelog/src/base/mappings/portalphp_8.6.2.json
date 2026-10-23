@@ -1,0 +1,11 @@
+{
+  "changeLogEntryFileNames": [
+    "9019.SUP-20305.bugfix",
+    "9047.SUP-20360.security",
+    "9009.SUP-20319.security"
+  ],
+  "componentVersion": "3.5.1",
+  "version": "8.6.2",
+  "date": "23.10.2026",
+  "genericProperties": {}
+}
