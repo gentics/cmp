@@ -1,0 +1,11 @@
+{
+  "changeLogEntryFileNames": [
+    "9876.SUP-19994.bugfix",
+    "8985.SUP-20295.bugfix",
+    "8981.SUP-19994.bugfix"
+  ],
+  "componentVersion": "3.4.3",
+  "version": "8.6.2",
+  "date": "23.10.2026",
+  "genericProperties": {}
+}
