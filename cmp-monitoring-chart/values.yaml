@@ -1,0 +1,548 @@
+# =============================================================================
+# CMP Monitoring Stack — Combined Values
+# Parent chart: cmp-monitoring
+# All sub-chart values are namespaced under their alias key.
+# Service DNS names follow the pattern: <release-name>-<alias>[-suffix]
+# e.g. for `helm install cmp-monitoring .`:
+#   Prometheus : cmp-monitoring-prometheus-server:9090
+#   Loki       : cmp-monitoring-loki:3100
+#   Tempo      : cmp-monitoring-tempo:3100
+#   Grafana    : cmp-monitoring-grafana:3000
+#   OTel       : cmp-monitoring-opentelemetry-collector:8889
+#   Blackbox   : cmp-monitoring-blackbox-exporter:9115
+# =============================================================================
+
+# =============================================================================
+# Grafana
+# =============================================================================
+grafana:
+  nodeSelector:
+    kubernetes.io/hostname: nworker-0
+  image:
+    registry: docker.io
+    repository: grafana/grafana
+    tag: "11.6.0"
+#  image:
+#    registry: docker.io
+#    repository: grafana/grafana
+#    tag: "12.4.0"
+#    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+  adminUser: admin
+  adminPassword: admin
+
+  rbac:
+    namespaced: true
+
+  initChownData:
+    enabled: false
+
+  # Pod-level
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: ~
+    runAsGroup: ~
+    fsGroup: ~
+    seccompProfile:
+      type: RuntimeDefault
+
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: ~
+    seccompProfile:
+      type: RuntimeDefault
+
+  env:
+    GF_METRICS_ENABLED: "true"
+    GF_PLUGINS_ENABLE_ALPHA: "false"
+    GF_DEFAULT_APP_MODE: "production"
+
+  persistence:
+    enabled: true
+    size: 2Gi
+
+  livenessProbe:
+    initialDelaySeconds: 180
+    timeoutSeconds: 30
+    periodSeconds: 10
+    failureThreshold: 10
+
+  readinessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 10
+    failureThreshold: 3
+
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          uid: prometheus
+          type: prometheus
+          access: proxy
+          url: http://cmp-monitoring-prometheus-server:9090
+          jsonData:
+            httpMethod: GET
+          version: 1
+        - name: Loki
+          uid: loki
+          type: loki
+          access: proxy
+          url: http://cmp-monitoring-loki:3100
+        - name: Tempo
+          uid: tempo
+          type: tempo
+          access: proxy
+          url: http://cmp-monitoring-tempo:3100
+          jsonData:
+            serviceMap:
+              datasourceUid: prometheus
+            tracesToLogsV2:
+              datasourceUid: loki
+            tracesToMetrics:
+              datasourceUid: prometheus
+              tags:
+                - key: service.name
+                  value: service
+            nodeGraph:
+              enabled: true
+  
+  grafana.ini:
+    server:
+      http_addr: "0.0.0.0"
+    plugins:
+      allow_loading_unsigned_plugins: ""
+      disable_plugins: "grafana-lokiexplore-app,grafana-pyroscope-app,grafana-exploretraces-app,grafana-metricsdrilldown-app"
+    feature_toggles:
+      kubernetesDashboards: false
+    unified_storage:
+      enabled: false
+
+  ingress:
+    enabled: false
+
+# =============================================================================
+# Prometheus
+# =============================================================================
+prometheus:
+  # Disable cluster-scoped RBAC — prometheus-rbac.yaml in this chart
+  # creates a namespace-scoped Role + RoleBinding instead.
+  rbac:
+    create: false
+
+  alertmanager:
+    enabled: false
+  kube-state-metrics:
+    enabled: false
+  prometheus-node-exporter:
+    enabled: false
+  prometheus-pushgateway:
+    enabled: false
+
+  server:
+    image:
+      registry: docker.io
+      repository: prom/prometheus
+      tag: "v3.10.0"
+      pullPolicy: IfNotPresent
+
+    persistentVolume:
+      enabled: true
+      size: 10Gi
+
+    extraFlags:
+      - web.enable-lifecycle
+      - web.enable-remote-write-receiver
+
+    configMapOverrideName: ""
+
+    # Pod-level (chart has two keys for this — both must be set)
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: ~
+      runAsGroup: ~
+      fsGroup: ~
+      seccompProfile:
+        type: RuntimeDefault
+
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: ~
+      runAsGroup: ~
+      fsGroup: ~
+      seccompProfile:
+        type: RuntimeDefault
+
+    # Container-level
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      runAsUser: ~
+      runAsGroup: ~
+      capabilities:
+        drop: [ALL]
+      seccompProfile:
+        type: RuntimeDefault
+
+  configmapReload:
+    prometheus:
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        runAsUser: ~
+        runAsGroup: ~
+        capabilities:
+          drop: [ALL]
+        seccompProfile:
+          type: RuntimeDefault
+
+  global:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+
+  serverFiles:
+    prometheus.yml:
+      scrape_configs:
+        - job_name: otel-collector
+          static_configs:
+            - targets: ["cmp-monitoring-opentelemetry-collector:8889"]
+        - job_name: prometheus
+          static_configs:
+            - targets: ["cmp-monitoring-prometheus-server:9090"]
+        - job_name: loki
+          static_configs:
+            - targets: ["cmp-monitoring-loki:3100"]
+        - job_name: tempo
+          static_configs:
+            - targets: ["cmp-monitoring-tempo:3100"]
+        - job_name: grafana
+          metrics_path: /metrics
+          static_configs:
+            - targets: ["cmp-monitoring-grafana:3000"]
+        - job_name: blackbox
+          metrics_path: /probe
+          params:
+            module: [http_2xx]
+          static_configs:
+            - targets:
+                - http://cmp-gentics-cms/health
+                - http://cmp-gentics-mesh/health
+                - http://cmp-gentics-portal-java/health
+          relabel_configs:
+            - source_labels: [__address__]
+              target_label: __param_target
+            - source_labels: [__param_target]
+              target_label: instance
+            - target_label: __address__
+              replacement: cmp-monitoring-blackbox-exporter:9115
+
+# =============================================================================
+# Loki
+# =============================================================================
+loki:
+  deploymentMode: SingleBinary
+
+  loki:
+    image:
+      registry: docker.io
+      repository: grafana/loki
+      tag: "3.7.0"
+      pullPolicy: IfNotPresent
+
+    auth_enabled: false
+
+    commonConfig:
+      replication_factor: 1
+
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
+    storage:
+      type: filesystem
+      bucketNames:
+        chunks: chunks
+        ruler: ruler
+        admin: admin
+
+    limits_config:
+      allow_structured_metadata: true
+
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: ~
+      runAsGroup: ~
+      fsGroup: ~
+      fsGroupChangePolicy: ~
+      seccompProfile:
+        type: RuntimeDefault
+
+  rbac:
+    pspEnabled: false
+    sccEnabled: false
+    namespaced: true
+
+  singleBinary:
+    replicas: 1
+    persistence:
+      enabled: true
+      size: 10Gi
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: ~
+      runAsGroup: ~
+      fsGroup: ~
+      fsGroupChangePolicy: ~
+      seccompProfile:
+        type: RuntimeDefault
+
+  memcached:
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: ~
+      runAsGroup: ~
+      fsGroup: ~
+      seccompProfile:
+        type: RuntimeDefault
+
+  chunksCache:
+    enabled: false
+
+  resultsCache:
+    enabled: false
+
+  rollout_operator:
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: ~
+      runAsGroup: ~
+      fsGroup: ~
+      seccompProfile:
+        type: RuntimeDefault
+
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  backend:
+    replicas: 0
+
+  gateway:
+    enabled: false
+
+# =============================================================================
+# Tempo
+# =============================================================================
+tempo:
+  tempo:
+    image:
+      registry: docker.io
+      repository: grafana/tempo
+      tag: "2.10.3"
+      pullPolicy: IfNotPresent
+
+    extraArgs:
+      config.file: /conf/tempo.yaml
+
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+
+    storage:
+      trace:
+        backend: local
+        local:
+          path: /var/tempo/blocks
+        wal:
+          path: /var/tempo/wal
+
+    metricsGenerator:
+      enabled: true
+      remoteWriteUrl: "http://cmp-monitoring-prometheus-server:9090/api/v1/write"
+
+    retention: 48h
+
+    ingester:
+      max_block_duration: 5m
+
+    overrides:
+      defaults:
+        metrics_generator:
+          processors:
+            - span-metrics
+            - service-graphs
+
+    # Container-level
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      runAsUser: ~
+      runAsGroup: ~
+      capabilities:
+        drop: [ALL]
+      seccompProfile:
+        type: RuntimeDefault
+
+  # Pod-level
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: ~
+    runAsGroup: ~
+    fsGroup: ~
+    seccompProfile:
+      type: RuntimeDefault
+
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# =============================================================================
+# OpenTelemetry Collector
+# =============================================================================
+opentelemetry-collector:
+  mode: deployment
+
+  image:
+    registry: docker.io
+    repository: otel/opentelemetry-collector-contrib
+    tag: "0.148.0"
+    pullPolicy: IfNotPresent
+
+  command:
+    extraArgs:
+      - "--feature-gates=+extension.healthcheck.useComponentStatus"
+
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  # Use the ConfigMap defined in templates/otelcol-configmap.yaml
+  configMap:
+    create: false
+    existingName: cmp-monitoring-otelcol-config
+
+  # Pod-level
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: ~
+    seccompProfile:
+      type: RuntimeDefault
+
+  # Container-level
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: ~
+    capabilities:
+      drop: [ALL]
+
+  ports:
+    otlp:
+      enabled: true
+      containerPort: 4317
+      servicePort: 4317
+      protocol: TCP
+    otlp-http:
+      enabled: true
+      containerPort: 4318
+      servicePort: 4318
+      protocol: TCP
+    metrics:
+      enabled: true
+      containerPort: 8889
+      servicePort: 8889
+      protocol: TCP
+    jaeger-compact:
+      enabled: false
+    jaeger-thrift:
+      enabled: false
+    jaeger-grpc:
+      enabled: false
+    zipkin:
+      enabled: false
+
+# =============================================================================
+# Blackbox Exporter
+# =============================================================================
+blackbox-exporter:
+  image:
+    registry: quay.io
+    repository: prometheus/blackbox-exporter
+    tag: "v0.28.0"
+    pullPolicy: IfNotPresent
+
+  extraArgs:
+    - --web.listen-address=0.0.0.0:9115
+
+  livenessProbe:
+    initialDelaySeconds: 30
+  readinessProbe:
+    initialDelaySeconds: 10
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  # Pod-level
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: ~
+    seccompProfile:
+      type: RuntimeDefault
+
+  # Container-level — no capabilities.drop, no readOnlyRootFilesystem
+  # blackbox needs filesystem write access and CAP_NET_RAW for HTTP server init
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: ~
+    runAsGroup: ~
+
+  config:
+    modules:
+      http_2xx:
+        prober: http
+        timeout: 5s
+        http:
+          preferred_ip_protocol: ip4
+          valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+          valid_status_codes: []
+          method: GET
