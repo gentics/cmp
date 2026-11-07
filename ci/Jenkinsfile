@@ -112,7 +112,7 @@ pipeline {
                     echo "cms.version=${cmsVersion} meshsql.version=${meshVersion} portal.java.version=${portalJavaVersion} portal.php.version=${portalPhpVersion}"
 
                     def genticsCommonVersion = sh(
-                        script: "docker run --rm -v \$(pwd):/apps -w /apps mikefarah/yq:4 eval '.version' cmp-chart/charts/gentics-common/Chart.yaml",
+                        script: "docker run --rm -v \$(pwd):/apps -w /apps mikefarah/yq:4 eval '.version' ee/cmp-chart/charts/gentics-common/Chart.yaml",
                         returnStdout: true
                     ).trim()
 
@@ -127,7 +127,7 @@ pipeline {
                     }
 
                     //Release gentics-common first - it's used in the cmp chart too
-                    sh "ci/build-helm-chart.sh ${genticsCommonVersion} cmp-chart/charts/gentics-common"
+                    sh "ci/build-helm-chart.sh ${genticsCommonVersion} ee/cmp-chart/charts/gentics-common"
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
                         def genticsCommonPackageFilename = "gentics-common-${genticsCommonVersion}.tgz"
@@ -136,7 +136,7 @@ pipeline {
                     }
 
                     //update dependencies for cmp-sub-charts - use versions from pom.xml or test-version
-                    sh "ci/set-chart-dependency-versions.sh cmp-chart/Chart.yaml ${helmRepository} " +
+                    sh "ci/set-chart-dependency-versions.sh ee/cmp-chart/Chart.yaml ${helmRepository} " +
                         "gentics-common=${genticsCommonVersion} " +
                         "cms=${cmsVersion} " +
                         "gentics-mesh=${meshVersion} " +
@@ -144,11 +144,11 @@ pipeline {
                         "gentics-portal-php=${portalPhpVersion}"
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
-                        sh 'REPO_USERNAME=$repoUsername REPO_PASSWORD=$repoPassword ci/update-helm-dependencies.sh cmp-chart/'
+                        sh 'REPO_USERNAME=$repoUsername REPO_PASSWORD=$repoPassword ci/update-helm-dependencies.sh ee/cmp-chart/'
                     }
 
 
-                    sh "ci/build-helm-chart.sh ${helmVersion} cmp-chart/"
+                    sh "ci/build-helm-chart.sh ${helmVersion} ee/cmp-chart/"
                     
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
