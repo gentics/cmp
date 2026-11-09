@@ -258,3 +258,70 @@ secretKeyRef:
 {{ required "Either database.password, database.passwordSecret, or global.mariadb.enabled are required" "" }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+OpenTelemetry env vars for a Java component (OTel Java agent baked into the image).
+Renders NOTHING when telemetry is off for the component, so charts that do not use
+it render byte-identical output.
+On/off:    local.enabled true/false -> global.otel.enabled -> off.
+           An absent or null local.enabled follows the global switch (kindIs "bool").
+Endpoint:  local.endpoint -> global.otel.endpoint -> the CMP umbrella's bundled
+           Collector "http://<release>-opentelemetry-collector:4318". The umbrella
+           validates that the bundled Collector is installed when it is used.
+Protocol:  local.protocol -> global.otel.protocol -> "http/protobuf".
+Agent:     loaded through JDK_JAVA_OPTIONS, so JAVA_TOOL_OPTIONS (heap) stays as it
+           is. local.agentPath -> defaultAgentPath; an empty defaultAgentPath makes
+           local.agentPath required. A missing jar stops the JVM from starting.
+Resource:  service.namespace = global.otel.serviceNamespace -> "<namespace>-<release>".
+Headers:   local.headersSecret -> global.otel.headersSecret (Secret name, key
+           "headers") -> OTEL_EXPORTER_OTLP_HEADERS; omitted when both are empty.
+           For OTLP endpoints that need authentication (e.g. an API token).
+Every variable whose name is already set in extraEnv is skipped, so the user's value
+wins and no duplicate env names reach Kubernetes. OTEL_POD_NAME is emitted before
+OTEL_RESOURCE_ATTRIBUTES, which references it as $(OTEL_POD_NAME).
+Output: env list items at column 0 (or nothing). Callers indent them inside a
+`with`, so that "off" leaves no blank line behind:
+  {{- with include "gentics-common.otelEnv" (dict ...) }}
+  {{- . | nindent 10 }}
+  {{- end }}
+Args: (dict "root" $ "local" <otel map> "extraEnv" <env list>
+            "defaultServiceName" <string> "defaultAgentPath" <string, "" = required>)
+*/}}
+{{- define "gentics-common.otelEnv" -}}
+{{- $global := ((.root.Values.global | default dict).otel) | default dict -}}
+{{- $local := .local | default dict -}}
+{{- $enabled := $global.enabled -}}
+{{- if kindIs "bool" $local.enabled -}}
+{{- $enabled = $local.enabled -}}
+{{- end -}}
+{{- if $enabled -}}
+{{- $agentPath := $local.agentPath | default .defaultAgentPath | required "otel.agentPath is required when telemetry is on for this component: the path of the OpenTelemetry Java agent jar inside the image" -}}
+{{- $endpoint := $local.endpoint | default $global.endpoint | default (printf "http://%s-opentelemetry-collector:4318" .root.Release.Name) -}}
+{{- $protocol := $local.protocol | default $global.protocol | default "http/protobuf" -}}
+{{- $serviceNamespace := $global.serviceNamespace | default (printf "%s-%s" .root.Release.Namespace .root.Release.Name) -}}
+{{- $env := list -}}
+{{- $env = append $env (dict "name" "JDK_JAVA_OPTIONS" "value" (printf "-javaagent:%s" $agentPath)) -}}
+{{- $env = append $env (dict "name" "OTEL_SERVICE_NAME" "value" ($local.serviceName | default .defaultServiceName)) -}}
+{{- $env = append $env (dict "name" "OTEL_EXPORTER_OTLP_ENDPOINT" "value" $endpoint) -}}
+{{- $env = append $env (dict "name" "OTEL_EXPORTER_OTLP_PROTOCOL" "value" $protocol) -}}
+{{- $headersSecret := $local.headersSecret | default $global.headersSecret -}}
+{{- if $headersSecret -}}
+{{- $env = append $env (dict "name" "OTEL_EXPORTER_OTLP_HEADERS" "valueFrom" (dict "secretKeyRef" (dict "name" $headersSecret "key" "headers"))) -}}
+{{- end -}}
+{{- $env = append $env (dict "name" "OTEL_POD_NAME" "valueFrom" (dict "fieldRef" (dict "fieldPath" "metadata.name"))) -}}
+{{- $env = append $env (dict "name" "OTEL_RESOURCE_ATTRIBUTES" "value" (printf "service.namespace=%s,k8s.namespace.name=%s,k8s.pod.name=$(OTEL_POD_NAME)" $serviceNamespace .root.Release.Namespace)) -}}
+{{- $userNames := list -}}
+{{- range (.extraEnv | default list) -}}
+{{- $userNames = append $userNames .name -}}
+{{- end -}}
+{{- $out := list -}}
+{{- range $env -}}
+{{- if not (has .name $userNames) -}}
+{{- $out = append $out . -}}
+{{- end -}}
+{{- end -}}
+{{- if $out -}}
+{{ toYaml $out }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
