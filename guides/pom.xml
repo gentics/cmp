@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.gentics.cmp</groupId>
 		<artifactId>cmp</artifactId>
-		<version>8.6.3-SNAPSHOT</version>
+		<version>9.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>cmp-guides</artifactId>
@@ -21,11 +21,19 @@
 			<classifier>content</classifier>
 			<type>zip</type>
 		</dependency>
-		<!-- Mesh Commercial Plugin Guides -->
+		<!-- Mesh Plugin Guides -->
 		<dependency>
-			<groupId>com.gentics.mesh.plugin.commercial</groupId>
+			<groupId>com.gentics.mesh.plugin</groupId>
 			<artifactId>mesh-commercial-plugins-guides</artifactId>
-			<version>${mesh.plugins.version}</version>
+			<version>${mesh.version}</version>
+			<classifier>content</classifier>
+			<type>zip</type>
+		</dependency>
+		<!-- Mesh Enterprise Plugin Guides -->
+		<dependency>
+			<groupId>com.gentics.mesh.plugin.enterprise</groupId>
+			<artifactId>mesh-enterprise-plugins-guides</artifactId>
+			<version>${mesh.version}</version>
 			<classifier>content</classifier>
 			<type>zip</type>
 		</dependency>
@@ -33,7 +41,7 @@
 		<dependency>
 			<groupId>com.gentics.mesh.portal</groupId>
 			<artifactId>mesh-portal-docs</artifactId>
-			<version>${portal.java.version}</version>
+			<version>${portals.version}</version>
 			<classifier>content</classifier>
 			<type>zip</type>
 		</dependency>
@@ -41,11 +49,11 @@
 		<dependency>
 			<groupId>com.gentics.mesh.portal-php</groupId>
 			<artifactId>mesh-portal-php-docs</artifactId>
-			<version>${portal.php.version}</version>
+			<version>${portals.version}</version>
 			<classifier>content</classifier>
 			<type>zip</type>
 		</dependency>
-		<!-- Mesh Guides, currently only used for openapi.yaml -->
+		<!-- Mesh Guides, currently only used for openapi.yaml and Plugin guides -->
 		<dependency>
 			<groupId>com.gentics.mesh</groupId>
 			<artifactId>mesh-doc</artifactId>
@@ -63,7 +71,7 @@
 		<dependency>
 			<groupId>com.gentics.cms-oss</groupId>
 			<artifactId>cms-oss-server</artifactId>
-			<version>${cms-oss.version}</version>
+			<version>${cms.version}</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
@@ -86,7 +94,6 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -156,10 +163,19 @@
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/src/main/hugo/content</outputDirectory>
 								</artifactItem>
-								<!-- Mesh Commercial Plugins -->
+								<!-- Mesh Plugins -->
 								<artifactItem>
-									<groupId>com.gentics.mesh.plugin.commercial</groupId>
+									<groupId>com.gentics.mesh.plugin</groupId>
 									<artifactId>mesh-commercial-plugins-guides</artifactId>
+									<type>zip</type>
+									<classifier>content</classifier>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/src/main/hugo/content</outputDirectory>
+								</artifactItem>
+								<!-- Mesh Enterprise Plugins -->
+								<artifactItem>
+									<groupId>com.gentics.mesh.plugin.enterprise</groupId>
+									<artifactId>mesh-enterprise-plugins-guides</artifactId>
 									<type>zip</type>
 									<classifier>content</classifier>
 									<overWrite>true</overWrite>
@@ -196,7 +212,7 @@
 										<org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
 									</fileMappers>
 								</artifactItem>
-								<!-- CMS OSS -->
+								<!-- CMS -->
 								<artifactItem>
 									<groupId>com.gentics.cms-oss</groupId>
 									<artifactId>cms-oss-server</artifactId>

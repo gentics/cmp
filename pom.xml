@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gentics.cmp</groupId>
 	<artifactId>cmp</artifactId>
-	<version>8.6.3-SNAPSHOT</version>
+	<version>9.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
     <licenses>
@@ -27,11 +27,8 @@
 		<skip.mapping>false</skip.mapping>
 		<skip.render>false</skip.render>
 
-        <!-- Gentics CMS OSS -->
-        <cms-oss.version>6.6.2</cms-oss.version>
-
-        <!-- Gentics CMS EE -->
-        <cms.version>6.6.2</cms.version>
+        <!-- Gentics CMS -->
+        <cms.version>9.0.0-SNAPSHOT</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
@@ -39,24 +36,12 @@
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>3.3.2</mesh.version>
+        <mesh.version>9.0.0-SNAPSHOT</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
-        <!-- Gentics Mesh SQL -->
-        <meshsql.version>3.3.2</meshsql.version>
-        <meshsql.changelog.version>${meshsql.version}</meshsql.changelog.version>
-
-        <!-- Gentics Mesh Commercial Plugins -->
-        <mesh.plugins.version>3.4.3</mesh.plugins.version>
-        <mesh.plugins.changelog.version>${mesh.plugins.version}</mesh.plugins.changelog.version>
-
-        <!-- Gentics Portal | java -->
-        <portal.java.version>3.6.2</portal.java.version>
-        <portal.java.changelog.version>${portal.java.version}</portal.java.changelog.version>
-
-        <!-- Gentics Portal | php -->
-        <portal.php.version>3.5.1</portal.php.version>
-        <portal.php.changelog.version>${portal.php.version}</portal.php.changelog.version>
+        <!-- Gentics Portals -->
+        <portals.version>9.0.0-SNAPSHOT</portals.version>
+        <portals.changelog.version>${portals.version}</portals.changelog.version>
 
         <!-- ANDP -->
         <andp.version>8.6.2</andp.version>
