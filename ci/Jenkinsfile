@@ -105,11 +105,10 @@ pipeline {
 
                     version = MavenHelper.getVersion()
                     def cmsVersion        = sh(script: "mvn help:evaluate -Dexpression=cms.version -q -DforceStdout", returnStdout: true).trim()
-                    def meshVersion       = sh(script: "mvn help:evaluate -Dexpression=meshsql.version -q -DforceStdout", returnStdout: true).trim()
-                    def portalJavaVersion = sh(script: "mvn help:evaluate -Dexpression=portal.java.version -q -DforceStdout", returnStdout: true).trim()
-                    def portalPhpVersion  = sh(script: "mvn help:evaluate -Dexpression=portal.php.version -q -DforceStdout", returnStdout: true).trim()
+                    def meshVersion       = sh(script: "mvn help:evaluate -Dexpression=mesh.version -q -DforceStdout", returnStdout: true).trim()
+                    def portalsVersion = sh(script: "mvn help:evaluate -Dexpression=portals.version -q -DforceStdout", returnStdout: true).trim()
 
-                    echo "cms.version=${cmsVersion} meshsql.version=${meshVersion} portal.java.version=${portalJavaVersion} portal.php.version=${portalPhpVersion}"
+                    echo "cms.version=${cmsVersion} mesh.version=${meshVersion} portals.version=${portalsVersion}"
 
                     def genticsCommonVersion = sh(
                         script: "docker run --rm -v \$(pwd):/apps -w /apps mikefarah/yq:4 eval '.version' ee/cmp-chart/charts/gentics-common/Chart.yaml",
@@ -120,8 +119,7 @@ pipeline {
                     if (Boolean.valueOf(params.runDeployTesting)) {
                         cmsVersion = prependZeroIfNotDigitPrefixed(cmsVersion)
                         meshVersion = prependZeroIfNotDigitPrefixed(meshVersion)
-                        portalJavaVersion = prependZeroIfNotDigitPrefixed(portalJavaVersion)
-                        portalPhpVersion = prependZeroIfNotDigitPrefixed(portalPhpVersion)
+                        portalsVersion = prependZeroIfNotDigitPrefixed(portalsVersion)
                         genticsCommonVersion = prependZeroIfNotDigitPrefixed(genticsCommonVersion)
                         helmVersion = prependZeroIfNotDigitPrefixed(helmVersion)
                     }
@@ -140,8 +138,8 @@ pipeline {
                         "gentics-common=${genticsCommonVersion} " +
                         "cms=${cmsVersion} " +
                         "gentics-mesh=${meshVersion} " +
-                        "gentics-portal-java=${portalJavaVersion} " +
-                        "gentics-portal-php=${portalPhpVersion}"
+                        "gentics-portal-java=${portalsVersion} " +
+                        "gentics-portal-php=${portalsVersion}"
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
                         sh 'REPO_USERNAME=$repoUsername REPO_PASSWORD=$repoPassword ci/update-helm-dependencies.sh ee/cmp-chart/'
