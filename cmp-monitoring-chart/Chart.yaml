@@ -1,6 +1,6 @@
 apiVersion: v2
 name: cmp-monitoring
-description: Gentics CMP monitoring stack for OpenShift
+description: Gentics CMP monitoring stack for Kubernetes and OpenShift
 type: application
 version: 1.0.0
 

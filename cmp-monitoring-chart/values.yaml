@@ -2,22 +2,31 @@
 # CMP Monitoring Stack — Combined Values
 # Parent chart: cmp-monitoring
 # All sub-chart values are namespaced under their alias key.
-# Service DNS names follow the pattern: <release-name>-<alias>[-suffix]
-# e.g. for `helm install cmp-monitoring .`:
-#   Prometheus : cmp-monitoring-prometheus-server:9090
+#
+# These defaults target plain Kubernetes. On OpenShift add -f values-openshift.yaml.
+#
+# Service names are pinned with fullnameOverride, so they do not depend on the
+# release name. This allows one release per namespace.
+#   Prometheus : cmp-monitoring-prometheus-server:80
 #   Loki       : cmp-monitoring-loki:3100
-#   Tempo      : cmp-monitoring-tempo:3100
-#   Grafana    : cmp-monitoring-grafana:3000
-#   OTel       : cmp-monitoring-opentelemetry-collector:8889
+#   Tempo      : cmp-monitoring-tempo:3200 (query), :4317 / :4318 (OTLP)
+#   Grafana    : cmp-monitoring-grafana:80
+#   OTel       : cmp-monitoring-opentelemetry-collector:4317 / :4318 (OTLP), :8889 (metrics)
 #   Blackbox   : cmp-monitoring-blackbox-exporter:9115
+#
+# Every component sets explicit resources: a namespace LimitRange may otherwise
+# apply very low defaults, which leads to throttling and OOM kills.
+#
+# GODEBUG=multipathtcp=0 turns off Multipath TCP in the Go-based components. With it
+# enabled, kubelet probes failed with "connection reset by peer" on some cluster nodes.
 # =============================================================================
 
 # =============================================================================
 # Grafana
 # =============================================================================
 grafana:
-  nodeSelector:
-    kubernetes.io/hostname: nworker-0
+  fullnameOverride: cmp-monitoring-grafana
+
   image:
     registry: docker.io
     repository: grafana/grafana
@@ -36,21 +45,21 @@ grafana:
       cpu: 500m
       memory: 256Mi
 
+  # No adminPassword here: the chart generates one and keeps it across upgrades.
+  # Read it from the admin-password key of Secret cmp-monitoring-grafana.
   adminUser: admin
-  adminPassword: admin
 
   rbac:
     namespaced: true
 
+  # The init container runs as root, which restricted policies reject.
+  # fsGroup already sets the volume ownership.
   initChownData:
     enabled: false
 
-  # Pod-level
+  # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
   securityContext:
     runAsNonRoot: true
-    runAsUser: ~
-    runAsGroup: ~
-    fsGroup: ~
     seccompProfile:
       type: RuntimeDefault
 
@@ -60,7 +69,6 @@ grafana:
       drop: [ALL]
     readOnlyRootFilesystem: false
     runAsNonRoot: true
-    runAsUser: ~
     seccompProfile:
       type: RuntimeDefault
 
@@ -68,6 +76,7 @@ grafana:
     GF_METRICS_ENABLED: "true"
     GF_PLUGINS_ENABLE_ALPHA: "false"
     GF_DEFAULT_APP_MODE: "production"
+    GODEBUG: "multipathtcp=0"
 
   persistence:
     enabled: true
@@ -93,7 +102,7 @@ grafana:
           uid: prometheus
           type: prometheus
           access: proxy
-          url: http://cmp-monitoring-prometheus-server:9090
+          url: http://cmp-monitoring-prometheus-server:80
           jsonData:
             httpMethod: GET
           version: 1
@@ -106,7 +115,7 @@ grafana:
           uid: tempo
           type: tempo
           access: proxy
-          url: http://cmp-monitoring-tempo:3100
+          url: http://cmp-monitoring-tempo:3200
           jsonData:
             serviceMap:
               datasourceUid: prometheus
@@ -138,8 +147,7 @@ grafana:
 # Prometheus
 # =============================================================================
 prometheus:
-  # Disable cluster-scoped RBAC — prometheus-rbac.yaml in this chart
-  # creates a namespace-scoped Role + RoleBinding instead.
+  # All scrape targets below are static, so Prometheus needs no Kubernetes API access.
   rbac:
     create: false
 
@@ -153,6 +161,24 @@ prometheus:
     enabled: false
 
   server:
+    fullnameOverride: cmp-monitoring-prometheus-server
+
+    env:
+      - name: GODEBUG
+        value: "multipathtcp=0"
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
     image:
       registry: docker.io
       repository: prom/prometheus
@@ -169,20 +195,9 @@ prometheus:
 
     configMapOverrideName: ""
 
-    # Pod-level (chart has two keys for this — both must be set)
+    # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
     securityContext:
       runAsNonRoot: true
-      runAsUser: ~
-      runAsGroup: ~
-      fsGroup: ~
-      seccompProfile:
-        type: RuntimeDefault
-
-    podSecurityContext:
-      runAsNonRoot: true
-      runAsUser: ~
-      runAsGroup: ~
-      fsGroup: ~
       seccompProfile:
         type: RuntimeDefault
 
@@ -191,8 +206,6 @@ prometheus:
       allowPrivilegeEscalation: false
       readOnlyRootFilesystem: false
       runAsNonRoot: true
-      runAsUser: ~
-      runAsGroup: ~
       capabilities:
         drop: [ALL]
       seccompProfile:
@@ -200,49 +213,59 @@ prometheus:
 
   configmapReload:
     prometheus:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 64Mi
       containerSecurityContext:
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: false
         runAsNonRoot: true
-        runAsUser: ~
-        runAsGroup: ~
         capabilities:
           drop: [ALL]
         seccompProfile:
           type: RuntimeDefault
 
-  global:
-    scrape_interval: 15s
-    evaluation_interval: 15s
-
   serverFiles:
     prometheus.yml:
       scrape_configs:
         - job_name: otel-collector
+          # Keep the job and instance labels the Collector sets from the service name
+          # and instance. Otherwise they end up as exported_job and exported_instance.
+          honor_labels: true
           static_configs:
             - targets: ["cmp-monitoring-opentelemetry-collector:8889"]
         - job_name: prometheus
           static_configs:
-            - targets: ["cmp-monitoring-prometheus-server:9090"]
+            - targets: ["cmp-monitoring-prometheus-server:80"]
         - job_name: loki
           static_configs:
             - targets: ["cmp-monitoring-loki:3100"]
         - job_name: tempo
           static_configs:
-            - targets: ["cmp-monitoring-tempo:3100"]
+            - targets: ["cmp-monitoring-tempo:3200"]
         - job_name: grafana
           metrics_path: /metrics
           static_configs:
-            - targets: ["cmp-monitoring-grafana:3000"]
+            - targets: ["cmp-monitoring-grafana:80"]
         - job_name: blackbox
           metrics_path: /probe
           params:
             module: [http_2xx]
+          # These assume CMP was installed as release "cmp" in the same namespace.
+          # Otherwise adjust the names, e.g. http://<release>-mesh.<namespace>.svc/...
+          # A component that is not installed reports probe_success=0.
           static_configs:
             - targets:
-                - http://cmp-gentics-cms/health
-                - http://cmp-gentics-mesh/health
-                - http://cmp-gentics-portal-java/health
+                - http://cmp-cms/rest/info/maintenance
+                - http://cmp-mesh/api/v2/health/ready
+                # /health/ready is only available on the portal's monitoring port (3001),
+                # which its Service does not expose.
+                - http://cmp-portal-java:3000/
+                # Add the PHP portal here when it is installed, e.g. http://cmp-portal-php/
           relabel_configs:
             - source_labels: [__address__]
               target_label: __param_target
@@ -255,6 +278,8 @@ prometheus:
 # Loki
 # =============================================================================
 loki:
+  fullnameOverride: cmp-monitoring-loki
+
   deploymentMode: SingleBinary
 
   loki:
@@ -286,15 +311,19 @@ loki:
         ruler: ruler
         admin: admin
 
+    # Delete logs after 7 days. Without retention Loki never frees its volume.
+    compactor:
+      retention_enabled: true
+      delete_request_store: filesystem
+      working_directory: /var/loki/compactor
+
     limits_config:
       allow_structured_metadata: true
+      retention_period: 168h
 
+    # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
     podSecurityContext:
       runAsNonRoot: true
-      runAsUser: ~
-      runAsGroup: ~
-      fsGroup: ~
-      fsGroupChangePolicy: ~
       seccompProfile:
         type: RuntimeDefault
 
@@ -308,38 +337,22 @@ loki:
     persistence:
       enabled: true
       size: 10Gi
-    podSecurityContext:
-      runAsNonRoot: true
-      runAsUser: ~
-      runAsGroup: ~
-      fsGroup: ~
-      fsGroupChangePolicy: ~
-      seccompProfile:
-        type: RuntimeDefault
-
-  memcached:
-    podSecurityContext:
-      runAsNonRoot: true
-      runAsUser: ~
-      runAsGroup: ~
-      fsGroup: ~
-      seccompProfile:
-        type: RuntimeDefault
+    extraEnv:
+      - name: GODEBUG
+        value: "multipathtcp=0"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 1Gi
 
   chunksCache:
     enabled: false
 
   resultsCache:
     enabled: false
-
-  rollout_operator:
-    podSecurityContext:
-      runAsNonRoot: true
-      runAsUser: ~
-      runAsGroup: ~
-      fsGroup: ~
-      seccompProfile:
-        type: RuntimeDefault
 
   read:
     replicas: 0
@@ -351,19 +364,42 @@ loki:
   gateway:
     enabled: false
 
+  # Not needed for a single-binary install. The canary and its Helm test only
+  # verify Loki itself, and the rules sidecar needs a Role this chart does not create.
+  lokiCanary:
+    enabled: false
+  test:
+    enabled: false
+  sidecar:
+    rules:
+      enabled: false
+
 # =============================================================================
 # Tempo
 # =============================================================================
 tempo:
-  tempo:
-    image:
-      registry: docker.io
-      repository: grafana/tempo
-      tag: "2.10.3"
-      pullPolicy: IfNotPresent
+  fullnameOverride: cmp-monitoring-tempo
 
-    extraArgs:
-      config.file: /conf/tempo.yaml
+  tempo:
+    registry: docker.io
+    repository: grafana/tempo
+    tag: "2.10.3"
+    pullPolicy: IfNotPresent
+
+    extraEnv:
+      - name: GODEBUG
+        value: "multipathtcp=0"
+
+    # Chart default is 1024, too much for the memory limit below.
+    memBallastSizeMbs: 256
+
+    resources:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
 
     receivers:
       otlp:
@@ -383,7 +419,7 @@ tempo:
 
     metricsGenerator:
       enabled: true
-      remoteWriteUrl: "http://cmp-monitoring-prometheus-server:9090/api/v1/write"
+      remoteWriteUrl: "http://cmp-monitoring-prometheus-server:80/api/v1/write"
 
     retention: 48h
 
@@ -402,19 +438,14 @@ tempo:
       allowPrivilegeEscalation: false
       readOnlyRootFilesystem: false
       runAsNonRoot: true
-      runAsUser: ~
-      runAsGroup: ~
       capabilities:
         drop: [ALL]
       seccompProfile:
         type: RuntimeDefault
 
-  # Pod-level
+  # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
   securityContext:
     runAsNonRoot: true
-    runAsUser: ~
-    runAsGroup: ~
-    fsGroup: ~
     seccompProfile:
       type: RuntimeDefault
 
@@ -426,31 +457,41 @@ tempo:
 # OpenTelemetry Collector
 # =============================================================================
 opentelemetry-collector:
+  fullnameOverride: cmp-monitoring-opentelemetry-collector
+
   mode: deployment
 
   image:
     registry: docker.io
     repository: otel/opentelemetry-collector-contrib
-    tag: "0.148.0"
+    tag: "0.156.0"
     pullPolicy: IfNotPresent
 
-  command:
-    extraArgs:
-      - "--feature-gates=+extension.healthcheck.useComponentStatus"
+  extraEnvs:
+    - name: GODEBUG
+      value: "multipathtcp=0"
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
 
   livenessProbe:
-    initialDelaySeconds: 30
+    initialDelaySeconds: 120
     periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 3
+    failureThreshold: 6
 
   readinessProbe:
-    initialDelaySeconds: 15
+    initialDelaySeconds: 60
     periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 3
+    failureThreshold: 6
 
-  # Use the ConfigMap defined in templates/otelcol-configmap.yaml
+  # Use the ConfigMap defined in templates/otel-configmap.yaml
   configMap:
     create: false
     existingName: cmp-monitoring-otelcol-config
@@ -458,7 +499,6 @@ opentelemetry-collector:
   # Pod-level
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: ~
     seccompProfile:
       type: RuntimeDefault
 
@@ -467,7 +507,6 @@ opentelemetry-collector:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     runAsNonRoot: true
-    runAsUser: ~
     capabilities:
       drop: [ALL]
 
@@ -500,6 +539,8 @@ opentelemetry-collector:
 # Blackbox Exporter
 # =============================================================================
 blackbox-exporter:
+  fullnameOverride: cmp-monitoring-blackbox-exporter
+
   image:
     registry: quay.io
     repository: prometheus/blackbox-exporter
@@ -508,6 +549,17 @@ blackbox-exporter:
 
   extraArgs:
     - --web.listen-address=0.0.0.0:9115
+
+  extraEnv:
+    GODEBUG: "multipathtcp=0"
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
 
   livenessProbe:
     initialDelaySeconds: 30
@@ -521,20 +573,12 @@ blackbox-exporter:
       maxSurge: 1
 
   # Pod-level
+  # Container-level settings stay on the chart's hardened defaults
+  # (UIDs are cleared by values-openshift.yaml).
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: ~
     seccompProfile:
       type: RuntimeDefault
-
-  # Container-level — no capabilities.drop, no readOnlyRootFilesystem
-  # blackbox needs filesystem write access and CAP_NET_RAW for HTTP server init
-  securityContext:
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: false
-    runAsNonRoot: true
-    runAsUser: ~
-    runAsGroup: ~
 
   config:
     modules:

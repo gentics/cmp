@@ -1,3 +1,5 @@
+> Historical notes from the first OpenShift migration. For the current setup see README.md.
+
 # Session Summary – CMP Monitoring Stack Migration to OpenShift
 
 ## Goal
