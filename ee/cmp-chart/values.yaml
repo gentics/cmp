@@ -130,9 +130,10 @@ global:
 ##   true:   only valid together with global.otel.enabled=true
 ## It is deliberately left out here: Helm then falls back to global.otel.enabled
 ## (a null value would do the same, but makes Helm print a warning).
-## Install at most one monitoring stack per namespace: a few Loki and Tempo
-## objects and the "cmp-blackbox-targets" ConfigMap have fixed names.
-## On OpenShift, install with -f values-openshift.yaml and Helm 3.17 or newer.
+## Install at most one monitoring stack per namespace: the ConfigMaps "loki",
+## "tempo" and "cmp-blackbox-targets" have fixed names.
+## On OpenShift, set the commented "OpenShift" securityContext lines of the
+## monitoring sections below in your values file (Helm 3.17 or newer).
 monitoring: {}
   # enabled: false
 
@@ -313,8 +314,8 @@ mariadb:
 
 # =============================================================================
 # Monitoring stack: sub-chart values (installed only when the stack is on, see
-# "monitoring" above). Tested on plain Kubernetes and OpenShift; on OpenShift add
-# -f values-openshift.yaml.
+# "monitoring" above). Tested on plain Kubernetes and OpenShift; on OpenShift set
+# the commented "OpenShift" securityContext lines below (Helm 3.17 or newer).
 #
 # Services are named after the release, like the CMP components:
 #   OTLP input : <release>-opentelemetry-collector:4317 (gRPC) / :4318 (HTTP), :8889 (metrics)
@@ -335,22 +336,20 @@ mariadb:
 # Grafana
 # -----------------------------------------------------------------------------
 grafana:
-  image:
-    registry: docker.io
-    repository: grafana/grafana
-    tag: "11.6.0"
+  # Values not set here are the chart's defaults (helm show values grafana-community/grafana).
+  # Image: the chart's default "<appVersion>-distroless" (chart 14.4.1: Grafana 13.3.1).
 
+  # Grafana 13 keeps its search indexes in memory; 256Mi got it OOM-killed.
   resources:
     requests:
       cpu: 100m
-      memory: 128Mi
+      memory: 256Mi
     limits:
       cpu: 500m
-      memory: 256Mi
+      memory: 512Mi
 
-  # No adminPassword here: the chart generates one and keeps it across upgrades.
-  # Read it from the admin-password key of Secret <release>-grafana.
-  adminUser: admin
+  # Login: user "admin" (chart default). No adminPassword here: the chart generates one
+  # and keeps it across upgrades; read it from key admin-password of Secret <release>-grafana.
 
   rbac:
     namespaced: true
@@ -360,20 +359,19 @@ grafana:
   initChownData:
     enabled: false
 
-  # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
+  # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
   securityContext:
-    runAsNonRoot: true
     seccompProfile:
       type: RuntimeDefault
+    # OpenShift: uncomment (or copy into your own values file) to let the SCC
+    # assign the IDs. Requires Helm 3.17 or newer.
+    # runAsUser: ~
+    # runAsGroup: ~
+    # fsGroup: ~
 
   containerSecurityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop: [ALL]
     readOnlyRootFilesystem: false
     runAsNonRoot: true
-    seccompProfile:
-      type: RuntimeDefault
 
   env:
     GF_METRICS_ENABLED: "true"
@@ -389,9 +387,7 @@ grafana:
 
   livenessProbe:
     initialDelaySeconds: 180
-    timeoutSeconds: 30
     periodSeconds: 10
-    failureThreshold: 10
 
   readinessProbe:
     initialDelaySeconds: 60
@@ -463,13 +459,15 @@ grafana:
     unified_storage:
       enabled: false
 
-  ingress:
-    enabled: false
+  # Expose Grafana with grafana.ingress.* (off by default; on OpenShift the Ingress
+  # becomes a Route).
 
 # -----------------------------------------------------------------------------
 # Prometheus
 # -----------------------------------------------------------------------------
 prometheus:
+  # Values not set here are the chart's defaults (helm show values prometheus-community/prometheus).
+
   # All scrape targets are static, so Prometheus needs no Kubernetes API access.
   rbac:
     create: false
@@ -500,21 +498,17 @@ prometheus:
       scrape_interval: 15s
       evaluation_interval: 15s
 
+    # Docker Hub image instead of the chart's quay.io default; no tag: the chart's
+    # appVersion (chart 29.47.1: Prometheus v3.16.0)
     image:
-      registry: docker.io
       repository: prom/prometheus
-      tag: "v3.10.0"
-      pullPolicy: IfNotPresent
 
     persistentVolume:
-      enabled: true
       size: 10Gi
 
     extraFlags:
       - web.enable-lifecycle
       - web.enable-remote-write-receiver
-
-    configMapOverrideName: ""
 
     # Availability probe targets, rendered by this chart for the enabled CMP
     # components (templates/monitoring-blackbox-targets.yaml). The ConfigMap name is
@@ -525,11 +519,15 @@ prometheus:
         configMap: cmp-blackbox-targets
         readOnly: true
 
-    # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
+    # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
     securityContext:
-      runAsNonRoot: true
       seccompProfile:
         type: RuntimeDefault
+      # OpenShift: uncomment (or copy into your own values file) to let the SCC
+      # assign the IDs. Requires Helm 3.17 or newer.
+      # runAsUser: ~
+      # runAsGroup: ~
+      # fsGroup: ~
 
     # Container-level
     containerSecurityContext:
@@ -542,6 +540,11 @@ prometheus:
         type: RuntimeDefault
 
   configmapReload:
+    # The config reloader (prometheus-config-reloader since chart 29) is a Go
+    # binary too; without this its probes fail with "connection reset by peer".
+    env:
+      - name: GODEBUG
+        value: "multipathtcp=0"
     prometheus:
       resources:
         requests:
@@ -559,16 +562,32 @@ prometheus:
         seccompProfile:
           type: RuntimeDefault
 
-  # serverFiles is not templated, so it only holds the self-scrape job. The other
-  # jobs reference release-based service names and are in extraScrapeConfigs, which
-  # the Prometheus chart appends to scrape_configs.
-  serverFiles:
-    prometheus.yml:
-      scrape_configs:
-        - job_name: prometheus
-          static_configs:
-            - targets: ["localhost:9090"]
+  # The chart's default jobs: keep its self-scrape job "prometheus"
+  # (localhost:9090) and switch off the Kubernetes service discovery jobs, which
+  # need API access this chart does not grant (rbac.create: false).
+  scrapeConfigs:
+    kubernetes-api-servers:
+      enabled: false
+    kubernetes-nodes:
+      enabled: false
+    kubernetes-nodes-cadvisor:
+      enabled: false
+    kubernetes-service-endpoints:
+      enabled: false
+    kubernetes-service-endpoints-slow:
+      enabled: false
+    prometheus-pushgateway:
+      enabled: false
+    kubernetes-services:
+      enabled: false
+    kubernetes-pods:
+      enabled: false
+    kubernetes-pods-slow:
+      enabled: false
 
+  # Our jobs reference release-based service names, so they go here: the
+  # Prometheus chart renders extraScrapeConfigs through tpl and appends them to
+  # scrape_configs.
   extraScrapeConfigs: |
     - job_name: otel-collector
       # Keep the job and instance labels the Collector sets from the service name
@@ -606,15 +625,15 @@ prometheus:
 # Loki
 # -----------------------------------------------------------------------------
 loki:
-  deploymentMode: SingleBinary
+  # Values not set here are the chart's defaults (helm show values grafana-community/loki).
+  # Image: the chart's appVersion (chart 21.2.1: Loki 3.7.9).
+
+  # One Loki process with filesystem storage (chart 21.x name; was "SingleBinary").
+  # Same as the chart default, kept on purpose: the filesystem storage below only
+  # works in this mode, and this default has changed before.
+  deploymentMode: Monolithic
 
   loki:
-    image:
-      registry: docker.io
-      repository: grafana/loki
-      tag: "3.7.0"
-      pullPolicy: IfNotPresent
-
     auth_enabled: false
 
     commonConfig:
@@ -647,22 +666,19 @@ loki:
       allow_structured_metadata: true
       retention_period: 168h
 
-    # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
-    podSecurityContext:
-      runAsNonRoot: true
-      seccompProfile:
-        type: RuntimeDefault
+    # Pod-level: the chart's defaults (runAsNonRoot, RuntimeDefault seccomp, UIDs 10001).
+    # OpenShift: uncomment (or copy into your own values file) to let the SCC
+    # assign the IDs. Requires Helm 3.17 or newer.
+    # podSecurityContext:
+    #   runAsUser: ~
+    #   runAsGroup: ~
+    #   fsGroup: ~
 
   rbac:
-    pspEnabled: false
-    sccEnabled: false
     namespaced: true
 
   singleBinary:
     replicas: 1
-    persistence:
-      enabled: true
-      size: 10Gi
     extraEnv:
       - name: GODEBUG
         value: "multipathtcp=0"
@@ -704,24 +720,38 @@ loki:
 # Tempo
 # -----------------------------------------------------------------------------
 tempo:
-  # Copy of the Tempo chart's (1.24.4) default config. The only change is the
+  # Values not set here are the chart's defaults (helm show values grafana-community/tempo).
+
+  # Copy of the Tempo chart's (3.2.1) default config. The only change is the
   # remote_write url, which goes through tpl here so that
   # tempo.metricsGenerator.remoteWriteUrl can contain the release name.
   # Compare with the chart default when upgrading the Tempo chart.
   config: |
+    stream_over_http_enabled: {{ .Values.tempo.streamOverHttpEnabled }}
     memberlist:
       cluster_label: "{{ .Release.Name }}.{{ .Release.Namespace }}"
     multitenancy_enabled: {{ .Values.tempo.multitenancyEnabled }}
     usage_report:
       reporting_enabled: {{ .Values.tempo.reportingEnabled }}
-    compactor:
-      compaction:
-        block_retention: {{ .Values.tempo.retention }}
+    {{- $backendScheduler := dict "provider" (dict "compaction" (dict "compaction" (dict "block_retention" .Values.tempo.retention))) }}
+    {{- with .Values.tempo.backendScheduler }}
+    {{- $backendScheduler = mergeOverwrite $backendScheduler (deepCopy .) }}
+    {{- end }}
+    backend_scheduler:
+      {{- toYaml $backendScheduler | nindent 6 }}
+    {{- $backendWorker := dict "compaction" (deepCopy ($backendScheduler.provider.compaction.compaction | default dict)) }}
+    {{- with .Values.tempo.backendWorker }}
+    {{- $backendWorker = mergeOverwrite $backendWorker (deepCopy .) }}
+    {{- end }}
+    backend_worker:
+      {{- toYaml $backendWorker | nindent 6 }}
     distributor:
       receivers:
         {{- toYaml .Values.tempo.receivers | nindent 8 }}
-    ingester:
-      {{- toYaml .Values.tempo.ingester | nindent 6 }}
+    {{- with .Values.tempo.liveStore }}
+    live_store:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     server:
       {{- toYaml .Values.tempo.server | nindent 6 }}
     storage:
@@ -751,22 +781,13 @@ tempo:
         remote_write:
           - url: {{ tpl .Values.tempo.metricsGenerator.remoteWriteUrl . }}
         {{- end }}
-      traces_storage:
-        path: {{ .Values.tempo.metricsGenerator.traces_storage.path | quote }}
       {{- end }}
 
   tempo:
-    registry: docker.io
-    repository: grafana/tempo
-    tag: "2.10.3"
-    pullPolicy: IfNotPresent
-
+    # Image: the chart's appVersion (chart 3.2.1: Tempo 3.1.1)
     extraEnv:
       - name: GODEBUG
         value: "multipathtcp=0"
-
-    # Chart default is 1024, too much for the memory limit below.
-    memBallastSizeMbs: 256
 
     resources:
       requests:
@@ -776,6 +797,7 @@ tempo:
         cpu: 1000m
         memory: 2Gi
 
+    # Same as the chart defaults, kept on purpose: the Collector sends traces here.
     receivers:
       otlp:
         protocols:
@@ -789,8 +811,6 @@ tempo:
         backend: local
         local:
           path: /var/tempo/blocks
-        wal:
-          path: /var/tempo/wal
 
     # Span metrics and the service graph, written to Prometheus.
     metricsGenerator:
@@ -798,9 +818,6 @@ tempo:
       remoteWriteUrl: "http://{{ .Release.Name }}-prometheus-server:80/api/v1/write"
 
     retention: 48h
-
-    ingester:
-      max_block_duration: 5m
 
     overrides:
       defaults:
@@ -819,27 +836,30 @@ tempo:
       seccompProfile:
         type: RuntimeDefault
 
-  # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
+  # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
   securityContext:
-    runAsNonRoot: true
     seccompProfile:
       type: RuntimeDefault
+    # OpenShift: uncomment (or copy into your own values file) to let the SCC
+    # assign the IDs. Requires Helm 3.17 or newer.
+    # runAsUser: ~
+    # runAsGroup: ~
+    # fsGroup: ~
 
   persistence:
     enabled: true
-    size: 10Gi
 
 # -----------------------------------------------------------------------------
 # OpenTelemetry Collector
 # -----------------------------------------------------------------------------
 opentelemetry-collector:
+  # Values not set here are the chart's defaults
+  # (helm show values open-telemetry/opentelemetry-collector).
   mode: deployment
 
+  # Required by the chart. No tag: the chart's appVersion (chart 0.178.3: Collector 0.163.2)
   image:
-    registry: docker.io
     repository: otel/opentelemetry-collector-contrib
-    tag: "0.156.0"
-    pullPolicy: IfNotPresent
 
   extraEnvs:
     - name: GODEBUG
@@ -884,6 +904,8 @@ opentelemetry-collector:
     capabilities:
       drop: [ALL]
 
+  # otlp / otlp-http are the chart defaults, kept on purpose: they are the endpoint of
+  # the CMP components and of other CMP installations (external mode).
   ports:
     otlp:
       enabled: true
@@ -913,17 +935,17 @@ opentelemetry-collector:
 # Blackbox exporter (availability probes of the CMP components)
 # -----------------------------------------------------------------------------
 blackbox-exporter:
-  image:
-    registry: quay.io
-    repository: prometheus/blackbox-exporter
-    tag: "v0.28.0"
-    pullPolicy: IfNotPresent
+  # Values not set here are the chart's defaults
+  # (helm show values prometheus-community/prometheus-blackbox-exporter).
+  # Image: the chart's appVersion (chart 11.21.2: v0.29.1).
 
   extraArgs:
     - --web.listen-address=0.0.0.0:9115
 
+  # A list since chart 11.x (it was a map before)
   extraEnv:
-    GODEBUG: "multipathtcp=0"
+    - name: GODEBUG
+      value: "multipathtcp=0"
 
   resources:
     requests:
@@ -939,26 +961,27 @@ blackbox-exporter:
     initialDelaySeconds: 10
 
   strategy:
-    type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 1
-      maxSurge: 1
 
   # Pod-level
   # Container-level settings stay on the chart's hardened defaults
-  # (UIDs are cleared by values-openshift.yaml).
+  # (on OpenShift clear the UIDs, see below).
   podSecurityContext:
     runAsNonRoot: true
     seccompProfile:
       type: RuntimeDefault
 
+  # Container-level (in this chart "securityContext" is the container's).
+  # OpenShift: uncomment (or copy into your own values file) to let the SCC
+  # assign the IDs. Requires Helm 3.17 or newer.
+  # securityContext:
+  #   runAsUser: ~
+  #   runAsGroup: ~
+
   config:
     modules:
       http_2xx:
-        prober: http
-        timeout: 5s
         http:
-          preferred_ip_protocol: ip4
-          valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
           valid_status_codes: []
           method: GET
