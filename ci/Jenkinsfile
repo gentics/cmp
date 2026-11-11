@@ -14,6 +14,14 @@ def prependZeroIfNotDigitPrefixed(String ver) {
     return (ver ==~ /^[0-9].*/) ? ver : "0-" + ver
 }
 
+// Exact Helm dependency constraint for a test version: Helm reads "0-ci-devtest-SNAPSHOT"
+// as the partial version "0", i.e. a range that also matches "0-ci-hotfix-SNAPSHOT" and
+// picks the highest. "0.0.0-ci-devtest-SNAPSHOT" matches only the published
+// "0-ci-devtest-SNAPSHOT". Release versions (e.g. 6.6.2) are returned unchanged.
+def exactDependencyVersion(String ver) {
+    return ver.startsWith("0-") ? "0.0.0-" + ver.substring(2) : ver
+}
+
 pipeline {
     agent {
         label 'docker'
@@ -137,11 +145,11 @@ pipeline {
 
                     //update dependencies for cmp-sub-charts - use versions from pom.xml or test-version
                     sh "ci/set-chart-dependency-versions.sh cmp-chart/Chart.yaml ${helmRepository} " +
-                        "gentics-common=${genticsCommonVersion} " +
-                        "cms=${cmsVersion} " +
-                        "gentics-mesh=${meshVersion} " +
-                        "gentics-portal-java=${portalJavaVersion} " +
-                        "gentics-portal-php=${portalPhpVersion}"
+                        "gentics-common=${exactDependencyVersion(genticsCommonVersion)} " +
+                        "cms=${exactDependencyVersion(cmsVersion)} " +
+                        "gentics-mesh=${exactDependencyVersion(meshVersion)} " +
+                        "gentics-portal-java=${exactDependencyVersion(portalJavaVersion)} " +
+                        "gentics-portal-php=${exactDependencyVersion(portalPhpVersion)}"
 
                     withCredentials([usernamePassword(credentialsId: 'docker.gentics.com', usernameVariable: 'repoUsername', passwordVariable: 'repoPassword')]) {
                         sh 'REPO_USERNAME=$repoUsername REPO_PASSWORD=$repoPassword ci/update-helm-dependencies.sh cmp-chart/'
