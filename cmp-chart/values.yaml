@@ -130,8 +130,8 @@ global:
 ##   true:   only valid together with global.otel.enabled=true
 ## It is deliberately left out here: Helm then falls back to global.otel.enabled
 ## (a null value would do the same, but makes Helm print a warning).
-## Install at most one monitoring stack per namespace: a few Loki and Tempo
-## objects and the "cmp-blackbox-targets" ConfigMap have fixed names.
+## Install at most one monitoring stack per namespace: the ConfigMaps "loki",
+## "tempo" and "cmp-blackbox-targets" have fixed names.
 ## On OpenShift, set the commented "OpenShift" securityContext lines of the
 ## monitoring sections below in your values file (Helm 3.17 or newer).
 monitoring: {}

@@ -94,8 +94,8 @@ Every setting under `global.otel` can be overridden per component under `cms.ote
 | Tempo | `<release>-tempo` | 3200 (query), 4317 / 4318 (OTLP) |
 | Blackbox exporter | `<release>-blackbox-exporter` | 9115 |
 
-- **One stack per namespace:** a few Loki and Tempo objects (`loki`, `loki-headless`,
-  `tempo`, ...) and the probe-target ConfigMap `cmp-blackbox-targets` have fixed names.
+- **One stack per namespace:** the ConfigMaps `loki` and `tempo` (named by the Loki and
+  Tempo charts) and the probe-target ConfigMap `cmp-blackbox-targets` have fixed names.
 - **Grafana access:** not exposed by default (set `grafana.ingress.*`; OpenShift creates
   a Route from the Ingress):
   ```bash

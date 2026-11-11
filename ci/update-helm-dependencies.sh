@@ -18,7 +18,6 @@ docker run --rm -v $(pwd):/apps -w /apps \
         helm repo add --username "$REPO_USERNAME" --password "$REPO_PASSWORD" gentics https://repo.gentics.com/repository/helm/
         helm repo add --username "$REPO_USERNAME" --password "$REPO_PASSWORD" gentics-snapshots https://repo.gentics.com/repository/helm-snapshots/
         # Public repositories of the monitoring stack dependencies
-        helm repo add grafana https://grafana.github.io/helm-charts
         helm repo add grafana-community https://grafana-community.github.io/helm-charts
         helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
         helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
