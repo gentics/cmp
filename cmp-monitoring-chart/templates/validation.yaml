@@ -1,8 +1,0 @@
-{{- /*
-On OpenShift the restricted SCC rejects the fixed UIDs from the sub-chart defaults.
-They stay set if values-openshift.yaml is missing, or if Helm is older than 3.17,
-which ignores null overrides for sub-chart values.
-*/ -}}
-{{- if and (.Capabilities.APIVersions.Has "security.openshift.io/v1") .Values.grafana.securityContext.runAsUser }}
-{{- fail (printf "OpenShift detected, but fixed UIDs are still set. Install with -f values-openshift.yaml and Helm 3.17 or newer (current Helm: %s)." .Capabilities.HelmVersion.Version) }}
-{{- end }}
