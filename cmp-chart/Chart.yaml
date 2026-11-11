@@ -55,7 +55,7 @@ dependencies:
     condition: monitoring.enabled,global.otel.enabled
   - name: prometheus
     repository: "https://prometheus-community.github.io/helm-charts"
-    version: "27.5.0"
+    version: "29.47.1"
     condition: monitoring.enabled,global.otel.enabled
   - name: loki
     # OSS Loki chart is maintained in the community repository (the grafana.github.io

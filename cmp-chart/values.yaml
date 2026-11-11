@@ -510,7 +510,7 @@ prometheus:
     image:
       registry: docker.io
       repository: prom/prometheus
-      tag: "v3.10.0"
+      # No tag: the chart's appVersion (chart 29.47.1: Prometheus v3.16.0)
       pullPolicy: IfNotPresent
 
     persistentVolume:
@@ -554,6 +554,11 @@ prometheus:
         type: RuntimeDefault
 
   configmapReload:
+    # The config reloader (prometheus-config-reloader since chart 29) is a Go
+    # binary too; without this its probes fail with "connection reset by peer".
+    env:
+      - name: GODEBUG
+        value: "multipathtcp=0"
     prometheus:
       resources:
         requests:
@@ -571,16 +576,32 @@ prometheus:
         seccompProfile:
           type: RuntimeDefault
 
-  # serverFiles is not templated, so it only holds the self-scrape job. The other
-  # jobs reference release-based service names and are in extraScrapeConfigs, which
-  # the Prometheus chart appends to scrape_configs.
-  serverFiles:
-    prometheus.yml:
-      scrape_configs:
-        - job_name: prometheus
-          static_configs:
-            - targets: ["localhost:9090"]
+  # The chart's default jobs: keep its self-scrape job "prometheus"
+  # (localhost:9090) and switch off the Kubernetes service discovery jobs, which
+  # need API access this chart does not grant (rbac.create: false).
+  scrapeConfigs:
+    kubernetes-api-servers:
+      enabled: false
+    kubernetes-nodes:
+      enabled: false
+    kubernetes-nodes-cadvisor:
+      enabled: false
+    kubernetes-service-endpoints:
+      enabled: false
+    kubernetes-service-endpoints-slow:
+      enabled: false
+    prometheus-pushgateway:
+      enabled: false
+    kubernetes-services:
+      enabled: false
+    kubernetes-pods:
+      enabled: false
+    kubernetes-pods-slow:
+      enabled: false
 
+  # Our jobs reference release-based service names, so they go here: the
+  # Prometheus chart renders extraScrapeConfigs through tpl and appends them to
+  # scrape_configs.
   extraScrapeConfigs: |
     - job_name: otel-collector
       # Keep the job and instance labels the Collector sets from the service name
