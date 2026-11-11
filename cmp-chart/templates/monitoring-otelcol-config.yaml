@@ -27,12 +27,13 @@ data:
         limit_percentage: 80
         spike_limit_percentage: 25
       batch: {}
+    # otlp_grpc / otlp_http: exporter names since Collector v0.144.0 (formerly otlp / otlphttp)
     exporters:
-      otlp/tempo:
+      otlp_grpc/tempo:
         endpoint: {{ .Release.Name }}-tempo:4317
         tls:
           insecure: true
-      otlphttp/loki:
+      otlp_http/loki:
         endpoint: http://{{ .Release.Name }}-loki:3100/otlp
       prometheus:
         endpoint: 0.0.0.0:8889
@@ -53,7 +54,7 @@ data:
         traces:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [otlp/tempo]
+          exporters: [otlp_grpc/tempo]
         metrics:
           receivers: [otlp]
           processors: [memory_limiter, batch]
@@ -61,5 +62,5 @@ data:
         logs:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [otlphttp/loki]
+          exporters: [otlp_http/loki]
 {{- end }}

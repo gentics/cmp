@@ -70,7 +70,7 @@ dependencies:
     condition: monitoring.enabled,global.otel.enabled
   - name: opentelemetry-collector
     repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
-    version: "0.119.0"
+    version: "0.178.3"
     condition: monitoring.enabled,global.otel.enabled
   - name: prometheus-blackbox-exporter
     alias: blackbox-exporter
