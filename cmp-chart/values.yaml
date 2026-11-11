@@ -963,14 +963,16 @@ blackbox-exporter:
   image:
     registry: quay.io
     repository: prometheus/blackbox-exporter
-    tag: "v0.28.0"
+    # No tag: the chart's appVersion (chart 11.21.2: v0.29.1)
     pullPolicy: IfNotPresent
 
   extraArgs:
     - --web.listen-address=0.0.0.0:9115
 
+  # A list since chart 11.x (it was a map before)
   extraEnv:
-    GODEBUG: "multipathtcp=0"
+    - name: GODEBUG
+      value: "multipathtcp=0"
 
   resources:
     requests:

@@ -75,5 +75,5 @@ dependencies:
   - name: prometheus-blackbox-exporter
     alias: blackbox-exporter
     repository: "https://prometheus-community.github.io/helm-charts"
-    version: "9.5.0"
+    version: "11.21.2"
     condition: monitoring.enabled,global.otel.enabled
