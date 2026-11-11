@@ -58,8 +58,10 @@ dependencies:
     version: "27.5.0"
     condition: monitoring.enabled,global.otel.enabled
   - name: loki
-    repository: "https://grafana.github.io/helm-charts"
-    version: "6.30.1"
+    # OSS Loki chart is maintained in the community repository (the grafana.github.io
+    # chart continues as Grafana Enterprise Logs)
+    repository: "https://grafana-community.github.io/helm-charts"
+    version: "21.2.1"
     condition: monitoring.enabled,global.otel.enabled
   - name: tempo
     # Moved from grafana.github.io (deprecated there) to the community repository
