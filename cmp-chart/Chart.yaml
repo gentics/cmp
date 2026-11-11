@@ -49,8 +49,9 @@ dependencies:
   # path that holds a boolean; templates/validation.yaml rejects
   # monitoring.enabled=true without telemetry.
   - name: grafana
-    repository: "https://grafana.github.io/helm-charts"
-    version: "8.9.1"
+    # Moved from grafana.github.io (deprecated there) to the community repository
+    repository: "https://grafana-community.github.io/helm-charts"
+    version: "14.4.1"
     condition: monitoring.enabled,global.otel.enabled
   - name: prometheus
     repository: "https://prometheus-community.github.io/helm-charts"

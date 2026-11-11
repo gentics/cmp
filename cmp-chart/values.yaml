@@ -339,15 +339,16 @@ grafana:
   image:
     registry: docker.io
     repository: grafana/grafana
-    tag: "11.6.0"
+    # No tag: the chart's default "<appVersion>-distroless" (chart 14.4.1: Grafana 13.3.1)
 
+  # Grafana 13 keeps its search indexes in memory; 256Mi got it OOM-killed.
   resources:
     requests:
       cpu: 100m
-      memory: 128Mi
+      memory: 256Mi
     limits:
       cpu: 500m
-      memory: 256Mi
+      memory: 512Mi
 
   # No adminPassword here: the chart generates one and keeps it across upgrades.
   # Read it from the admin-password key of Secret <release>-grafana.
