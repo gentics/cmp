@@ -132,7 +132,8 @@ global:
 ## (a null value would do the same, but makes Helm print a warning).
 ## Install at most one monitoring stack per namespace: a few Loki and Tempo
 ## objects and the "cmp-blackbox-targets" ConfigMap have fixed names.
-## On OpenShift, install with -f values-openshift.yaml and Helm 3.17 or newer.
+## On OpenShift, set the commented "OpenShift" securityContext lines of the
+## monitoring sections below in your values file (Helm 3.17 or newer).
 monitoring: {}
   # enabled: false
 
@@ -313,8 +314,8 @@ mariadb:
 
 # =============================================================================
 # Monitoring stack: sub-chart values (installed only when the stack is on, see
-# "monitoring" above). Tested on plain Kubernetes and OpenShift; on OpenShift add
-# -f values-openshift.yaml.
+# "monitoring" above). Tested on plain Kubernetes and OpenShift; on OpenShift set
+# the commented "OpenShift" securityContext lines below (Helm 3.17 or newer).
 #
 # Services are named after the release, like the CMP components:
 #   OTLP input : <release>-opentelemetry-collector:4317 (gRPC) / :4318 (HTTP), :8889 (metrics)
@@ -360,11 +361,16 @@ grafana:
   initChownData:
     enabled: false
 
-  # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
+  # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
   securityContext:
     runAsNonRoot: true
     seccompProfile:
       type: RuntimeDefault
+    # OpenShift: uncomment (or copy into your own values file) to let the SCC
+    # assign the IDs. Requires Helm 3.17 or newer.
+    # runAsUser: ~
+    # runAsGroup: ~
+    # fsGroup: ~
 
   containerSecurityContext:
     allowPrivilegeEscalation: false
@@ -525,11 +531,16 @@ prometheus:
         configMap: cmp-blackbox-targets
         readOnly: true
 
-    # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
+    # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
     securityContext:
       runAsNonRoot: true
       seccompProfile:
         type: RuntimeDefault
+      # OpenShift: uncomment (or copy into your own values file) to let the SCC
+      # assign the IDs. Requires Helm 3.17 or newer.
+      # runAsUser: ~
+      # runAsGroup: ~
+      # fsGroup: ~
 
     # Container-level
     containerSecurityContext:
@@ -647,11 +658,16 @@ loki:
       allow_structured_metadata: true
       retention_period: 168h
 
-    # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
+    # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
     podSecurityContext:
       runAsNonRoot: true
       seccompProfile:
         type: RuntimeDefault
+      # OpenShift: uncomment (or copy into your own values file) to let the SCC
+      # assign the IDs. Requires Helm 3.17 or newer.
+      # runAsUser: ~
+      # runAsGroup: ~
+      # fsGroup: ~
 
   rbac:
     pspEnabled: false
@@ -819,11 +835,16 @@ tempo:
       seccompProfile:
         type: RuntimeDefault
 
-  # Pod-level (UIDs are chart defaults; values-openshift.yaml clears them)
+  # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
   securityContext:
     runAsNonRoot: true
     seccompProfile:
       type: RuntimeDefault
+    # OpenShift: uncomment (or copy into your own values file) to let the SCC
+    # assign the IDs. Requires Helm 3.17 or newer.
+    # runAsUser: ~
+    # runAsGroup: ~
+    # fsGroup: ~
 
   persistence:
     enabled: true
@@ -946,11 +967,18 @@ blackbox-exporter:
 
   # Pod-level
   # Container-level settings stay on the chart's hardened defaults
-  # (UIDs are cleared by values-openshift.yaml).
+  # (on OpenShift clear the UIDs, see below).
   podSecurityContext:
     runAsNonRoot: true
     seccompProfile:
       type: RuntimeDefault
+
+  # Container-level (in this chart "securityContext" is the container's).
+  # OpenShift: uncomment (or copy into your own values file) to let the SCC
+  # assign the IDs. Requires Helm 3.17 or newer.
+  # securityContext:
+  #   runAsUser: ~
+  #   runAsGroup: ~
 
   config:
     modules:
