@@ -7,6 +7,41 @@ This template renders nothing — it only fails fast on inconsistent configurati
 {{- end }}
 
 {{- /*
+OpenTelemetry and the bundled monitoring stack.
+*/ -}}
+{{- $otel := (.Values.global).otel | default dict }}
+{{- $monitoringEnabled := include "cmp.monitoringEnabled" . }}
+{{- $monitoringValue := (.Values.monitoring | default dict).enabled }}
+
+{{- /* The stack only makes sense with telemetry; Helm cannot AND two conditions. */ -}}
+{{- if and (kindIs "bool" $monitoringValue) $monitoringValue (not $otel.enabled) }}
+{{- fail "monitoring.enabled=true requires telemetry: the monitoring stack only receives data from the CMP components when global.otel.enabled=true.\n      Fix: --set global.otel.enabled=true (and leave monitoring.enabled unset)" }}
+{{- end }}
+
+{{- /*
+Without the bundled stack, every component with telemetry on needs an endpoint;
+otherwise the agent would export to a Collector that does not exist.
+*/ -}}
+{{- if not $monitoringEnabled }}
+{{- range $component := list "cms" "mesh" "portal-java" }}
+{{- if include "cmp.componentOtelEnabled" (dict "root" $ "component" $component) }}
+{{- if not (or (dig "otel" "endpoint" "" (index $.Values $component | default dict)) $otel.endpoint) }}
+{{- fail (printf "Telemetry is on for %s, but the bundled monitoring stack is not installed and no OTLP endpoint is set.\n      Fix (any one):\n        --set global.otel.endpoint=http://<collector>:4318   (external mode, e.g. another CMP's Collector: http://<release>-opentelemetry-collector.<namespace>.svc:4318)\n        --set %s.otel.endpoint=http://<collector>:4318\n        install the bundled stack: --set global.otel.enabled=true and leave monitoring.enabled unset" $component $component) }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- /*
+On OpenShift the restricted SCC rejects the fixed UIDs from the monitoring
+sub-chart defaults. They stay set if values-openshift.yaml is missing, or if Helm
+is older than 3.17, which ignores null overrides for sub-chart values.
+*/ -}}
+{{- if and $monitoringEnabled (.Capabilities.APIVersions.Has "security.openshift.io/v1") (((.Values.grafana).securityContext).runAsUser) }}
+{{- fail (printf "OpenShift detected, but the monitoring stack still has fixed UIDs. Install with -f values-openshift.yaml and Helm 3.17 or newer (current Helm: %s)." .Capabilities.HelmVersion.Version) }}
+{{- end }}
+
+{{- /*
 Requirements for the example installation. Every problem is collected before
 failing so one "helm install" reports the full list — fixing them one error per
 attempt is a poor first experience for what is meant to be the easy path.

@@ -67,3 +67,35 @@ Uses mesh.database.passwordSecret when set, otherwise the chart-managed secret.
 {{- define "cmp.meshDbSecretName" -}}
 {{- (((.Values.mesh).database).passwordSecret) | default (printf "%s-mesh-db" .Release.Name) -}}
 {{- end -}}
+
+{{/*
+"true" when the bundled monitoring stack is installed, "" otherwise.
+Mirrors the dependency condition "monitoring.enabled,global.otel.enabled" in
+Chart.yaml: Helm uses the first of these paths that holds a boolean.
+*/}}
+{{- define "cmp.monitoringEnabled" -}}
+{{- $monitoring := (.Values.monitoring | default dict).enabled -}}
+{{- if kindIs "bool" $monitoring -}}
+{{- if $monitoring -}}true{{- end -}}
+{{- else if ((.Values.global).otel).enabled -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{/*
+"true" when a Java component is installed and its telemetry is on, "" otherwise.
+Same rule as gentics-common.otelEnv: <component>.otel.enabled true/false wins,
+an absent or null value follows global.otel.enabled.
+Args: (dict "root" $ "component" "cms"|"mesh"|"portal-java")
+*/}}
+{{- define "cmp.componentOtelEnabled" -}}
+{{- $values := index .root.Values .component | default dict -}}
+{{- $local := dig "otel" "enabled" nil $values -}}
+{{- $enabled := ((.root.Values.global).otel).enabled -}}
+{{- if kindIs "bool" $local -}}
+{{- $enabled = $local -}}
+{{- end -}}
+{{- if and $values.enabled $enabled -}}
+true
+{{- end -}}
+{{- end -}}
