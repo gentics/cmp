@@ -1,0 +1,21 @@
+{{- /*
+CMP dashboards (dashboards/*.json), mounted into Grafana through
+grafana.dashboardsConfigMaps and provisioned read-only into the folder "CMP"
+(grafana.dashboardProviders). A new chart version updates them in place; users
+keep their own changes by saving a copy ("Save as").
+*/ -}}
+{{- if include "cmp.monitoringEnabled" . }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-grafana-dashboards
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cmp.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+data:
+{{- range $path, $_ := .Files.Glob "dashboards/*.json" }}
+  {{ base $path }}: |-
+{{ $.Files.Get $path | replace "\r\n" "\n" | trimSuffix "\n" | indent 4 }}
+{{- end }}
+{{- end }}

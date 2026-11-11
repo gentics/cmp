@@ -1,0 +1,65 @@
+{{- /*
+Pipeline config of the bundled OpenTelemetry Collector
+(opentelemetry-collector.configMap.existingName): OTLP in, traces to Tempo,
+logs to Loki, metrics to a Prometheus scrape endpoint on :8889.
+*/ -}}
+{{- if include "cmp.monitoringEnabled" . }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-otelcol-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cmp.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opentelemetry-collector
+data:
+  relay: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    processors:
+      memory_limiter:
+        check_interval: 5s
+        limit_percentage: 80
+        spike_limit_percentage: 25
+      batch: {}
+    exporters:
+      otlp/tempo:
+        endpoint: {{ .Release.Name }}-tempo:4317
+        tls:
+          insecure: true
+      otlphttp/loki:
+        endpoint: http://{{ .Release.Name }}-loki:3100/otlp
+      prometheus:
+        endpoint: 0.0.0.0:8889
+    extensions:
+      health_check:
+        endpoint: "${env:MY_POD_IP}:13133"
+    service:
+      extensions: [health_check]
+      telemetry:
+        metrics:
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: ${env:MY_POD_IP}
+                    port: 8888
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlp/tempo]
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [prometheus]
+        logs:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/loki]
+{{- end }}
