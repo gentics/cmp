@@ -721,24 +721,36 @@ loki:
 # Tempo
 # -----------------------------------------------------------------------------
 tempo:
-  # Copy of the Tempo chart's (1.24.4) default config. The only change is the
+  # Copy of the Tempo chart's (3.2.1) default config. The only change is the
   # remote_write url, which goes through tpl here so that
   # tempo.metricsGenerator.remoteWriteUrl can contain the release name.
   # Compare with the chart default when upgrading the Tempo chart.
   config: |
+    stream_over_http_enabled: {{ .Values.tempo.streamOverHttpEnabled }}
     memberlist:
       cluster_label: "{{ .Release.Name }}.{{ .Release.Namespace }}"
     multitenancy_enabled: {{ .Values.tempo.multitenancyEnabled }}
     usage_report:
       reporting_enabled: {{ .Values.tempo.reportingEnabled }}
-    compactor:
-      compaction:
-        block_retention: {{ .Values.tempo.retention }}
+    {{- $backendScheduler := dict "provider" (dict "compaction" (dict "compaction" (dict "block_retention" .Values.tempo.retention))) }}
+    {{- with .Values.tempo.backendScheduler }}
+    {{- $backendScheduler = mergeOverwrite $backendScheduler (deepCopy .) }}
+    {{- end }}
+    backend_scheduler:
+      {{- toYaml $backendScheduler | nindent 6 }}
+    {{- $backendWorker := dict "compaction" (deepCopy ($backendScheduler.provider.compaction.compaction | default dict)) }}
+    {{- with .Values.tempo.backendWorker }}
+    {{- $backendWorker = mergeOverwrite $backendWorker (deepCopy .) }}
+    {{- end }}
+    backend_worker:
+      {{- toYaml $backendWorker | nindent 6 }}
     distributor:
       receivers:
         {{- toYaml .Values.tempo.receivers | nindent 8 }}
-    ingester:
-      {{- toYaml .Values.tempo.ingester | nindent 6 }}
+    {{- with .Values.tempo.liveStore }}
+    live_store:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     server:
       {{- toYaml .Values.tempo.server | nindent 6 }}
     storage:
@@ -768,22 +780,17 @@ tempo:
         remote_write:
           - url: {{ tpl .Values.tempo.metricsGenerator.remoteWriteUrl . }}
         {{- end }}
-      traces_storage:
-        path: {{ .Values.tempo.metricsGenerator.traces_storage.path | quote }}
       {{- end }}
 
   tempo:
     registry: docker.io
     repository: grafana/tempo
-    tag: "2.10.3"
+    # No tag: the chart's appVersion (chart 3.2.1: Tempo 3.1.1)
     pullPolicy: IfNotPresent
 
     extraEnv:
       - name: GODEBUG
         value: "multipathtcp=0"
-
-    # Chart default is 1024, too much for the memory limit below.
-    memBallastSizeMbs: 256
 
     resources:
       requests:
@@ -815,9 +822,6 @@ tempo:
       remoteWriteUrl: "http://{{ .Release.Name }}-prometheus-server:80/api/v1/write"
 
     retention: 48h
-
-    ingester:
-      max_block_duration: 5m
 
     overrides:
       defaults:
