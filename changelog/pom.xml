@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.gentics.cmp</groupId>
 		<artifactId>cmp</artifactId>
-		<version>9.0.0-SNAPSHOT</version>
+		<version>ci-devtest-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>cmp-changelog</artifactId>
