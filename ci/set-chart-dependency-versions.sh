@@ -23,7 +23,7 @@ for ENTRY in "$@"; do
         echo "Setting dependency '${NAME}' to version ${VERSION} in ${CHART_FILE}"
         docker run --rm -v $(pwd):/apps -w /apps --user root \
             mikefarah/yq:4 eval -i \
-            "(.dependencies[] | select(.name == \"${NAME}\") | .version) = \"${VERSION}\"" \
+            "(.dependencies[] | select(.name == \"${NAME}\") | .version) = \"=${VERSION}\"" \
             "${CHART_FILE}"
     fi
 done
