@@ -1,0 +1,47 @@
+{{- /*
+Availability probe targets for the Blackbox exporter: one URL per enabled CMP
+component, on the Service port configured in its sub-chart (":80" is left out).
+Prometheus reads the file through file_sd_configs (job "blackbox" in
+prometheus.extraScrapeConfigs) and picks up changes without a restart.
+The name is fixed because prometheus.server.extraConfigmapMounts is not
+templated by the Prometheus chart; hence one monitoring stack per namespace.
+*/ -}}
+{{- if include "cmp.monitoringEnabled" . }}
+{{- $probes := list }}
+{{- $cms := .Values.cms | default dict }}
+{{- if $cms.enabled }}
+{{- $probes = append $probes (list "cms" (dig "cms" "service" "port" 80 $cms) "/rest/info/maintenance") }}
+{{- end }}
+{{- $mesh := .Values.mesh | default dict }}
+{{- if $mesh.enabled }}
+{{- $probes = append $probes (list "mesh" (dig "service" "mesh" "port" 80 $mesh) "/api/v2/health/ready") }}
+{{- end }}
+{{- $portalJava := index .Values "portal-java" | default dict }}
+{{- if $portalJava.enabled }}
+{{- /* /health/ready is only on the portal's monitoring port (3001), which its Service does not expose. */}}
+{{- $probes = append $probes (list "portal-java" (dig "service" "port" 80 $portalJava) "/") }}
+{{- end }}
+{{- $targets := list }}
+{{- range $probes }}
+{{- $port := toString (index . 1) }}
+{{- $targets = append $targets (printf "http://%s-%s%s%s" $.Release.Name (index . 0) (ternary "" (printf ":%s" $port) (eq $port "80")) (index . 2)) }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cmp-blackbox-targets
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cmp.labels" . | nindent 4 }}
+    app.kubernetes.io/component: blackbox-exporter
+data:
+  targets.yaml: |
+    {{- if $targets }}
+    - targets:
+        {{- range $targets }}
+        - {{ . }}
+        {{- end }}
+    {{- else }}
+    []
+    {{- end }}
+{{- end }}

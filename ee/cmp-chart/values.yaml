@@ -48,6 +48,34 @@ global:
   mariadb:
     enabled: true
 
+  ## OpenTelemetry: traces, metrics and logs from the Java components (CMS, Mesh,
+  ## Portal | Java) through the OpenTelemetry Java agent in their images.
+  ## Three modes:
+  ##   off (default)  global.otel.enabled=false: no telemetry, no monitoring stack.
+  ##   bundled        global.otel.enabled=true: the monitoring stack (see
+  ##                  "monitoring" below) is installed with this release and
+  ##                  receives the telemetry.
+  ##   external       global.otel.enabled=true, monitoring.enabled=false and
+  ##                  global.otel.endpoint set: telemetry goes to an existing OTLP
+  ##                  endpoint, e.g. the bundled Collector of another CMP release:
+  ##                  http://<release>-opentelemetry-collector.<namespace>.svc:4318
+  ## Each component can override these values under <component>.otel (see the
+  ## cms, mesh and portal-java sections).
+  otel:
+    ## Master switch. The monitoring stack requires it.
+    enabled: false
+    ## OTLP endpoint. Empty: the bundled Collector
+    ## (http://<release>-opentelemetry-collector:4318). Required in external mode.
+    endpoint: ""
+    ## OTLP protocol: http/protobuf (port 4318) or grpc (port 4317).
+    protocol: http/protobuf
+    ## Only for endpoints that need authentication: name of a Secret whose key
+    ## "headers" holds the OTLP headers, e.g. "Authorization=Bearer <token>".
+    headersSecret: ""
+    ## Resource attribute service.namespace, which tells several CMP installations
+    ## apart in one monitoring stack. Empty: "<namespace>-<release>".
+    serviceNamespace: ""
+
   ## Example installation — deploys a ready-made reference project instead of
   ## requiring you to build and supply your own portal image.
   ##
@@ -91,6 +119,25 @@ global:
         value: "Example"
 
 # -----------------------------------------------------------------------
+# Monitoring stack
+# -----------------------------------------------------------------------
+## Bundled monitoring stack: OpenTelemetry Collector, Prometheus, Loki, Tempo,
+## Grafana (with the CMP dashboards) and a Blackbox exporter. Their settings are
+## at the end of this file.
+## monitoring.enabled:
+##   unset:  follow global.otel.enabled (installed when telemetry is on)
+##   false:  external mode, no stack; set global.otel.endpoint
+##   true:   only valid together with global.otel.enabled=true
+## It is deliberately left out here: Helm then falls back to global.otel.enabled
+## (a null value would do the same, but makes Helm print a warning).
+## Install at most one monitoring stack per namespace: the ConfigMaps "loki",
+## "tempo" and "cmp-blackbox-targets" have fixed names.
+## On OpenShift, set the commented "OpenShift" securityContext lines of the
+## monitoring sections below in your values file (Helm 3.17 or newer).
+monitoring: {}
+  # enabled: false
+
+# -----------------------------------------------------------------------
 # CMS
 # -----------------------------------------------------------------------
 cms:
@@ -106,6 +153,14 @@ cms:
   cms:
     preUpgrade:
       enabled: false
+
+  ## OpenTelemetry for the CMS; unset values follow global.otel.
+  # otel:
+  #   enabled: null          # null: follow global.otel.enabled; true/false: override
+  #   endpoint: ""           # empty: global.otel.endpoint, then the bundled Collector
+  #   headersSecret: ""      # empty: global.otel.headersSecret
+  #   serviceName: ""        # empty: "Gentics CMS"
+  #   agentPath: ""          # empty: /cms/opentelemetry-javaagent.jar
 
   # for all available options, please check the gentics/cms chart
 
@@ -136,6 +191,14 @@ mesh:
   #  username: db-user
   #  password: db-pw
 
+  ## OpenTelemetry for Mesh; unset values follow global.otel.
+  # otel:
+  #   enabled: null          # null: follow global.otel.enabled; true/false: override
+  #   endpoint: ""           # empty: global.otel.endpoint, then the bundled Collector
+  #   headersSecret: ""      # empty: global.otel.headersSecret
+  #   serviceName: ""        # empty: "Gentics Mesh"
+  #   agentPath: ""          # empty: /mesh/opentelemetry-javaagent.jar
+
   # for all available options, please check the gentics/gentics-mesh chart
 
 # -----------------------------------------------------------------------
@@ -153,6 +216,17 @@ portal-java:
     apiKeyFromSecret: true
 
   licenseKeyPath: "/tmp"
+
+  ## OpenTelemetry for the portal; unset values follow global.otel.
+  ## Portal images are project-specific: when telemetry is on, agentPath must point
+  ## at the OpenTelemetry Java agent jar in your image (the JVM does not start if it
+  ## is missing).
+  # otel:
+  #   enabled: null          # null: follow global.otel.enabled; true/false: override
+  #   endpoint: ""           # empty: global.otel.endpoint, then the bundled Collector
+  #   headersSecret: ""      # empty: global.otel.headersSecret
+  #   serviceName: ""        # empty: "Gentics Portal Java"
+  #   agentPath: ""          # REQUIRED when telemetry is on
 
   # for all available options, please check the gentics/gentics-portal-java chart
 
@@ -238,4 +312,676 @@ mariadb:
       innodb_snapshot_isolation = OFF
        
 
+# =============================================================================
+# Monitoring stack: sub-chart values (installed only when the stack is on, see
+# "monitoring" above). Tested on plain Kubernetes and OpenShift; on OpenShift set
+# the commented "OpenShift" securityContext lines below (Helm 3.17 or newer).
+#
+# Services are named after the release, like the CMP components:
+#   OTLP input : <release>-opentelemetry-collector:4317 (gRPC) / :4318 (HTTP), :8889 (metrics)
+#   Grafana    : <release>-grafana:80
+#   Prometheus : <release>-prometheus-server:80
+#   Loki       : <release>-loki:3100
+#   Tempo      : <release>-tempo:3200 (query), :4317 / :4318 (OTLP)
+#   Blackbox   : <release>-blackbox-exporter:9115
+#
+# Every component sets explicit resources: a namespace LimitRange may otherwise
+# apply very low defaults, which leads to throttling and OOM kills.
+#
+# GODEBUG=multipathtcp=0 turns off Multipath TCP in the Go-based components. With it
+# enabled, kubelet probes failed with "connection reset by peer" on some cluster nodes.
+# =============================================================================
 
+# -----------------------------------------------------------------------------
+# Grafana
+# -----------------------------------------------------------------------------
+grafana:
+  # Values not set here are the chart's defaults (helm show values grafana-community/grafana).
+  # Image: the chart's default "<appVersion>-distroless" (chart 14.4.1: Grafana 13.3.1).
+
+  # Grafana 13 keeps its search indexes in memory; 256Mi got it OOM-killed.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # Login: user "admin" (chart default). No adminPassword here: the chart generates one
+  # and keeps it across upgrades; read it from key admin-password of Secret <release>-grafana.
+
+  rbac:
+    namespaced: true
+
+  # The init container runs as root, which restricted policies reject.
+  # fsGroup already sets the volume ownership.
+  initChownData:
+    enabled: false
+
+  # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+    # OpenShift: uncomment (or copy into your own values file) to let the SCC
+    # assign the IDs. Requires Helm 3.17 or newer.
+    # runAsUser: ~
+    # runAsGroup: ~
+    # fsGroup: ~
+
+  containerSecurityContext:
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+
+  env:
+    GF_METRICS_ENABLED: "true"
+    GF_PLUGINS_ENABLE_ALPHA: "false"
+    GF_DEFAULT_APP_MODE: "production"
+    GODEBUG: "multipathtcp=0"
+
+  # Keeps Grafana's database: dashboards that users create or copy survive restarts
+  # and upgrades.
+  persistence:
+    enabled: true
+    size: 2Gi
+
+  livenessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 10
+
+  readinessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # The dashboards rely on these datasource uids.
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          uid: prometheus
+          type: prometheus
+          access: proxy
+          url: "http://{{ .Release.Name }}-prometheus-server:80"
+          jsonData:
+            httpMethod: GET
+          version: 1
+        - name: Loki
+          uid: loki
+          type: loki
+          access: proxy
+          url: "http://{{ .Release.Name }}-loki:3100"
+        - name: Tempo
+          uid: tempo
+          type: tempo
+          access: proxy
+          url: "http://{{ .Release.Name }}-tempo:3200"
+          jsonData:
+            serviceMap:
+              datasourceUid: prometheus
+            tracesToLogsV2:
+              datasourceUid: loki
+            tracesToMetrics:
+              datasourceUid: prometheus
+              tags:
+                - key: service.name
+                  value: service
+            nodeGraph:
+              enabled: true
+
+  # CMP dashboards (dashboards/*.json in this chart), provisioned read-only into the
+  # folder "CMP" and updated with every chart version. To customise one, use
+  # "Save as": the copy is stored in Grafana's database and kept across upgrades.
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: cmp
+          folder: CMP
+          type: file
+          allowUiUpdates: false
+          disableDeletion: true
+          options:
+            path: /var/lib/grafana/dashboards/cmp
+  dashboardsConfigMaps:
+    cmp: "{{ .Release.Name }}-grafana-dashboards"
+
+  grafana.ini:
+    server:
+      http_addr: "0.0.0.0"
+    plugins:
+      allow_loading_unsigned_plugins: ""
+      disable_plugins: "grafana-lokiexplore-app,grafana-pyroscope-app,grafana-exploretraces-app,grafana-metricsdrilldown-app"
+    feature_toggles:
+      kubernetesDashboards: false
+    unified_storage:
+      enabled: false
+
+  # Expose Grafana with grafana.ingress.* (off by default; on OpenShift the Ingress
+  # becomes a Route).
+
+# -----------------------------------------------------------------------------
+# Prometheus
+# -----------------------------------------------------------------------------
+prometheus:
+  # Values not set here are the chart's defaults (helm show values prometheus-community/prometheus).
+
+  # All scrape targets are static, so Prometheus needs no Kubernetes API access.
+  rbac:
+    create: false
+
+  alertmanager:
+    enabled: false
+  kube-state-metrics:
+    enabled: false
+  prometheus-node-exporter:
+    enabled: false
+  prometheus-pushgateway:
+    enabled: false
+
+  server:
+    env:
+      - name: GODEBUG
+        value: "multipathtcp=0"
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    # Docker Hub image instead of the chart's quay.io default; no tag: the chart's
+    # appVersion (chart 29.47.1: Prometheus v3.16.0)
+    image:
+      repository: prom/prometheus
+
+    persistentVolume:
+      size: 10Gi
+
+    extraFlags:
+      - web.enable-lifecycle
+      - web.enable-remote-write-receiver
+
+    # Availability probe targets, rendered by this chart for the enabled CMP
+    # components (templates/monitoring-blackbox-targets.yaml). The ConfigMap name is
+    # fixed because this value is not templated by the Prometheus chart.
+    extraConfigmapMounts:
+      - name: cmp-blackbox-targets
+        mountPath: /etc/cmp-blackbox-targets
+        configMap: cmp-blackbox-targets
+        readOnly: true
+
+    # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      # OpenShift: uncomment (or copy into your own values file) to let the SCC
+      # assign the IDs. Requires Helm 3.17 or newer.
+      # runAsUser: ~
+      # runAsGroup: ~
+      # fsGroup: ~
+
+    # Container-level
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      capabilities:
+        drop: [ALL]
+      seccompProfile:
+        type: RuntimeDefault
+
+  configmapReload:
+    # The config reloader (prometheus-config-reloader since chart 29) is a Go
+    # binary too; without this its probes fail with "connection reset by peer".
+    env:
+      - name: GODEBUG
+        value: "multipathtcp=0"
+    prometheus:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 64Mi
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        capabilities:
+          drop: [ALL]
+        seccompProfile:
+          type: RuntimeDefault
+
+  # The chart's default jobs: keep its self-scrape job "prometheus"
+  # (localhost:9090) and switch off the Kubernetes service discovery jobs, which
+  # need API access this chart does not grant (rbac.create: false).
+  scrapeConfigs:
+    kubernetes-api-servers:
+      enabled: false
+    kubernetes-nodes:
+      enabled: false
+    kubernetes-nodes-cadvisor:
+      enabled: false
+    kubernetes-service-endpoints:
+      enabled: false
+    kubernetes-service-endpoints-slow:
+      enabled: false
+    prometheus-pushgateway:
+      enabled: false
+    kubernetes-services:
+      enabled: false
+    kubernetes-pods:
+      enabled: false
+    kubernetes-pods-slow:
+      enabled: false
+
+  # Our jobs reference release-based service names, so they go here: the
+  # Prometheus chart renders extraScrapeConfigs through tpl and appends them to
+  # scrape_configs.
+  extraScrapeConfigs: |
+    - job_name: otel-collector
+      # Keep the job and instance labels the Collector sets from the service name
+      # and instance. Otherwise they end up as exported_job and exported_instance.
+      honor_labels: true
+      static_configs:
+        - targets: ["{{ .Release.Name }}-opentelemetry-collector:8889"]
+    - job_name: loki
+      static_configs:
+        - targets: ["{{ .Release.Name }}-loki:3100"]
+    - job_name: tempo
+      static_configs:
+        - targets: ["{{ .Release.Name }}-tempo:3200"]
+    - job_name: grafana
+      metrics_path: /metrics
+      static_configs:
+        - targets: ["{{ .Release.Name }}-grafana:80"]
+    - job_name: blackbox
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+      # Only the enabled CMP components (see extraConfigmapMounts above). Prometheus
+      # watches the file, so changed targets apply without a restart.
+      file_sd_configs:
+        - files: ["/etc/cmp-blackbox-targets/*.yaml"]
+      relabel_configs:
+        - source_labels: [__address__]
+          target_label: __param_target
+        - source_labels: [__param_target]
+          target_label: instance
+        - target_label: __address__
+          replacement: "{{ .Release.Name }}-blackbox-exporter:9115"
+
+# -----------------------------------------------------------------------------
+# Loki
+# -----------------------------------------------------------------------------
+loki:
+  # Values not set here are the chart's defaults (helm show values grafana-community/loki).
+  # Image: the chart's appVersion (chart 21.2.1: Loki 3.7.9).
+
+  # One Loki process with filesystem storage (chart 21.x name; was "SingleBinary").
+  # Same as the chart default, kept on purpose: the filesystem storage below only
+  # works in this mode, and this default has changed before.
+  deploymentMode: Monolithic
+
+  loki:
+    auth_enabled: false
+
+    commonConfig:
+      replication_factor: 1
+
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
+    storage:
+      type: filesystem
+      bucketNames:
+        chunks: chunks
+        ruler: ruler
+        admin: admin
+
+    # Delete logs after 7 days. Without retention Loki never frees its volume.
+    compactor:
+      retention_enabled: true
+      delete_request_store: filesystem
+      working_directory: /var/loki/compactor
+
+    limits_config:
+      allow_structured_metadata: true
+      retention_period: 168h
+
+    # Pod-level: the chart's defaults (runAsNonRoot, RuntimeDefault seccomp, UIDs 10001).
+    # OpenShift: uncomment (or copy into your own values file) to let the SCC
+    # assign the IDs. Requires Helm 3.17 or newer.
+    # podSecurityContext:
+    #   runAsUser: ~
+    #   runAsGroup: ~
+    #   fsGroup: ~
+
+  rbac:
+    namespaced: true
+
+  singleBinary:
+    replicas: 1
+    extraEnv:
+      - name: GODEBUG
+        value: "multipathtcp=0"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 1Gi
+
+  chunksCache:
+    enabled: false
+
+  resultsCache:
+    enabled: false
+
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  backend:
+    replicas: 0
+
+  gateway:
+    enabled: false
+
+  # Not needed for a single-binary install. The canary and its Helm test only
+  # verify Loki itself, and the rules sidecar needs a Role this chart does not create.
+  lokiCanary:
+    enabled: false
+  test:
+    enabled: false
+  sidecar:
+    rules:
+      enabled: false
+
+# -----------------------------------------------------------------------------
+# Tempo
+# -----------------------------------------------------------------------------
+tempo:
+  # Values not set here are the chart's defaults (helm show values grafana-community/tempo).
+
+  # Copy of the Tempo chart's (3.2.1) default config. The only change is the
+  # remote_write url, which goes through tpl here so that
+  # tempo.metricsGenerator.remoteWriteUrl can contain the release name.
+  # Compare with the chart default when upgrading the Tempo chart.
+  config: |
+    stream_over_http_enabled: {{ .Values.tempo.streamOverHttpEnabled }}
+    memberlist:
+      cluster_label: "{{ .Release.Name }}.{{ .Release.Namespace }}"
+    multitenancy_enabled: {{ .Values.tempo.multitenancyEnabled }}
+    usage_report:
+      reporting_enabled: {{ .Values.tempo.reportingEnabled }}
+    {{- $backendScheduler := dict "provider" (dict "compaction" (dict "compaction" (dict "block_retention" .Values.tempo.retention))) }}
+    {{- with .Values.tempo.backendScheduler }}
+    {{- $backendScheduler = mergeOverwrite $backendScheduler (deepCopy .) }}
+    {{- end }}
+    backend_scheduler:
+      {{- toYaml $backendScheduler | nindent 6 }}
+    {{- $backendWorker := dict "compaction" (deepCopy ($backendScheduler.provider.compaction.compaction | default dict)) }}
+    {{- with .Values.tempo.backendWorker }}
+    {{- $backendWorker = mergeOverwrite $backendWorker (deepCopy .) }}
+    {{- end }}
+    backend_worker:
+      {{- toYaml $backendWorker | nindent 6 }}
+    distributor:
+      receivers:
+        {{- toYaml .Values.tempo.receivers | nindent 8 }}
+    {{- with .Values.tempo.liveStore }}
+    live_store:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    server:
+      {{- toYaml .Values.tempo.server | nindent 6 }}
+    storage:
+      {{- toYaml .Values.tempo.storage | nindent 6 }}
+    querier:
+      {{- toYaml .Values.tempo.querier | nindent 6 }}
+    query_frontend:
+      {{- toYaml .Values.tempo.queryFrontend | nindent 6 }}
+    overrides:
+      {{- toYaml .Values.tempo.overrides | nindent 6 }}
+      {{- if .Values.tempo.metricsGenerator.enabled }}
+    metrics_generator:
+      {{- if .Values.tempo.metricsGenerator.processor }}
+      processor:
+        {{- toYaml .Values.tempo.metricsGenerator.processor | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tempo.metricsGenerator.registry }}
+      registry:
+        {{- toYaml .Values.tempo.metricsGenerator.registry | nindent 8 }}
+      {{- end }}
+      storage:
+        path: {{ .Values.tempo.metricsGenerator.storage.path | quote }}
+        {{- if .Values.tempo.metricsGenerator.storage.remote_write }}
+        remote_write:
+          {{- toYaml .Values.tempo.metricsGenerator.storage.remote_write | nindent 10 }}
+        {{- else }}
+        remote_write:
+          - url: {{ tpl .Values.tempo.metricsGenerator.remoteWriteUrl . }}
+        {{- end }}
+      {{- end }}
+
+  tempo:
+    # Image: the chart's appVersion (chart 3.2.1: Tempo 3.1.1)
+    extraEnv:
+      - name: GODEBUG
+        value: "multipathtcp=0"
+
+    resources:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+    # Same as the chart defaults, kept on purpose: the Collector sends traces here.
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+
+    storage:
+      trace:
+        backend: local
+        local:
+          path: /var/tempo/blocks
+
+    # Span metrics and the service graph, written to Prometheus.
+    metricsGenerator:
+      enabled: true
+      remoteWriteUrl: "http://{{ .Release.Name }}-prometheus-server:80/api/v1/write"
+
+    retention: 48h
+
+    overrides:
+      defaults:
+        metrics_generator:
+          processors:
+            - span-metrics
+            - service-graphs
+
+    # Container-level
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      capabilities:
+        drop: [ALL]
+      seccompProfile:
+        type: RuntimeDefault
+
+  # Pod-level (UIDs are chart defaults; on OpenShift clear them, see below)
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+    # OpenShift: uncomment (or copy into your own values file) to let the SCC
+    # assign the IDs. Requires Helm 3.17 or newer.
+    # runAsUser: ~
+    # runAsGroup: ~
+    # fsGroup: ~
+
+  persistence:
+    enabled: true
+
+# -----------------------------------------------------------------------------
+# OpenTelemetry Collector
+# -----------------------------------------------------------------------------
+opentelemetry-collector:
+  # Values not set here are the chart's defaults
+  # (helm show values open-telemetry/opentelemetry-collector).
+  mode: deployment
+
+  # Required by the chart. No tag: the chart's appVersion (chart 0.178.3: Collector 0.163.2)
+  image:
+    repository: otel/opentelemetry-collector-contrib
+
+  extraEnvs:
+    - name: GODEBUG
+      value: "multipathtcp=0"
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+
+  livenessProbe:
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+
+  # The pipeline config is templates/monitoring-otelcol-config.yaml in this chart.
+  configMap:
+    create: false
+    existingName: "{{ .Release.Name }}-otelcol-config"
+
+  # Pod-level
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  # Container-level
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop: [ALL]
+
+  # otlp / otlp-http are the chart defaults, kept on purpose: they are the endpoint of
+  # the CMP components and of other CMP installations (external mode).
+  ports:
+    otlp:
+      enabled: true
+      containerPort: 4317
+      servicePort: 4317
+      protocol: TCP
+    otlp-http:
+      enabled: true
+      containerPort: 4318
+      servicePort: 4318
+      protocol: TCP
+    metrics:
+      enabled: true
+      containerPort: 8889
+      servicePort: 8889
+      protocol: TCP
+    jaeger-compact:
+      enabled: false
+    jaeger-thrift:
+      enabled: false
+    jaeger-grpc:
+      enabled: false
+    zipkin:
+      enabled: false
+
+# -----------------------------------------------------------------------------
+# Blackbox exporter (availability probes of the CMP components)
+# -----------------------------------------------------------------------------
+blackbox-exporter:
+  # Values not set here are the chart's defaults
+  # (helm show values prometheus-community/prometheus-blackbox-exporter).
+  # Image: the chart's appVersion (chart 11.21.2: v0.29.1).
+
+  extraArgs:
+    - --web.listen-address=0.0.0.0:9115
+
+  # A list since chart 11.x (it was a map before)
+  extraEnv:
+    - name: GODEBUG
+      value: "multipathtcp=0"
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+  livenessProbe:
+    initialDelaySeconds: 30
+  readinessProbe:
+    initialDelaySeconds: 10
+
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+
+  # Pod-level
+  # Container-level settings stay on the chart's hardened defaults
+  # (on OpenShift clear the UIDs, see below).
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  # Container-level (in this chart "securityContext" is the container's).
+  # OpenShift: uncomment (or copy into your own values file) to let the SCC
+  # assign the IDs. Requires Helm 3.17 or newer.
+  # securityContext:
+  #   runAsUser: ~
+  #   runAsGroup: ~
+
+  config:
+    modules:
+      http_2xx:
+        http:
+          valid_status_codes: []
+          method: GET

@@ -1,0 +1,47 @@
+Gentics CMP {{ .Chart.AppVersion }} has been installed as release "{{ .Release.Name }}".
+
+Components:
+  CMS:          {{ if .Values.cms.enabled }}enabled{{ else }}disabled{{ end }}
+  Mesh:         {{ if .Values.mesh.enabled }}enabled{{ else }}disabled{{ end }}
+  Portal Java:  {{ if (index .Values "portal-java").enabled }}enabled{{ else }}disabled{{ end }}
+  Portal PHP:   {{ if (index .Values "portal-php").enabled }}enabled{{ else }}disabled{{ end }}
+  MariaDB:      {{ if .Values.global.mariadb.enabled }}bundled ({{ .Release.Name }}-mariadb){{ else }}external{{ end }}
+
+{{ if ((.Values.global).persistence).keepOnUninstall }}
+Data retention:
+  All persistent volumes (database, CMS data, Mesh uploads, ...) are KEPT when this
+  release is uninstalled (helm.sh/resource-policy: keep).
+  To permanently remove all CMP data after "helm uninstall":
+
+    kubectl delete pvc -l app.kubernetes.io/instance={{ .Release.Name }} -n {{ .Release.Namespace }}
+{{ end }}
+
+{{- $otel := .Values.global.otel | default dict }}
+{{- $telemetry := list }}
+{{- range $component := list "cms" "mesh" "portal-java" }}
+{{- if include "cmp.componentOtelEnabled" (dict "root" $ "component" $component) }}
+{{- $telemetry = append $telemetry $component }}
+{{- end }}
+{{- end }}
+{{- if include "cmp.monitoringEnabled" . }}
+
+Monitoring (bundled stack):
+  Telemetry ({{ join ", " $telemetry }}) goes to the Collector {{ .Release.Name }}-opentelemetry-collector.
+  Grafana is not exposed by default:
+    kubectl -n {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-grafana 3000:80
+    user "admin", password:
+    kubectl -n {{ .Release.Namespace }} get secret {{ .Release.Name }}-grafana -o jsonpath='{.data.admin-password}' | base64 -d
+  The CMP dashboards are in the Grafana folder "CMP" and are updated with each chart
+  version. They are read-only: use "Save as" to keep your own modified copy.
+  Another CMP installation can send its telemetry here (external mode):
+    global.otel.endpoint=http://{{ .Release.Name }}-opentelemetry-collector.{{ .Release.Namespace }}.svc:4318
+{{- else if $telemetry }}
+
+Telemetry ({{ join ", " $telemetry }}) is sent to {{ $otel.endpoint | default "the endpoints set per component" }}.
+{{- end }}
+{{- if and $telemetry (index .Values "portal-php").enabled }}
+  Note: Portal | PHP sends no telemetry.
+{{- end }}
+
+For component-specific access instructions see the NOTES of the sub-charts above,
+and the chart README for Argo CD deployment notes and credential management.
