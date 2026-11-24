@@ -23,7 +23,7 @@ Without the bundled stack, every component with telemetry on needs an endpoint;
 otherwise the agent would export to a Collector that does not exist.
 */ -}}
 {{- if not $monitoringEnabled }}
-{{- range $component := list "cms" "mesh" "portal-java" }}
+{{- range $component := list "cms" "mesh" "portal-java" "portal-php" }}
 {{- if include "cmp.componentOtelEnabled" (dict "root" $ "component" $component) }}
 {{- if not (or (dig "otel" "endpoint" "" (index $.Values $component | default dict)) $otel.endpoint) }}
 {{- fail (printf "Telemetry is on for %s, but the bundled monitoring stack is not installed and no OTLP endpoint is set.\n      Fix (any one):\n        --set global.otel.endpoint=http://<collector>:4318   (external mode, e.g. another CMP's Collector: http://<release>-opentelemetry-collector.<namespace>.svc:4318)\n        --set %s.otel.endpoint=http://<collector>:4318\n        install the bundled stack: --set global.otel.enabled=true and leave monitoring.enabled unset" $component $component) }}

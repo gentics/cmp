@@ -18,7 +18,7 @@ dependencies:
   # Shared template library used by the sub-charts. Renders nothing itself.
   - name: gentics-common
     repository: "https://repo.gentics.com/repository/helm/"
-    version: "0.2.0"
+    version: "0.3.0"
   - name: cms
     # TODO: replace with your published Helm repository URL
     repository: "https://repo.gentics.com/repository/helm/"

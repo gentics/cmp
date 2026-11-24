@@ -49,7 +49,8 @@ global:
     enabled: true
 
   ## OpenTelemetry: traces, metrics and logs from the Java components (CMS, Mesh,
-  ## Portal | Java) through the OpenTelemetry Java agent in their images.
+  ## Portal | Java) through the OpenTelemetry Java agent in their images, and traces
+  ## from Portal | PHP through the OpenTelemetry PHP extension in its image.
   ## Three modes:
   ##   off (default)  global.otel.enabled=false: no telemetry, no monitoring stack.
   ##   bundled        global.otel.enabled=true: the monitoring stack (see
@@ -60,7 +61,7 @@ global:
   ##                  endpoint, e.g. the bundled Collector of another CMP release:
   ##                  http://<release>-opentelemetry-collector.<namespace>.svc:4318
   ## Each component can override these values under <component>.otel (see the
-  ## cms, mesh and portal-java sections).
+  ## cms, mesh, portal-java and portal-php sections).
   otel:
     ## Master switch. The monitoring stack requires it.
     enabled: false
@@ -243,6 +244,16 @@ portal-php:
 
   # Mesh connection is auto-wired to the bundled Mesh service.
   # The API key is read from the "<release>-mesh-secret" secret (shared with portal-java).
+
+  ## OpenTelemetry for the portal (traces only); unset values follow global.otel.
+  ## Portal images are project-specific: when telemetry is on, your image needs the
+  ## PHP extension "opentelemetry" and the OpenTelemetry Composer packages (see the
+  ## Portal | PHP documentation, "OpenTelemetry"). Without them no traces are sent.
+  # otel:
+  #   enabled: null          # null: follow global.otel.enabled; true/false: override
+  #   endpoint: ""           # empty: global.otel.endpoint, then the bundled Collector
+  #   headersSecret: ""      # empty: global.otel.headersSecret
+  #   serviceName: ""        # empty: "Gentics Portal PHP"
 
   # for all available options, please check the gentics/gentics-portal-php chart
 

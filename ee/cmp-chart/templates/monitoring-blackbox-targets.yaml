@@ -21,6 +21,11 @@ templated by the Prometheus chart; hence one monitoring stack per namespace.
 {{- /* /health/ready is only on the portal's monitoring port (3001), which its Service does not expose. */}}
 {{- $probes = append $probes (list "portal-java" (dig "service" "port" 80 $portalJava) "/") }}
 {{- end }}
+{{- $portalPhp := index .Values "portal-php" | default dict }}
+{{- if $portalPhp.enabled }}
+{{- /* Same endpoint as the readiness probe of the portal-php chart. */}}
+{{- $probes = append $probes (list "portal-php" (dig "service" "port" 80 $portalPhp) "/api/health/ready") }}
+{{- end }}
 {{- $targets := list }}
 {{- range $probes }}
 {{- $port := toString (index . 1) }}

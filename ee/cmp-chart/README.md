@@ -14,7 +14,7 @@ Each sub-chart also works standalone; the umbrella adds cross-component wiring:
 | Mesh API key for the portals | the mesh chart always renders the (empty) secret `<release>-mesh-secret` (key `apikey`); enable `mesh.generateApiKey=true` (e.g. `--set` on first install) to have a Job generate the key and patch it in. Create-once — an existing key is never regenerated. Bring your own via `portal-java.mesh.secretName` / `portal-php.mesh.secretName` |
 | Image pull secrets | `global.imagePullSecrets` (overridable per chart) |
 | Registry mirror | `global.imageRegistry` rewrites the registry of **all** images |
-| Telemetry (OpenTelemetry) and monitoring | `global.otel.enabled` → OTel Java agent in CMS, Mesh, Portal Java + optional bundled monitoring stack, see [Telemetry and monitoring](#telemetry-and-monitoring) |
+| Telemetry (OpenTelemetry) and monitoring | `global.otel.enabled` → OTel Java agent in CMS, Mesh, Portal Java, OTel PHP instrumentation in Portal PHP + optional bundled monitoring stack, see [Telemetry and monitoring](#telemetry-and-monitoring) |
 
 ## Quick start
 
@@ -30,7 +30,8 @@ Portal | Java has no pre-built image — build your portal project image and set
 
 The Java components (CMS, Mesh, Portal | Java) can send traces, metrics and logs via
 OpenTelemetry. The OpenTelemetry Java agent is part of the CMS and Mesh images; the chart
-only switches it on. Portal | PHP sends no telemetry.
+only switches it on. Portal | PHP sends traces, when its image contains the OpenTelemetry
+PHP extension and Composer packages (see below).
 
 ### Modes
 
@@ -63,19 +64,24 @@ With telemetry on, a component's pod gets these environment variables:
 
 | Variable | Value |
 |---|---|
-| `JDK_JAVA_OPTIONS` | `-javaagent:<agentPath>`. `JAVA_TOOL_OPTIONS` (heap settings) is not touched. |
-| `OTEL_SERVICE_NAME` | `Gentics CMS`, `Gentics Mesh`, `Gentics Portal Java` |
+| `JDK_JAVA_OPTIONS` | Java components only: `-javaagent:<agentPath>`. `JAVA_TOOL_OPTIONS` (heap settings) is not touched. |
+| `OTEL_PHP_AUTOLOAD_ENABLED` | Portal \| PHP only: `true`, switches on the zero-code instrumentation |
+| `OTEL_METRICS_EXPORTER` / `OTEL_LOGS_EXPORTER` | Portal \| PHP only: `none`, the portal sends traces only |
+| `OTEL_SERVICE_NAME` | `Gentics CMS`, `Gentics Mesh`, `Gentics Portal Java`, `Gentics Portal PHP` |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` / `_PROTOCOL` | component → global → bundled Collector `http://<release>-opentelemetry-collector:4318`; protocol default `http/protobuf` |
 | `OTEL_RESOURCE_ATTRIBUTES` | `service.namespace`, `k8s.namespace.name`, `k8s.pod.name` |
 | `OTEL_EXPORTER_OTLP_HEADERS` | only with `headersSecret` (see below) |
 
 Every setting under `global.otel` can be overridden per component under `cms.otel`,
-`mesh.otel` and `portal-java.otel` (`enabled`, `endpoint`, `protocol`, `headersSecret`,
-`serviceName`, `agentPath`). A variable that you set yourself in the component's
-`extraEnv` (`cms.cms.extraEnv` for the CMS) always wins.
+`mesh.otel`, `portal-java.otel` and `portal-php.otel` (`enabled`, `endpoint`, `protocol`,
+`headersSecret`, `serviceName`, and `agentPath` for the Java components). A variable that
+you set yourself in the component's `extraEnv` (`cms.cms.extraEnv` for the CMS) always wins.
 
 - **Portal | Java:** portal images are project-specific, so `portal-java.otel.agentPath`
   must point at the agent jar in your image. The JVM does not start if the file is missing.
+- **Portal | PHP:** portal images are project-specific, so your image needs the PHP extension
+  `opentelemetry` and the OpenTelemetry Composer packages, as described in the Portal | PHP
+  documentation ("OpenTelemetry"). Without them the portal runs normally but sends no traces.
 - **Don't load the agent twice:** remove any `-javaagent` you added to `JAVA_TOOL_OPTIONS`
   yourself before switching telemetry on.
 - **Authenticated endpoints:** `global.otel.headersSecret` (or `<component>.otel.headersSecret`)

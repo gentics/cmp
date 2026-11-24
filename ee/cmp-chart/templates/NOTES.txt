@@ -18,7 +18,7 @@ Data retention:
 
 {{- $otel := .Values.global.otel | default dict }}
 {{- $telemetry := list }}
-{{- range $component := list "cms" "mesh" "portal-java" }}
+{{- range $component := list "cms" "mesh" "portal-java" "portal-php" }}
 {{- if include "cmp.componentOtelEnabled" (dict "root" $ "component" $component) }}
 {{- $telemetry = append $telemetry $component }}
 {{- end }}

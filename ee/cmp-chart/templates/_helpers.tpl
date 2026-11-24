@@ -83,10 +83,10 @@ true
 {{- end -}}
 
 {{/*
-"true" when a Java component is installed and its telemetry is on, "" otherwise.
-Same rule as gentics-common.otelEnv: <component>.otel.enabled true/false wins,
+"true" when a component is installed and its telemetry is on, "" otherwise.
+Same rule as gentics-common.otelEnv/otelEnvPhp: <component>.otel.enabled true/false wins,
 an absent or null value follows global.otel.enabled.
-Args: (dict "root" $ "component" "cms"|"mesh"|"portal-java")
+Args: (dict "root" $ "component" "cms"|"mesh"|"portal-java"|"portal-php")
 */}}
 {{- define "cmp.componentOtelEnabled" -}}
 {{- $values := index .root.Values .component | default dict -}}

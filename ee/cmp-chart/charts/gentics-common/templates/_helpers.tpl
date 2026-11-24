@@ -288,19 +288,61 @@ Args: (dict "root" $ "local" <otel map> "extraEnv" <env list>
             "defaultServiceName" <string> "defaultAgentPath" <string, "" = required>)
 */}}
 {{- define "gentics-common.otelEnv" -}}
+{{- if include "gentics-common.otelEnabled" . -}}
+{{- $local := .local | default dict -}}
+{{- $agentPath := $local.agentPath | default .defaultAgentPath | required "otel.agentPath is required when telemetry is on for this component: the path of the OpenTelemetry Java agent jar inside the image" -}}
+{{- $runtimeEnv := list (dict "name" "JDK_JAVA_OPTIONS" "value" (printf "-javaagent:%s" $agentPath)) -}}
+{{- include "gentics-common.otelEnvList" (dict "root" .root "local" .local "extraEnv" .extraEnv "defaultServiceName" .defaultServiceName "runtimeEnv" $runtimeEnv) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+OpenTelemetry env vars for a PHP component (Portal | PHP with the OpenTelemetry PHP
+extension and the zero-code instrumentation packages in the image).
+Same on/off, endpoint, protocol, resource, headers and extraEnv rules as
+gentics-common.otelEnv, without the Java agent. Instead it switches on the SDK
+autoloading (OTEL_PHP_AUTOLOAD_ENABLED) and exports traces only: the PHP SDK
+defaults metrics and logs to "otlp" as well, so both are set to "none".
+Args: (dict "root" $ "local" <otel map> "extraEnv" <env list> "defaultServiceName" <string>)
+*/}}
+{{- define "gentics-common.otelEnvPhp" -}}
+{{- if include "gentics-common.otelEnabled" . -}}
+{{- $runtimeEnv := list -}}
+{{- $runtimeEnv = append $runtimeEnv (dict "name" "OTEL_PHP_AUTOLOAD_ENABLED" "value" "true") -}}
+{{- $runtimeEnv = append $runtimeEnv (dict "name" "OTEL_METRICS_EXPORTER" "value" "none") -}}
+{{- $runtimeEnv = append $runtimeEnv (dict "name" "OTEL_LOGS_EXPORTER" "value" "none") -}}
+{{- include "gentics-common.otelEnvList" (dict "root" .root "local" .local "extraEnv" .extraEnv "defaultServiceName" .defaultServiceName "runtimeEnv" $runtimeEnv) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Internal: "true" when telemetry is on for the component, otherwise empty.
+Args: (dict "root" $ "local" <otel map>)
+*/}}
+{{- define "gentics-common.otelEnabled" -}}
 {{- $global := ((.root.Values.global | default dict).otel) | default dict -}}
 {{- $local := .local | default dict -}}
 {{- $enabled := $global.enabled -}}
 {{- if kindIs "bool" $local.enabled -}}
 {{- $enabled = $local.enabled -}}
 {{- end -}}
-{{- if $enabled -}}
-{{- $agentPath := $local.agentPath | default .defaultAgentPath | required "otel.agentPath is required when telemetry is on for this component: the path of the OpenTelemetry Java agent jar inside the image" -}}
+{{- if $enabled -}}true{{- end -}}
+{{- end -}}
+
+{{/*
+Internal: the env list shared by otelEnv and otelEnvPhp. runtimeEnv (the
+runtime-specific variables) comes first, followed by service name, endpoint,
+protocol, headers and resource attributes.
+Args: (dict "root" $ "local" <otel map> "extraEnv" <env list>
+            "defaultServiceName" <string> "runtimeEnv" <env list>)
+*/}}
+{{- define "gentics-common.otelEnvList" -}}
+{{- $global := ((.root.Values.global | default dict).otel) | default dict -}}
+{{- $local := .local | default dict -}}
 {{- $endpoint := $local.endpoint | default $global.endpoint | default (printf "http://%s-opentelemetry-collector:4318" .root.Release.Name) -}}
 {{- $protocol := $local.protocol | default $global.protocol | default "http/protobuf" -}}
 {{- $serviceNamespace := $global.serviceNamespace | default (printf "%s-%s" .root.Release.Namespace .root.Release.Name) -}}
-{{- $env := list -}}
-{{- $env = append $env (dict "name" "JDK_JAVA_OPTIONS" "value" (printf "-javaagent:%s" $agentPath)) -}}
+{{- $env := .runtimeEnv -}}
 {{- $env = append $env (dict "name" "OTEL_SERVICE_NAME" "value" ($local.serviceName | default .defaultServiceName)) -}}
 {{- $env = append $env (dict "name" "OTEL_EXPORTER_OTLP_ENDPOINT" "value" $endpoint) -}}
 {{- $env = append $env (dict "name" "OTEL_EXPORTER_OTLP_PROTOCOL" "value" $protocol) -}}
@@ -322,6 +364,5 @@ Args: (dict "root" $ "local" <otel map> "extraEnv" <env list>
 {{- end -}}
 {{- if $out -}}
 {{ toYaml $out }}
-{{- end -}}
 {{- end -}}
 {{- end -}}
