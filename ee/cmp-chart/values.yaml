@@ -245,7 +245,7 @@ portal-php:
   # Mesh connection is auto-wired to the bundled Mesh service.
   # The API key is read from the "<release>-mesh-secret" secret (shared with portal-java).
 
-  ## OpenTelemetry for the portal (traces only); unset values follow global.otel.
+  ## OpenTelemetry for the portal (traces, optionally metrics); unset values follow global.otel.
   ## Portal images are project-specific: when telemetry is on, your image needs the
   ## PHP extension "opentelemetry" and the OpenTelemetry Composer packages (see the
   ## Portal | PHP documentation, "OpenTelemetry"). Without them no traces are sent.
@@ -254,6 +254,8 @@ portal-php:
   #   endpoint: ""           # empty: global.otel.endpoint, then the bundled Collector
   #   headersSecret: ""      # empty: global.otel.headersSecret
   #   serviceName: ""        # empty: "Gentics Portal PHP"
+  #   metricsEnabled: false  # true: also send metrics (delta temporality; an external
+  #                          # Collector needs the processors of the bundled one, see README)
 
   # for all available options, please check the gentics/gentics-portal-php chart
 

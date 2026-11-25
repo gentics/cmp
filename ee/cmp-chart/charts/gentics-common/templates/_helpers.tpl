@@ -301,15 +301,28 @@ OpenTelemetry env vars for a PHP component (Portal | PHP with the OpenTelemetry 
 extension and the zero-code instrumentation packages in the image).
 Same on/off, endpoint, protocol, resource, headers and extraEnv rules as
 gentics-common.otelEnv, without the Java agent. Instead it switches on the SDK
-autoloading (OTEL_PHP_AUTOLOAD_ENABLED) and exports traces only: the PHP SDK
-defaults metrics and logs to "otlp" as well, so both are set to "none".
+autoloading (OTEL_PHP_AUTOLOAD_ENABLED). Logs are set to "none" (the PHP SDK
+defaults them to "otlp").
+Metrics:   local.metricsEnabled true -> OTEL_METRICS_EXPORTER=otlp, otherwise "none".
+           Every PHP request exports its own metrics at its end, so they are sent
+           with delta temporality. The receiving Collector must give every PHP
+           worker its own series (service.instance.id from k8s.pod.name and
+           process.pid) and turn the metrics into cumulative ones
+           (delta_to_cumulative processor) before a Prometheus exporter, as the
+           bundled Collector of the CMP chart does.
 Args: (dict "root" $ "local" <otel map> "extraEnv" <env list> "defaultServiceName" <string>)
 */}}
 {{- define "gentics-common.otelEnvPhp" -}}
 {{- if include "gentics-common.otelEnabled" . -}}
+{{- $local := .local | default dict -}}
 {{- $runtimeEnv := list -}}
 {{- $runtimeEnv = append $runtimeEnv (dict "name" "OTEL_PHP_AUTOLOAD_ENABLED" "value" "true") -}}
+{{- if $local.metricsEnabled -}}
+{{- $runtimeEnv = append $runtimeEnv (dict "name" "OTEL_METRICS_EXPORTER" "value" "otlp") -}}
+{{- $runtimeEnv = append $runtimeEnv (dict "name" "OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE" "value" "delta") -}}
+{{- else -}}
 {{- $runtimeEnv = append $runtimeEnv (dict "name" "OTEL_METRICS_EXPORTER" "value" "none") -}}
+{{- end -}}
 {{- $runtimeEnv = append $runtimeEnv (dict "name" "OTEL_LOGS_EXPORTER" "value" "none") -}}
 {{- include "gentics-common.otelEnvList" (dict "root" .root "local" .local "extraEnv" .extraEnv "defaultServiceName" .defaultServiceName "runtimeEnv" $runtimeEnv) -}}
 {{- end -}}

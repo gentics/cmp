@@ -30,8 +30,8 @@ Portal | Java has no pre-built image — build your portal project image and set
 
 The Java components (CMS, Mesh, Portal | Java) can send traces, metrics and logs via
 OpenTelemetry. The OpenTelemetry Java agent is part of the CMS and Mesh images; the chart
-only switches it on. Portal | PHP sends traces, when its image contains the OpenTelemetry
-PHP extension and Composer packages (see below).
+only switches it on. Portal | PHP sends traces and, with `portal-php.otel.metricsEnabled=true`,
+metrics, when its image contains the OpenTelemetry PHP extension and Composer packages (see below).
 
 ### Modes
 
@@ -66,7 +66,8 @@ With telemetry on, a component's pod gets these environment variables:
 |---|---|
 | `JDK_JAVA_OPTIONS` | Java components only: `-javaagent:<agentPath>`. `JAVA_TOOL_OPTIONS` (heap settings) is not touched. |
 | `OTEL_PHP_AUTOLOAD_ENABLED` | Portal \| PHP only: `true`, switches on the zero-code instrumentation |
-| `OTEL_METRICS_EXPORTER` / `OTEL_LOGS_EXPORTER` | Portal \| PHP only: `none`, the portal sends traces only |
+| `OTEL_METRICS_EXPORTER` / `OTEL_LOGS_EXPORTER` | Portal \| PHP only: `none`; with `portal-php.otel.metricsEnabled=true` `OTEL_METRICS_EXPORTER=otlp` |
+| `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE` | Portal \| PHP with metrics only: `delta` (see below) |
 | `OTEL_SERVICE_NAME` | `Gentics CMS`, `Gentics Mesh`, `Gentics Portal Java`, `Gentics Portal PHP` |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` / `_PROTOCOL` | component → global → bundled Collector `http://<release>-opentelemetry-collector:4318`; protocol default `http/protobuf` |
 | `OTEL_RESOURCE_ATTRIBUTES` | `service.namespace`, `k8s.namespace.name`, `k8s.pod.name` |
@@ -82,6 +83,13 @@ you set yourself in the component's `extraEnv` (`cms.cms.extraEnv` for the CMS) 
 - **Portal | PHP:** portal images are project-specific, so your image needs the PHP extension
   `opentelemetry` and the OpenTelemetry Composer packages, as described in the Portal | PHP
   documentation ("OpenTelemetry"). Without them the portal runs normally but sends no traces.
+- **Portal | PHP metrics:** `portal-php.otel.metricsEnabled=true`. Every PHP request exports
+  its own metrics when it ends, so they are sent with delta temporality. The bundled
+  Collector gives every PHP worker process its own series (`service.instance.id` =
+  `<pod>/<process.pid>`, processor `transform/php_instance`) and adds up the deltas
+  (`delta_to_cumulative`) for Prometheus. Sum over `instance` in queries. An external
+  Collector needs both processors (see `templates/monitoring-otelcol-config.yaml`) before a
+  Prometheus exporter.
 - **Don't load the agent twice:** remove any `-javaagent` you added to `JAVA_TOOL_OPTIONS`
   yourself before switching telemetry on.
 - **Authenticated endpoints:** `global.otel.headersSecret` (or `<component>.otel.headersSecret`)
