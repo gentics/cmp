@@ -28,19 +28,19 @@
 		<skip.render>false</skip.render>
 
         <!-- Gentics CMS -->
-        <cms.version>9.0.0-SNAPSHOT</cms.version>
+        <cms.version>ci-devtest-SNAPSHOT</cms.version>
         <cms.changelog.version>${cms.version}</cms.changelog.version>
 
         <!-- Gentics Aloha Editor -->
-        <aloha.version>2.1.21</aloha.version>
+        <aloha.version>ci-devtest-SNAPSHOT</aloha.version>
         <aloha.changelog.version>${aloha.version}</aloha.changelog.version>
 
         <!-- Gentics Mesh -->
-        <mesh.version>9.0.0-SNAPSHOT</mesh.version>
+        <mesh.version>ci-devtest-SNAPSHOT</mesh.version>
         <mesh.changelog.version>${mesh.version}</mesh.changelog.version>
 
         <!-- Gentics Portals -->
-        <portals.version>9.0.0-SNAPSHOT</portals.version>
+        <portals.version>ci-devtest-SNAPSHOT</portals.version>
         <portals.changelog.version>${portals.version}</portals.changelog.version>
 
         <!-- ANDP -->
